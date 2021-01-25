@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Windows Quirks</title>
+    
+  </head>
+  <body id="windows-quirks"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Windows Quirks</h1>
+    <p>
+      We aim to make RabbitMQ a first-class citizen on
+      Windows. However, sometimes there are circumstances beyond our
+      control that can introduce quirky behaviour. This page documents
+      them.
+    </p>
+
+    <h3>Cannot install to a path with non-ASCII characters</h3>
+    <p>
+      RabbitMQ will fail to start with the error "<span class="code ">RabbitMQ: Erlang machine stopped instantly (distribution name conflict?)</span>"
+      when installed to a path with
+      non-ASCII characters in it. This is because we need to pass the
+      location of the compiled Erlang files to the Erlang VM. It
+      expects input in UTF-8, but the console will typically use some
+      other encoding.
+    </p>
+    <p><strong>Workarounds:</strong></p>
+    <ul>
+      <li>
+        Override <span class="code ">RABBITMQ_BASE</span> to point to a directory
+        that only has ASCII characters and <em>re-install</em> the
+        service.
+      </li>
+      <li>
+        Edit the file <span class="code ">rabbitmq-server.bat</span> and change the
+        line "<span class="code ">set TDP0=%~dp0</span>" to "
+        <span class="code ">set TDP0=%~dps0</span>". This will use short paths (the
+        infamous <span class="code ">C:\PROGRA~1</span>) everywhere.
+      </li>
+    </ul>
+
+    <h3>rabbitmqctl shows / parses non-ASCII characters incorrectly</h3>
+    <p>
+      Similarly, <span class="code ">rabbitmqctl</span> will expect command line
+      parameters to be encoded in UTF-8, and display strings as
+      UTF-8. The console will instead provide and expect some
+      country-specific encoding.
+    </p>
+    <p><strong>Workarounds:</strong></p>
+    <ul>
+      <li>
+        On recent versions of Windows, issue the command "
+        <span class="code ">chcp 65001</span>" before using <span class="code ">rabbitmqctl</span> to force
+        the console to use UTF-8. (Beware: on older versions
+        including Windows XP this will cause the console to silently
+        fail to run any batch file at all!) <em>or</em>
+      </li>
+      <li>
+        Avoid using non-ASCII characters in object names <em>or</em>
+      </li>
+      <li>
+        Use the <a href="management.html">management plugin</a> instead of
+        <span class="code ">rabbitmqctl</span>.
+      </li>
+    </ul>
+
+    <h3>Installing as a non-administrator user leaves .erlang.cookie
+    in the wrong place</h3>
+    <p>
+      This makes it impossible to use <span class="code ">rabbitmqctl</span>.
+    </p>
+    <p><strong>Workarounds:</strong></p>
+    <ul>
+      <li>
+        Run the installer as an administrator <em>or</em>
+      </li>
+      <li>
+        Copy the file <span class="code ">.erlang.cookie</span> manually
+        from <span class="code ">%SystemRoot%</span> to
+        <span class="code ">%HOMEDRIVE%</span><span class="code ">%HOMEPATH%</span>.
+      </li>
+    </ul>
+    <h3>Shutting down Windows</h3>
+    <p>
+      It is necessary to take precautions when shutting down Windows
+      and using versions of Erlang prior to R15B02. Due to limitations
+      in older versions of the underlying Erlang VM, the broker will
+      not go through a controlled shutdown sequence when Windows
+      shuts down. If RabbitMQ is installed as a service using an older
+      version of Erlang then you must stop the service manually before
+      shutting down Windows. Failure to do so may cause the broker to
+      spend longer on recovery when started subsequently. The use of
+      Erlang R15B02 or later is recommended to avoid this problem.
+    </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/configure.html">Configuration</a></li>
+       <li><a href="/ssl.html">TLS/SSL Support</a></li>
+       <li><a href="/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/clustering.html">Clustering</a></li>
+       <li><a href="/vhosts.html">Virtual Hosts</a></li>
+       <li><a href="/ha.html">High Availability</a></li>
+       <li><a href="/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/access-control.html">Access Control (Authorisation)</a></li>
+       <li><a href="/authentication.html">Authentication Mechanisms</a></li>
+       <li><a href="/ldap.html">LDAP</a></li>
+       <li><a href="/production-checklist.html">Production Checklist</a></li>
+       <li><a href="/alarms.html">Alarms</a></li>
+       <li><a href="/networking.html">Networking</a></li>
+       <li><a href="/memory-use.html">Memory Use</a></li>
+       <li><a href="/lazy-queues.html">Lazy Queues</a></li>
+       <li><a href="/event-exchange.html">Internal Event Exchange</a></li>
+       <li><a href="/firehose.html">Firehose (Message Tracing)</a></li>
+       <li><a href="/manpages.html">Manual Pages</a></li>
+       <li><a href="/windows-quirks.html" class="selected">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/clients.html">Client Documentation</a></li>
+     <li><a href="/plugins.html">Plugins</a></li>
+     <li><a href="/news.html">News</a></li>
+     <li><a href="/protocol.html">Protocol</a></li>
+     <li><a href="/extensions.html">Our Extensions</a></li>
+     <li><a href="/build.html">Building</a></li>
+     
+       <li><a href="/previous.html">Previous Releases</a></li>
+     
+     <li><a href="/mpl.html">License</a></li>
+   </ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

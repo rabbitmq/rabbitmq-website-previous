@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Clustering Communication using SSL</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Clustering Communication using SSL</h1>
+      <div class="docSection"><a name="intro" id="intro"></a>
+        <p class="intro">Sometimes is desirable to make the Erlang
+        nodes talk to each other using SSL, and thus make the whole RabbitMQ
+        cluster communication via SSL. To achieve that we need to make the
+        Erlang distribution mechanism to use SSL. In this document we are
+        going to review the steps to make this possible.</p>
+      </div>
+
+      <div class="docSection"><a name="how-to-linux" id="how-to-linux"></a>
+        <h2 class="docHeading">Linux</h2>
+        <p>First we need to create the SSL certificate that's going to
+        be used by the Erlang distribution mechanism. We assume you have done
+        that already, otherwise follow the guide <a href="/v3_5_7/ssl.html">here</a>.
+        Once we have our certificates ready we need to concatenate the server
+        certificate and key into one file, for example, assuming we have the
+        files <span class="code ">server_certificate.pem</span> and
+        <span class="code ">server_key.pem</span> we can do the following:</p>
+
+<pre class="sourcecode">
+$ cat server_certificate.pem server_key.pem &gt; rabbit.pem
+</pre>
+
+        <p>Then we have to tell Erlang where to find the
+        <span class="code ">ssl</span> library during startup. We can create a variable like
+        this:</p>
+
+<pre class="sourcecode">
+$ echo `erl -eval 'io:format("~p", [code:lib_dir(ssl, ebin)]),halt().' -noshell`
+"/path/to/erl/lib/ssl-5.3.5/ebin"
+$ export ERL_SSL_PATH=/path/to/erl/lib/ssl-5.3.5/ebin
+</pre>
+
+        <p>There first we find where Erlang has the ssl library, and then the
+          variable ERL_SSL_PATH is set with the result from the first command
+          <em>without</em> the double quotes.</p>
+
+        <p>By using the previous information now is time to craft the
+        <span class="code ">$RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS</span> environment variable
+        so RabbitMQ is able to start Erlang using SSL for distribution. We do
+        that by setting the <span class="code ">proto_dist</span> argument to
+        <span class="code ">inet_tls</span> and then telling Erlang what certificate to use
+        (in our case that's the <span class="code ">rabbit.pem</span> file we just
+        created). Finally we set secure renegotiation to
+        <span class="code ">true</span>. Here's the whole command:</p>
+
+<pre class="sourcecode">
+$ export RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-pa ${ERL_SSL_PATH} \
+-proto_dist inet_tls \
+-ssl_dist_opt server_certfile /path/to/rabbit.pem \
+-ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true
+</pre>
+
+        <p>Keep in mind that every Erlang program that tries to
+        communicate with our RabbitMQ server by using Erlang's distribution
+        must now use SSL as well. One of such programs is
+        <span class="code ">rabbitmqctl</span> that we use for administering RabbitMQ. This
+        means we have to do what we just did for
+        <span class="code ">$RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS</span> but this time for
+        the environment variable <span class="code ">RABBITMQ_CTL_ERL_ARGS</span>.</p>
+
+        <p>Now that we have this in place, it's just a matter of
+        starting RabbitMQ as we usually do to get the Erlang distribution to
+        use SSL for internode communication. Keep in mind that other nodes in
+        the cluster that want to join our initial node must use the same
+        certificate and the same
+        <span class="code ">RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS</span> arguments. The same
+        applies for <span class="code ">rabbitmqctl</span>.</p>
+
+      </div>
+
+      <div class="docSection"><a name="how-to-osx" id="how-to-osx"></a>
+        <h2 class="docHeading">OS X</h2>
+        <p>If you are using the OSX Standalone Release, then you need
+        to add some extra arguments in order to run the <span class="code ">erl</span>
+        command to find the path of Erlang's SSL library.  Assuming you are
+        inside the folder where you installed the standalone release, the
+        commands will look like these:</p>
+
+<pre class="sourcecode">
+$ echo erts-6.1/bin/erl -boot releases/3.4.3/start_clean \
+-eval 'io:format("~p", [code:lib_dir(ssl, ebin)]),halt().' -noshell
+"/path/to/erl/lib/ssl-5.3.5/ebin"
+$ export ERL_SSL_PATH=/path/to/erl/lib/ssl-5.3.5/ebin
+</pre>
+
+        <p>The difference is that we need to specify the path to the
+        <span class="code ">erl</span> executable and also provide a path to a boot file,
+        which in our case is inside the releases folder of our standalone
+        installation.</p>
+
+        <p>Once you have ran the previous commands, then you can
+        proceed to create the environment variables as explained above on the
+        <a href="/v3_5_7/clustering-ssl.html#how-to-linux">Linux section</a></p>
+
+      </div>
+
+      <div class="docSection"><a name="how-to-windows" id="how-to-windows"></a>
+        <h2 class="docHeading">Windows</h2>
+
+        <p>Coming soon.</p>
+
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_5_7/configure.html">Configuration</a></li>
+       <li><a href="/v3_5_7/ssl.html">TLS/SSL Support</a></li>
+       <li><a href="/v3_5_7/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_5_7/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_5_7/clustering.html" class="selected">Clustering</a><ul>
+         <li><a href="/v3_5_7/partitions.html">Network Partitions</a></li>
+         <li><a href="/v3_5_7/nettick.html">Net Tick Time</a></li>
+         <li><a href="/v3_5_7/clustering-ssl.html" class="selected">Clustering SSL</a></li>
+       </ul></li>
+       <li><a href="/v3_5_7/ha.html">High Availability</a></li>
+       <li><a href="/v3_5_7/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_5_7/access-control.html">Access Control (Authorisation)</a></li>
+       <li><a href="/v3_5_7/production-checklist.html">Production Checklist</a></li>
+       <li><a href="/v3_5_7/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_5_7/alarms.html">Alarms</a></li>
+       <li><a href="/v3_5_7/networking.html">Networking</a></li>
+       <li><a href="/v3_5_7/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_5_7/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_5_7/manpages.html">Manual Pages</a></li>
+       <li><a href="/v3_5_7/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Troubleshooting</title>
+    
+  </head>
+  <body id="troubleshooting"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Troubleshooting</h1>
+        <dl class="instructions">
+          <dt><strong>Checking Broker Status</strong></dt>
+          <dd>
+            <p>
+              You can use <span class="code ">rabbitmqctl status</span>
+              to verify whether a broker is running.<br />
+              Normal output from a running broker without plugins follows this pattern:
+              <pre>
+  Status of node 'rabbit@xxx' ...
+  [{pid,...},
+   {running_applications,[{rabbit,"RabbitMQ","3.6.14"},
+                          {os_mon,"..."},
+                          {sasl,"..."},
+                          {mnesia,"..."},
+                          {stdlib,"..."},
+                          {kernel,"..."},
+  {os,"..."},
+  {erlang_version,"..."},
+  {memory,"..."}}]</pre>
+            </p>
+            <p>
+              This example indicates that no broker is running:
+              <pre>
+  Status of node 'rabbit@xxx' ...
+  Error: unable to connect to node 'rabbit@xxx': nodedown
+  diagnostics:
+  - nodes and their ports on xxx: [{rabbitmqctl,...}]
+  - current node: 'rabbitmqctlxxx@xxx'
+  - current node home dir: [...]
+  - current node cookie hash: [...]</pre>
+            </p>
+            <p>
+              If the diagnostic line looks like this:
+              <pre>
+  - nodes and their ports on xxx: [{rabbit,...},{rabbitmqctl,...}]</pre>
+  and the <a href="relocate.html">broker log file</a> contains entries
+  similar to
+              <pre>
+  Connection attempt from disallowed node...</pre> then you should
+  make sure the <a href="clustering.html#setup">erlang cookies</a> are
+  the same, e.g. by checking that the cookie hash displayed in the
+  diagnostics is the same as that shown by the broker when it starts
+  up.
+            </p>
+            <p>
+              A common reason for cookie mismatches when invoking
+              rabbitmqctl against a broker on the same host is that
+              broker and rabbitmqctl were run as different
+              user. Evidence of this comes in the form of a mismatch
+              in the node home dir shown by the broker on startup vs
+              what is displayed in the rabbitmqctl diagnostics.
+            </p>
+            <p>
+              In the absence of the "
+              <span class="code ">Connection attempt from disallowed node...</span>" log entry, check that the
+              Erlang distribution port on which the broker is
+              listening is not blocked by a <a href="clustering.html#firewall">firewall</a>. The port
+              is shown in the <span class="code ">{rabbit,...}</span> part of the
+              "<span class="code ">nodes and their ports...</span>" diagnostics
+              line. Try connecting to it with e.g. telnet.
+            </p>
+            <p>
+              If the "<span class="code ">nodes and their ports...</span>" line
+              contains no entry for rabbit then the broker probably
+              isn't running. Check the broker logs for errors.
+            </p>
+          </dd>
+          <dt><strong>Server Fails to Start</strong></dt>
+          <dd>
+            <p>
+              When the server fails to start, usually a crash dump file
+              <span class="code ">erl_crash.dump</span> is created in the directory
+              where the server was started. This can provide very detailed
+              information on the causes of a start up failure, but its
+              analysis requires Erlang expertise.
+            </p>
+            <p>
+          If you attempt to start another server while a broker is already running,
+          then you will receive an error report.
+          You can confirm whether the broker is already running by checking the status.
+            </p>
+            <p>
+              If the server fails to start, examine the console output and
+              the log files in the <b>RABBITMQ_LOG_BASE</b> directory.
+              Configuration and permission errors are frequently the cause, e.g. the
+              Mnesia directory cannot be created.
+            </p>
+          </dd>
+          <dt><strong>Windows Service fails to Install</strong></dt>
+          <dd>
+            <p>
+            If the service fails to install, check the service account has full access permission for
+            <b>RABBITMQ_BASE</b>, <b>RABBITMQ_MNESIA_BASE</b> and
+            <b>RABBITMQ_LOG_BASE</b> directories
+            [<a href="http://www.microsoft.com/windowsxp/using/security/learnmore/accesscontrol.mspx">XP</a>,
+                <a href="http://windows.microsoft.com/en-US/windows-vista/Troubleshoot-access-denied-when-opening-files-or-folders">Vista</a>].
+            </p>
+          </dd>
+          <dt><strong>Windows Service fails to Start</strong></dt>
+          <dd>
+            <p>
+            If the service fails to start, make sure the service has been
+            installed.
+            </p>
+            <p>
+                On starting the service, if the service output reads "
+                <span class="code ">The process terminated unexpectedly</span>" instead, then the
+                service did not start correctly. Check that the
+                environment variables are set correctly. The logfiles in
+                <span class="code ">RABBITMQ_BASE</span> may also contain useful diagnostic
+                information.
+            </p>
+            <p>
+              If <span class="code ">RABBITMQ_BASE</span> path contains non-ASCII characters, RabbitMQ service may fail to start
+              with the error "<span class="code ">RabbitMQ: Erlang machine stopped instantly (distribution name conflict?)</span>". If this is the case,
+              override <span class="code ">RABBITMQ_BASE</span> to point to a directory that only has ASCII characters and <em>re-install</em> the service
+              (restarting will not be sufficient).
+            </p>
+          </dd>
+          <dt><strong>You receive an error message reading "The handle is invalid" after upgrading the Windows Service</strong></dt>
+          <dd>
+            <p>
+            The solution is to uninstall RabbitMQ and Erlang.
+            Then remove all registry keys under <span class="code ">HKLM/SOFTWARE/Ericsson/Erlang/ErlSrv</span>,
+            and then install Erlang and RabbitMQ (in that order).
+            </p>
+            <p>
+            </p>
+          </dd>
+          <dt><strong>Plugin fails to activate</strong></dt>
+          <dd>
+            <p>
+            If a plugin fails to activate, check the output of
+            <span class="code ">rabbitmq-plugins list</span>.
+            </p>
+          </dd>
+          <dt><strong>Problems with SSL</strong></dt>
+          <dd>
+            <p>
+              See <a href="troubleshooting-ssl.html">SSL troubleshooting</a>.
+            </p>
+          </dd>
+
+          <dt><strong>Client Connection Takes a Long Time</strong></dt>
+          <dd>
+            <p>
+              Client connections generally should not take more than a second
+              on networks with reasonable latency. If it takes 10 or more seconds
+              for a client to connect to RabbitMQ, this typically suggests a DNS resolution timeout.
+              This is often the case with environements that use VPN, which may alter DNS servers
+              configuration silently.
+            </p>
+          </dd>
+        </dl>
+        <p>
+          If the server is not behaving as expected during operation,
+          examine the log files and use the <span class="code ">rabbitmqctl</span>
+          commands from the <a href="admin-guide.html">admin guide</a>
+          to obtain further information on the server status.
+        </p>
+        <p>
+          For problems encountered in the handling of network traffic,
+          the <a href="api-guide.html#tracer">RabbitMQ capture and analysis
+          tool</a> may help in the analysis.
+        </p>
+        <p>
+          Failing that, it's possible that we've solved the problem for someone else.
+          Try using the search box at the top of our web pages to find site,
+          mailing list and blog information.
+           You might also check our
+          <a href="https://groups.google.com/forum/#!forum/rabbitmq-users">mailing list archives</a>.
+        </p>
+        <p>
+          If you still can't find a solution to your problem then
+          please post a new message to
+          <a href="https://groups.google.com/forum/#!forum/rabbitmq-users">RabbitMQ mailing list</a>.
+          Please specify what you were trying to do and the error you're getting.
+          Plase also including the log files under <b>RABBITMQ_LOG_BASE</b> in your report.
+        </p>
+  </div><div id="right-nav"></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

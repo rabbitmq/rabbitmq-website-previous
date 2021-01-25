@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_0_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_0_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_0_x/favicon.ico" /><link rel="stylesheet" href="/v3_0_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_0_x/js/site.js"></script><script type="text/javascript" src="/v3_0_x/js/ga-bootstrap.js"></script><title>RabbitMQ - rabbitmq-env.conf(5) manual page</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_0_x/"><img src="/v3_0_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v3_0_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_0_x/download.html">Installation</a></li><li><a href="/v3_0_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_0_x/getstarted.html">Tutorials</a></li><li><a href="/v3_0_x/services.html">Services</a></li><li><a href="/v3_0_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>rabbitmq-env.conf(5) manual page</h1>
+    <p>
+          This is the manual page for
+          <span class="code ">rabbitmq-env.conf(5)</span>.
+        </p>
+    <p><a href="../manpages.html">See a list of all manual pages</a>.
+        </p>
+    <p>
+         For more general documentation, please see the
+         <a href="../admin-guide.html">administrator's guide</a>.
+    </p>
+    <div xml:lang="en" class="refentry" title="rabbitmq-env.conf" lang="en">
+      <a id="idp3257416"></a>
+      <div class="titlepage"></div>
+      <div class="docSection"><a name="Name" id="Name"></a>
+        <h2 class="docHeading">Name</h2>
+        <p>rabbitmq-env.conf — default settings for RabbitMQ AMQP server</p>
+      </div>
+      <div class="docSection"><a name="Description" id="Description"></a>
+        <a id="idp3392360"></a>
+        <h2 class="docHeading">Description</h2>
+        <p><span class="code filename">/etc/rabbitmq/rabbitmq-env.conf</span> contains variable settings that override the
+defaults built in to the RabbitMQ startup scripts.
+        </p>
+        <p>
+The file is interpreted by the system shell, and so should consist of
+a sequence of shell environment variable definitions. Normal shell
+syntax is permitted (since the file is sourced using the shell "."
+operator), including line comments starting with "#".
+        </p>
+        <p>
+In order of preference, the startup scripts get their values from the
+environment, from <span class="code filename">/etc/rabbitmq/rabbitmq-env.conf</span> and finally from the
+built-in default values. For example, for the <span class="code envar">RABBITMQ_NODENAME</span>
+setting,
+        </p>
+        <p>
+          <span class="code envar">RABBITMQ_NODENAME</span>
+        </p>
+        <p>
+from the environment is checked first. If it is absent or equal to the
+empty string, then
+        </p>
+        <p>
+          <span class="code envar">NODENAME</span>
+        </p>
+        <p>
+from <span class="code filename">/etc/rabbitmq/rabbitmq-env.conf</span> is checked. If it is also absent
+or set equal to the empty string then the default value from the
+startup script is used.
+        </p>
+        <p>
+The variable names in /etc/rabbitmq/rabbitmq-env.conf are always equal to the
+environment variable names, with the <span class="code envar">RABBITMQ_</span> prefix removed:
+<span class="code envar">RABBITMQ_NODE_PORT</span> from the environment becomes <span class="code envar">NODE_PORT</span> in the
+<span class="code filename">/etc/rabbitmq/rabbitmq-env.conf</span> file, etc.
+        </p>
+        <p class="example-prefix">For example:</p>
+        <pre class="sourcecode">
+# I am a complete /etc/rabbitmq/rabbitmq-env.conf file.
+# Comment lines start with a hash character.
+# This is a /bin/sh script file - use ordinary envt var syntax
+NODENAME=hare
+        </pre>
+        <p class="example">
+            This is an example of a complete
+            <span class="code filename">/etc/rabbitmq/rabbitmq-env.conf</span> file that overrides the default Erlang
+            node name from "rabbit" to "hare".
+        </p>
+      </div>
+      <div class="docSection"><a name="See also" id="See also"></a>
+        <a id="idp4032680"></a>
+        <h2 class="docHeading">See also</h2>
+        <p>
+          <span class="citerefentry"><span class="refentrytitle">rabbitmq-server</span>(1)</span>
+          <span class="citerefentry"><span class="refentrytitle">rabbitmqctl</span>(1)</span>
+        </p>
+      </div>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_0_x/features.html">Features</a></li>
+     <li><a href="/v3_0_x/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_0_x/configure.html">Configuration</a></li>
+       <li><a href="/v3_0_x/ssl.html">SSL Support</a></li>
+       <li><a href="/v3_0_x/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_0_x/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_0_x/clustering.html">Clustering</a></li>
+       <li><a href="/v3_0_x/ha.html">High Availability</a></li>
+       <li><a href="/v3_0_x/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_0_x/access-control.html">Access Control</a></li>
+       <li><a href="/v3_0_x/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_0_x/memory.html">Flow Control</a></li>
+       <li><a href="/v3_0_x/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_0_x/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_0_x/manpages.html" class="selected">Manual Pages</a><ul>
+         <li><a href="/v3_0_x/man/rabbitmqctl.1.man.html">rabbitmqctl</a></li>
+         <li><a href="/v3_0_x/man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a></li>
+         <li><a href="/v3_0_x/man/rabbitmq-server.1.man.html">rabbitmq-server</a></li>
+         <li><a href="/v3_0_x/man/rabbitmq-service.man.html">rabbitmq-service</a></li>
+         <li><a href="/v3_0_x/man/rabbitmq-echopid.man.html">rabbitmq-echopid</a></li>
+         <li><a href="/v3_0_x/man/rabbitmq-env.conf.5.man.html" class="selected">rabbitmq-env.conf</a></li>
+       </ul></li>
+       <li><a href="/v3_0_x/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_0_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_0_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_0_x/news.html">News</a></li>
+     <li><a href="/v3_0_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_0_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_0_x/build.html">Building</a></li>
+     <li><a href="/v3_0_x/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#Name">Name</a></li><li><a href="#Description">Description</a></li><li><a href="#See also">See also</a></li></ul></div><div id="related-links"><h4>Related Links</h4><ul><li><a href="/v3_0_x/configure.html">Configuration</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_0_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_0_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

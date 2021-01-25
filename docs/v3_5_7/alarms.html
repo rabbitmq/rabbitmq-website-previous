@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Memory and Disk Alarms</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Memory and Disk Alarms</h1>
+    <p>
+      There are two circumstances under which RabbitMQ will stop
+      reading from client network sockets, in order to prevent
+      crashes. They are:
+    </p>
+    <ul>
+      <li>
+        When <a href="memory-use.html">memory use</a> goes above the
+        configured limit.
+      </li>
+      <li>
+        When disk space drops below the configured limit.
+      </li>
+    </ul>
+
+    <p>
+      In both circumstances the server will temporarily <em>block</em>
+      connections - the server will pause reading from the sockets of
+      connected clients which publish messages. Connection
+      heartbeat monitoring will be disabled too. All network
+      connections will show in <span class="code ">rabbitmqctl</span> and the
+      management plugin as either <span class="code ">blocking</span>, meaning they
+      have not attempted to publish and can thus continue or
+      <span class="code ">blocked</span>, meaning they have published and are now
+      paused.
+    </p>
+
+    <p>
+      When running RabbitMQ in a cluster, the memory and disk alarms
+      are cluster-wide; if one node goes over the limit then all nodes
+      will block connections.
+    </p>
+
+    <p>
+      The intent here is to stop producers but let consumers continue
+      unaffected. However, since AMQP permits producers and consumers
+      to operate on the same channel, and on different channels of a
+      single connection, this logic is necessarily imperfect. In
+      practice that does not pose any problems for most applications
+      since the throttling is observable merely as a
+      delay. Nevertheless, other design considerations permitting, it
+      is advisable to only use individual AMQP connections for either
+      producing or consuming.
+    </p>
+
+    <div class="landing-box">
+      <h2>Read more</h2>
+      <ul>
+        <li>
+          <a href="memory.html">How the memory limit works</a>
+        </li>
+        <li>
+          <a href="disk-alarms.html">How the disk limit works</a>
+        </li>
+
+        <li>
+          <a href="connection-blocked.html">How clients can determine if they are blocked</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="docSection"><a name="related" id="related"></a>
+      <h2 class="docHeading">Related concepts</h2>
+      <ul>
+        <li>
+          When the server is close to using all the file descriptors
+          that the OS has made available to it, it will refuse client
+          connections altogether.
+        </li>
+        <li>
+          When clients attempt to publish faster than the server can
+          accept their messages, they go into <a href="flow-control.html">flow control</a>.
+        </li>
+      </ul>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_5_7/configure.html">Configuration</a></li>
+       <li><a href="/v3_5_7/ssl.html">TLS/SSL Support</a></li>
+       <li><a href="/v3_5_7/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_5_7/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_5_7/clustering.html">Clustering</a></li>
+       <li><a href="/v3_5_7/ha.html">High Availability</a></li>
+       <li><a href="/v3_5_7/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_5_7/access-control.html">Access Control (Authorisation)</a></li>
+       <li><a href="/v3_5_7/production-checklist.html">Production Checklist</a></li>
+       <li><a href="/v3_5_7/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_5_7/alarms.html" class="selected">Alarms</a><ul>
+         <li><a href="/v3_5_7/memory.html">Memory Alarms</a></li>
+         <li><a href="/v3_5_7/disk-alarms.html">Disk Alarms</a></li>
+         <li><a href="/v3_5_7/flow-control.html">Flow Control</a></li>
+       </ul></li>
+       <li><a href="/v3_5_7/networking.html">Networking</a></li>
+       <li><a href="/v3_5_7/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_5_7/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_5_7/manpages.html">Manual Pages</a></li>
+       <li><a href="/v3_5_7/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

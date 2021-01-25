@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Priority Queue Support</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Priority Queue Support</h1>
+    <p>
+      RabbitMQ has priority queue implementation in the core as of version <span class="code ">3.5.0</span>.
+    </p>
+    <p>
+      You can declare priority queues using the
+      <span class="code ">x-max-priority</span> argument. This argument should be an integer
+      indicating the maximum priority the queue should support. For example,
+      using the Java client:
+    </p>
+
+    <pre class="code">    Channel ch = ...;
+    Map&lt;String, Object&gt; args = new HashMap&lt;String, Object&gt;();
+    args.put("x-max-priority", 10);
+    ch.queueDeclare("my-priority-queue", true, false, false, args);</pre>
+
+    <p>
+      You can then publish prioritised messages using the
+      <span class="code ">priority</span> field of
+      <span class="code ">basic.properties</span>. Larger numbers indicate higher
+      priority.
+    </p>
+
+    <p>
+      Because the on-disk format for a priority queue is different,
+      <b>priority queues can only be defined by arguments</b>, not
+      policies. Queues can never change the number of priorities they
+      support.
+    </p>
+
+    <h2>Behaviour</h2>
+
+    <p>
+      The AMQP 0-9-1 spec is a bit vague about how priorities work. It says
+      that all queues MUST support at least 2 priorities, and MAY
+      support up to 10. It does not define how messages without a
+      priority property are treated.
+    </p>
+
+    <p>
+      In contrast to the AMQP 0-9-1 spec, RabbitMQ queues by default do not
+      support priorities. When creating priority queues, you can
+      specify as many priority levels as you like. Note that:
+    </p>
+
+    <ul>
+      <li>
+        There is some in-memory and on-disk cost per priority level
+        per queue. There is also an additional CPU cost, especially
+        when consuming, so you may not wish to create huge numbers of
+        levels.
+      </li>
+      <li>
+        The message <span class="code ">priority</span> field is defined as an
+        unsigned byte, so in practice priorities should be between 0
+        and 255.
+      </li>
+    </ul>
+
+    <p>
+      Messages without a <span class="code ">priority</span> property are treated as
+      if their priority were 0. Messages with a priority which is
+      higher than the queue's maximum are treated as if they were
+      published with the maximum priority.
+    </p>
+
+    <h2>Interaction with consumers</h2>
+
+    <p>
+      It's important to understand how consumers work when working
+      with priority queues. By default, consumers may be sent a large
+      number of messages before they acknowledge any, limited only by
+      network backpressure.
+    </p>
+
+    <p>
+      So if such a hungry consumer connects to an empty queue to which
+      messages are subsequently published, the messages may not spend
+      any time at all waiting in the queue. In this case the priority
+      queue will not get any opportunity to prioritise them.
+    </p>
+
+    <p>
+      In most cases you will want to use the <span class="code ">basic.qos</span>
+      method in manual acknowledgement mode on your consumers, to
+      limit the number of messages that can be out for delivery at any
+      time and thus allow messages to be prioritised.
+    </p>
+
+    <h2>Interaction with other features</h2>
+
+    <p>
+      In general priority queues have all the features of standard
+      RabbitMQ queues: they support persistence, paging, mirroring,
+      and so on. There are a couple of interactions that should be
+      noted though:
+    </p>
+
+    <ul>
+      <li>
+        <a href="ttl.html">Messages which should expire</a> will still
+        only expire from the head of the queue. This means that unlike
+        with normal queues, even per-queue TTL can lead to expired
+        lower-priority messages getting stuck behind non-expired
+        higher priority ones. These messages will never be delivered,
+        but they will appear in queue statistics.
+      </li>
+      <li>
+        <a href="maxlength.html">Queues which have a max-length
+        set</a> will, as usual, drop messages from the head of the
+        queue to enforce the limit. This means that higher priority
+        messages might be dropped to make way for lower priority ones,
+        which might not be what you would expect.
+      </li>
+    </ul>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_5_7/confirms.html">Confirms</a></li>
+       <li><a href="/v3_5_7/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_5_7/consumer-prefetch.html">Consumer Prefetch</a></li>
+       <li><a href="/v3_5_7/consumer-priority.html">Consumer Priorities</a></li>
+       <li><a href="/v3_5_7/direct-reply-to.html">Direct reply-to</a></li>
+       <li><a href="/v3_5_7/connection-blocked.html">Blocked Connections</a></li>
+       <li><a href="/v3_5_7/nack.html">basic.nack</a></li>
+       <li><a href="/v3_5_7/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_5_7/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_5_7/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_5_7/ttl.html">TTL</a></li>
+       <li><a href="/v3_5_7/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_5_7/maxlength.html">Length Limit</a></li>
+       <li><a href="/v3_5_7/priority.html" class="selected">Priority Queues</a></li>
+       <li><a href="/v3_5_7/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_5_7/auth-notification.html">Auth Failure</a></li>
+       <li><a href="/v3_5_7/spec-differences.html">Spec Differences</a></li>
+     </ul></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_3_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_3_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_3_x/favicon.ico" /><link rel="stylesheet" href="/v3_3_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_3_x/js/site.js"></script><script type="text/javascript" src="/v3_3_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Protocol Documentation</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_3_x/"><img src="/v3_3_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_3_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_3_x/features.html">Features</a></li><li><a href="/v3_3_x/download.html">Installation</a></li><li><a href="/v3_3_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_3_x/getstarted.html">Tutorials</a></li><li><a href="/v3_3_x/services.html">Services</a></li><li><a href="/v3_3_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Protocol Documentation</h1>
+    <p>
+      AMQP is a standard wire-level protocol and semantic framework
+      for high performance enterprise messaging.
+    </p>
+    <p>
+      From the AMQP website:
+    </p>
+    <blockquote>
+      <p>
+        AMQP is an Open Standard for Messaging Middleware.
+      </p>
+      <p>
+        By complying to the AMQP standard, middleware products
+        written for different platforms and in different
+        languages can send messages to one another. AMQP
+        addresses the problem of transporting value-bearing
+        messages across and between organisations in a timely
+        manner.
+      </p>
+      <p>
+        AMQP enables complete interoperability for messaging
+        middleware; both the networking protocol and the
+        semantics of broker services are defined in AMQP.
+      </p>
+    </blockquote>
+    <p>
+      For more information on what AMQP is, please see
+        the <a href="http://amqp.org/about/what">AMQP
+        Working Group's overview page</a>.
+    </p>
+    <h2 id="downloads">Downloads</h2>
+    <p>
+      All AMQP specifications and protocol definitions are published under
+      the <a href="http://www.amqp.org/legal/amqp-license">AMQP license</a>
+      unless stated otherwise.
+    </p>
+    <table class="styled-table">
+      <tr>
+        <th>Protocol Version</th>
+        <th>Documentation (PDF)</th>
+        <th>Machine-Readable Spec (XML)</th>
+      </tr>
+      <tr>
+        <td>AMQP 0-9-1 (incl. extensions)</td>
+        <td></td>
+        <td>
+          <a href="resources/specs/amqp0-9-1.extended.xml">Full</a> |
+          <a href="resources/specs/amqp0-9-1.stripped.extended.xml">BSD-licensed</a>
+        </td>
+      </tr>
+      <tr>
+        <td>AMQP 0-9-1</td>
+        <td>
+          <a href="resources/specs/amqp0-9-1.pdf">Specification</a> |
+          <a href="resources/specs/amqp-xml-doc0-9-1.pdf">Generated Doc</a>
+        </td>
+        <td>
+          <a href="resources/specs/amqp0-9-1.xml">Full</a> |
+          <a href="resources/specs/amqp0-9-1.stripped.xml">BSD-licensed</a>
+        </td>
+      </tr>
+      <tr>
+        <td>AMQP 0-9</td>
+        <td>
+          <a href="resources/specs/amqp0-9.pdf">Specification</a> |
+          <a href="resources/specs/amqp-xml-doc0-9.pdf">Generated Doc</a>
+        </td>
+        <td>
+          <a href="resources/specs/amqp0-9.xml">Full</a> |
+          <a href="resources/specs/amqp0-9.stripped.xml">BSD-licensed</a>
+        </td>
+      </tr>
+      <tr>
+        <td>AMQP 0-8</td>
+        <td>
+          <a href="resources/specs/amqp0-8.pdf">Specification</a> |
+          <a href="resources/specs/amqp-xml-doc0-8.pdf">Generated Doc</a>
+        </td>
+        <td>
+          <a href="resources/specs/amqp0-8.xml">Full</a> |
+          <a href="resources/specs/amqp0-8.stripped.xml">BSD-licensed</a>
+        </td>
+      </tr>
+    </table>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_3_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_3_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_3_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_3_x/news.html">News</a></li>
+     <li><a href="/v3_3_x/protocol.html" class="selected">Protocol</a><ul>
+       <li><a href="/v3_3_x/specification.html">Compatibility</a></li>
+       <li><a href="/v3_3_x/interoperability.html">Interoperability</a></li>
+       <li><a href="/v3_3_x/semantics.html">Broker Semantics</a></li>
+
+       <li><a href="/v3_3_x/amqp-0-9-1-quickref.html">Quick Reference</a></li>
+       <li><a href="/v3_3_x/amqp-0-9-1-reference.html">Full Reference</a></li>
+       <li><a href="/v3_3_x/amqp-0-9-1-errata.html">Errata</a></li>
+       <li><a href="/v3_3_x/amqp-0-8-to-0-9-1.html">Differences from AMQP 0-8 to 0-9-1</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_3_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_3_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_3_x/mpl.html">License</a></li>
+   </ul></div><div id="related-links"><h4>Related Links</h4><ul><li><a href="/v3_3_x/tutorials/amqp-concepts.html">AMQP Concepts</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_3_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_3_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

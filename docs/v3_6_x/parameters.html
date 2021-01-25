@@ -1,0 +1,425 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Parameters and Policies</title>
+    
+  </head>
+  <body id="parameters"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Parameters and Policies</h1>
+  <div class="docSection"><a name="intro" id="intro"></a>
+    <h2 class="docHeading">Introduction</h2>
+    <p>
+      While much of the configuration for RabbitMQ lives in
+      the <a href="configure.html">configuration file</a>, some things
+      do not mesh well with the use of a configuration file:
+    </p>
+    <ul>
+      <li>If they need to be the same across all nodes in a cluster</li>
+      <li>If they are likely to change at run time</li>
+    </ul>
+    <p>
+      RabbitMQ calls these items <i>parameters</i>. Parameters can be
+      set by
+      invoking <a href="man/rabbitmqctl.1.man.html"><span class="code ">rabbitmqctl</span></a>
+      or through <a href="management.html">the management plugin</a>'s HTTP API.
+      There are 2 kinds of parameters: vhost-scoped parameters and global parameters.
+      Vhost-scoped parameters are tied to a virtual host and consist
+      of a component name, a name and a value.
+      Global parameters are not tied to a particular virtual and they consist
+      of a name and value.
+    </p>
+    <p>
+      One special case of parameters usage is <a href="#policies">policies</a>, which are used for specifying
+      optional arguments for groups of queues and exchanges, as well
+      as plugins such as <a href="/federation.html">Federation</a> and <a href="/shovel.html">Shovel</a>.
+      Policies are vhost-scoped.
+    </p>
+  </div>
+
+  <div class="docSection"><a name="parameter-management" id="parameter-management"></a>
+    <h2 class="docHeading">Global and Per-vhost Parameters</h2>
+    <p>
+      As stated above, there are vhost-scoped parameters and global parameters.
+      An example of vhost-scoped
+      parameter is a federation upstream: it targets a component
+      (<span class="code ">federation-upstream</span>), it has a name that identifies
+      it, it's tied to a virtual host (federation links will target
+      some resources of this virtual host), and its value defines connection
+      parameters to an upstream broker.
+      Vhost-scoped parameters can be set, cleared and listed:
+    </p>
+    <table>
+      <tr>
+        <th>rabbitmqctl</th>
+        <td>
+          <span class="code ">rabbitmqctl set_parameter {-p <i>vhost</i>} <i>component_name</i> <i>name</i> <i>value</i></span><br />
+          <span class="code ">rabbitmqctl clear_parameter {-p <i>vhost</i>} <i>component_name</i> <i>name</i></span><br />
+          <span class="code ">rabbitmqctl list_parameters {-p <i>vhost</i>}</span>
+        </td>
+      </tr>
+      <tr>
+        <th>HTTP API</th>
+        <td>
+          <span class="code ">PUT /api/parameters/<i>component_name</i>/<i>vhost</i>/<i>name</i></span><br />
+          <span class="code ">DELETE /api/parameters/<i>component_name</i>/<i>vhost</i>/<i>name</i></span><br />
+          <span class="code ">GET /api/parameters</span><br />
+        </td>
+      </tr>
+    </table>
+    <p>
+      Global parameters is the other kind of parameters.
+      An example of a global parameter is the name of the cluster.
+      Global parameters can be set, cleared and listed:
+    </p>
+    <table>
+      <tr>
+        <th>rabbitmqctl</th>
+        <td>
+          <span class="code ">rabbitmqctl set_global_parameter <i>name</i> <i>value</i></span><br />
+          <span class="code ">rabbitmqctl clear_global_parameter <i>name</i></span><br />
+          <span class="code ">rabbitmqctl list_global_parameters</span>
+        </td>
+      </tr>
+      <tr>
+        <th>HTTP API</th>
+        <td>
+          <span class="code ">PUT /api/global-parameters/<i>name</i></span><br />
+          <span class="code ">DELETE /api/global-parameters/<i>name</i></span><br />
+          <span class="code ">GET /api/global-parameters</span><br />
+        </td>
+      </tr>
+    </table>
+    <p>
+        Since a parameter value is a JSON document, you will usually
+        need to quote it when creating one on the command line
+        with <span class="code ">rabbitmqctl</span>. On Unix it is usually easiest to
+        quote the whole document with single quotes, and use double
+        quotes within it. On Windows you will have to escape every
+        double quote. We give examples for both Unix and Windows for
+        this reason.
+      </p>
+      <p>
+        Parameters reside in the database used by RabbitMQ for
+        definitions of virtual hosts, exchanges, queues, bindings, users
+        and permissions. Parameters are exported along with other object
+        definitions by the management plugin's export feature.
+    </p>
+    <p>
+        Vhost-scoped parameters are used by the federation and shovel plugins.
+        Global parameters are used by the MQTT plugin.
+    </p>
+    </div>
+
+    <div class="docSection"><a name="policies" id="policies"></a>
+      <h2 class="docHeading">Policies</h2>
+
+      <div class="docSubsection"><a name="why-policies-exist" id="why-policies-exist"></a>
+        <h3 class="docHeading">Why Policies Exist</h3>
+
+        <p>
+          Before we explain what policies are and how to use them it would
+          be helpful to explain why they were introduced to RabbitMQ.
+        </p>
+        <p>
+          In addition to mandatory properties
+          (e.g. <span class="code ">durable</span> or <span class="code ">exclusive</span>),
+          queues and exchanges in RabbitMQ have optional parameters
+          (arguments), sometimes referred to as
+          <span class="code ">x-arguments</span>. Those are provided by clients when
+          they declare queues (exchanges) and control various optional
+          features, such as <a href="/maxlength.html">queue length limit</a> or <a href="/ttl.html">TTL</a>.
+        </p>
+        <p>
+          Client-controlled properties in some of the protocols RabbitMQ supports
+          generally work well but they can be inflexible: updating TTL values
+          or mirroring parameters that way required application changes, redeployment
+          and queue re-declaration (which involves deletion). In addition, there is
+          no way to control the extra arguments for groups of queues and exchanges.
+          Policies were introduced to address the above pain points.
+        </p>
+        <p>
+          A policy matches one or more queues by name (using a regular
+          expression pattern) and appends its definition (a map of
+          optional arguments) to the x-arguments of the matching
+          queues. In other words, it is possible to configure
+          x-arguments for multiple queues at once with a policy, and
+          update them all at once by updating policy definition.
+        </p>
+        <p>
+          In modern versions of RabbitMQ the set of features which can
+          be controlled by policy is not the same as the set of
+          features which can be controlled by client-provided
+          arguments.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="how-policies-work" id="how-policies-work"></a>
+        <h3 class="docHeading">How Policies Work</h3>
+
+        <p>
+          Key policy attributes are
+
+          <ul>
+            <li>
+              name: it can be anything but ASCII-based names without spaces
+              are recommended
+            </li>
+            <li>
+              pattern: a regular expression that matches one or more queue (exchange) names. Any
+              regular expression can be used.
+            </li>
+            <li>
+              definition: a set of key/value pairs (think a JSON document) that will be injected
+              into the map of optional arguments of the matching queues and exchanges
+            </li>
+            <li>
+              priority: see below
+            </li>
+          </ul>
+        </p>
+        <p>
+          Policies automatically match against exchanges and queues,
+          and help determine how they behave. Each exchange or queue
+          will have at most one policy matching (see <a href="#combining-policy-definitions">Combining Policy
+          Definitions</a> below), and each policy then injects a set
+          of key-value pairs (policy definition) on to the matching
+          queues (exchanges).
+        </p>
+        <p>
+          Policies can match only queues, only exchanges, or both.
+          This is controlled using the <span class="code ">apply-to</span> flag
+          when a policy is created.
+        </p>
+        <p>
+          Policies can change at any time. When a policy definition is
+          updated, its effect on matching exchanges and queues will be
+          reapplied. Usually it happens instantaneously but for very
+          busy queues can take a bit of time (say, a few seconds).
+        </p>
+        <p>
+          Policies are matched and applied every time an exchange or
+          queue is created, not just when the policy is created.
+        </p>
+        <p>
+          Policies can be used to configure
+          the <a href="federation.html">federation
+          plugin</a>, <a href="ha.html">mirrored
+          queues</a>, <a href="ae.html">alternate exchanges</a>,
+          <a href="dlx.html">dead lettering</a>,
+          <a href="ttl.html">per-queue TTLs</a>, and
+          <a href="maxlength.html">maximum queue length</a>.
+        </p>
+      </div>
+
+      <p>
+        An example of defining a policy looks like:
+      </p>
+
+      <table>
+        <tr>
+          <th>rabbitmqctl</th>
+          <td>
+            <pre>rabbitmqctl set_policy federate-me "^amq\." '{"federation-upstream-set":"all"}' --priority 1 --apply-to exchanges</pre>
+          </td>
+        </tr>
+        <tr>
+          <th>rabbitmqctl (Windows)</th>
+          <td>
+            <pre>rabbitmqctl set_policy federate-me "^amq\." "{""federation-upstream-set"":""all""}" --priority 1 --apply-to exchanges</pre>
+          </td>
+        </tr>
+        <tr>
+          <th>HTTP API</th>
+          <td>
+            <pre>PUT /api/policies/%2f/federate-me
+                    {"pattern": "^amq\.",
+                     "definition": {"federation-upstream-set":"all"},
+                     "priority": 1,
+                    "apply-to": "exchanges"}</pre>
+          </td>
+        </tr>
+        <tr>
+          <th>Web UI</th>
+          <td>
+            <ul>
+              <li>
+                Navigate to Admin &gt; Policies &gt; Add / update a
+                policy.
+              </li>
+              <li>
+                Enter "federate-me" next to Name, "^amq\." next to
+                Pattern, and select "Exchanges" next to Apply to.
+              </li>
+              <li>
+                Enter "federation-upstream-set" = "all" in the first line next to
+                Policy.
+              </li>
+              <li>
+                Click Add policy.
+              </li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        This matches the value <span class="code ">"all"</span> with the key
+        <span class="code ">"federation-upstream-set"</span> for all exchanges
+        with names beginning with <span class="code ">"amq."</span>, in the
+        virtual host <span class="code ">"/"</span>.
+      </p>
+
+      <p>
+        The <span class="code ">"pattern"</span> argument is a regular expression used
+        to match exchange or queue names.
+      </p>
+
+      <p>
+        In the event that more than one policy can match a given
+        exchange or queue, the policy with the greatest priority applies.
+      </p>
+
+      <p>
+        The <span class="code ">"apply-to"</span> argument can be <span class="code ">"exchanges"</span>,
+        <span class="code ">"queues"</span> or <span class="code ">"all"</span>. The <span class="code ">"apply-to"</span>
+        and <span class="code ">"priority"</span> settings are optional, in which case the
+        defaults are <span class="code ">"all"</span> and <span class="code ">"0"</span> respectively.
+      </p>
+
+
+      <div class="docSubsection"><a name="combining-policy-definitions" id="combining-policy-definitions"></a>
+          <h3 class="docHeading">Combining policy definitions</h3>
+
+          <p>
+            In some cases we might want to apply more than one policy
+            definition to a resource.  For example we might need a queue to
+            be federated and mirrored. At most one policy will apply to a
+            resource at any given time, but we can apply multiple
+            definitions in that policy.
+          </p>
+          <p>
+            A federation policy definition would require an <em>upstream set</em>
+            to be specified, so we would need the <span class="code ">federation-upstream-set</span>
+            key in our definition. On the other hand to define some queues as mirrored,
+            we would need the <span class="code ">ha-mode</span> key to be defined as well for the
+            policy. Since the policy definition is just a JSON object, we can have both
+            keys in the same policy definition.
+          </p>
+          <p>
+            Here's an example:
+          </p>
+
+          <table>
+            <tr>
+              <th>rabbitmqctl</th>
+              <td>
+                <pre>rabbitmqctl set_policy ha-fed "^hf\." '{"federation-upstream-set":"all","ha-mode":"all"}' \
+--priority 1 --apply-to queues</pre>
+              </td>
+            </tr>
+            <tr>
+              <th>rabbitmqctl (Windows)</th>
+              <td>
+                <pre>rabbitmqctl set_policy ha-fed "^hf\." "{""federation-upstream-set"":""all"", ""ha-mode"":""all""}" ^
+--priority 1 --apply-to queues</pre>
+              </td>
+            </tr>
+            <tr>
+              <th>HTTP API</th>
+              <td>
+                <pre>PUT /api/policies/%2f/ha-fed
+{"pattern": "^hf\.",
+ "definition": {"federation-upstream-set":"all", "ha-mode": "all"},
+ "priority": 1,
+ "apply-to": "queues"}</pre>
+              </td>
+            </tr>
+            <tr>
+              <th>Web UI</th>
+              <td>
+                <ul>
+                  <li>
+                    Navigate to Admin &gt; Policies &gt; Add / update a
+                    policy.
+                  </li>
+                  <li>
+                    Enter "ha-fed" next to Name, "^hf\." next to
+                    Pattern, and select "Queues" next to Apply to.
+                  </li>
+                  <li>
+                    Enter "federation-upstream-set" = "all" in the first line next to
+                    Policy.
+                  </li>
+                  <li>
+                    Enter "ha-mode" = "all" on the next line.
+                  </li>
+                  <li>
+                    Click Add policy.
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+
+          <p>
+            By doing that all the queues matched by the pattern "^hf\." will have the <span class="code ">"federation-upstream-set"</span>
+            and the <span class="code ">"ha-mode"</span> definitions applied to them.
+          </p>
+      </div>
+      
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/configure.html" class="selected">Configuration</a><ul>
+         <li><a href="/relocate.html">File Locations</a></li>
+         <li><a href="/persistence-conf.html">Persistence</a></li>
+         <li><a href="/networking.html">Networking</a></li>
+         <li><a href="/parameters.html" class="selected">Parameters and Policies</a></li>
+       </ul></li>
+       <li><a href="/ssl.html">TLS/SSL Support</a></li>
+       <li><a href="/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/clustering.html">Clustering</a></li>
+       <li><a href="/vhosts.html">Virtual Hosts</a></li>
+       <li><a href="/ha.html">High Availability</a></li>
+       <li><a href="/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/access-control.html">Access Control (Authorisation)</a></li>
+       <li><a href="/authentication.html">Authentication Mechanisms</a></li>
+       <li><a href="/ldap.html">LDAP</a></li>
+       <li><a href="/production-checklist.html">Production Checklist</a></li>
+       <li><a href="/alarms.html">Alarms</a></li>
+       <li><a href="/networking.html">Networking</a></li>
+       <li><a href="/memory-use.html">Memory Use</a></li>
+       <li><a href="/lazy-queues.html">Lazy Queues</a></li>
+       <li><a href="/event-exchange.html">Internal Event Exchange</a></li>
+       <li><a href="/firehose.html">Firehose (Message Tracing)</a></li>
+       <li><a href="/manpages.html">Manual Pages</a></li>
+       <li><a href="/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/clients.html">Client Documentation</a></li>
+     <li><a href="/plugins.html">Plugins</a></li>
+     <li><a href="/news.html">News</a></li>
+     <li><a href="/protocol.html">Protocol</a></li>
+     <li><a href="/extensions.html">Our Extensions</a></li>
+     <li><a href="/build.html">Building</a></li>
+     
+       <li><a href="/previous.html">Previous Releases</a></li>
+     
+     <li><a href="/mpl.html">License</a></li>
+   </ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

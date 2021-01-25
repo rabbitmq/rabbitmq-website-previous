@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Sender-selected Distribution</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html">Installation</a></li><li><a href="/v3_4_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Sender-selected Distribution</h1>
+    <p>
+      The routing logic in AMQP does not offer a way for message
+      publishers to select intended recipients. This is the
+      equivalent of entering multiple recipients in the "CC"
+      field of an email. The RabbitMQ broker treats two headers
+      in a special way to overcome this limitation.
+    </p>
+    <p>
+      The values associated with the "CC" and "BCC" header keys will
+      be added to the routing key if they are present. The message
+      will be routed to all destinations matching the routing key
+      supplied as a parameter to the <span class="code ">basic.publish</span>
+      method, as well as the routes supplied in the "CC" and "BCC"
+      headers. The type of "CC" and "BCC" values must be an array
+      of <a href="/v3_4_x/amqp-0-9-1-reference.html#domain.longstr">longstr</a>
+      and these keys are case-sensitive. If the header does not
+      contain "CC" or "BCC" keys then this extension has no effect.
+    </p>
+    <p>
+      The "BCC" key and value will be removed from the message
+      prior to delivery, offering some confidentiality among
+      consumers. This feature is a violation of the AMQP
+      specification which forbids any message modification,
+      including headers. This feature imposes a small
+      performance penalty.
+    </p>
+    <p>
+      This extension is independent of the client. Any AMQP
+      client with the ability to interoperate with RabbitMQ and
+      set header values can make use of this extension.
+    </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_4_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_4_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_4_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_4_x/news.html">News</a></li>
+     <li><a href="/v3_4_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_4_x/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_4_x/confirms.html">Confirms</a></li>
+       <li><a href="/v3_4_x/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_4_x/consumer-prefetch.html">Consumer Prefetch</a></li>
+       <li><a href="/v3_4_x/consumer-priority.html">Consumer Priorities</a></li>
+       <li><a href="/v3_4_x/direct-reply-to.html">Direct reply-to</a></li>
+       <li><a href="/v3_4_x/connection-blocked.html">Blocked Connections</a></li>
+       <li><a href="/v3_4_x/nack.html">basic.nack</a></li>
+       <li><a href="/v3_4_x/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_4_x/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_4_x/sender-selected.html" class="selected">Sender Routing</a></li>
+       <li><a href="/v3_4_x/ttl.html">TTL</a></li>
+       <li><a href="/v3_4_x/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_4_x/maxlength.html">Length Limit</a></li>
+       <li><a href="/v3_4_x/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_4_x/auth-notification.html">Auth Failure</a></li>
+       <li><a href="/v3_4_x/undeprecated.html">Undeprecation</a></li>
+     </ul></li>
+     <li><a href="/v3_4_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_4_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

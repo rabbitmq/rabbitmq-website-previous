@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_1_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_1_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_1_x/favicon.ico" /><link rel="stylesheet" href="/v3_1_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_1_x/js/site.js"></script><script type="text/javascript" src="/v3_1_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Confirms (aka Publisher Acknowledgements)</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_1_x/"><img src="/v3_1_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_1_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_1_x/download.html">Installation</a></li><li><a href="/v3_1_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_1_x/getstarted.html">Tutorials</a></li><li><a href="/v3_1_x/services.html">Services</a></li><li><a href="/v3_1_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Confirms (aka Publisher Acknowledgements)</h1>
+    <p>
+      Using standard AMQP, the only way to guarantee that a
+      message isn't lost is by using transactions -- make the
+      channel transactional, publish the message, commit.  In this
+      case, transactions are unnecessarily heavyweight and
+      decrease throughput by a factor of 250.  To remedy this,
+      a confirmation mechanism was introduced.
+    </p>
+
+    <p>
+      To enable confirms, a client sends the
+      <span class="code ">confirm.select</span> method.  Depending on whether
+      <span class="code ">no-wait</span> was set or not, the broker may respond
+      with a <span class="code ">confirm.select-ok</span>.  Once the
+      <span class="code ">confirm.select</span> method is used on a channel, it
+      is said to be in confirm mode.  A transactional channel
+      cannot be put into confirm mode and once a channel is in
+      confirm mode, it cannot be made transactional.
+    </p>
+
+    <p>
+      Once a channel is in confirm mode, both the broker and the
+      client count messages (counting starts at 1 on the first
+      <span class="code ">confirm.select</span>).  The broker then confirms
+      messages as it handles them by sending a
+      <span class="code ">basic.ack</span> on the same channel. The
+      <span class="code ">delivery-tag</span> field contains the sequence number
+      of the confirmed message.  The broker may also set the
+      <span class="code ">multiple</span> field in <span class="code ">basic.ack</span> to
+      indicate that all messages up to and including the one with
+      the sequence number have been handled.
+    </p>
+
+    <p>
+      In exceptional cases when the broker is unable to handle
+      messages successfully, instead of a <span class="code ">basic.ack</span>,
+      the broker will send a <span class="code ">basic.nack</span>.  In this
+      context, fields of the <span class="code ">basic.nack</span> have the same
+      meaning as the corresponding ones in <span class="code ">basic.ack</span>
+      and the <span class="code ">requeue</span> field should be ignored.  By
+      nack'ing one or more messages, the broker indicates that it
+      was unable to process the messages and refuses responsibility
+      for them; at that point, the client may choose to re-publish
+      the messages.
+    </p>
+
+    <p>
+      After a channel is put into confirm mode, all subsequently
+      published messages will be confirmed or nack'd once.  No
+      guarantees are made as to how soon a message is confirmed.
+      No message will be both confirmed and nack'd.
+    </p>
+
+    <p>
+      An example in Java that publishes a large number of
+      messages to a channel in confirm mode and waits for the
+      acknowledgements can be found <a href="http://hg.rabbitmq.com/rabbitmq-java-client/file/default/test/src/com/rabbitmq/examples/ConfirmDontLoseMessages.java">here</a>.
+    </p>
+
+    <h3 id="when">When will messages be confirmed?</h3>
+
+    <p>
+      The broker will confirm messages once:
+    </p>
+
+    <ul>
+      <li>
+        it decides a message will not be routed to queues<br />
+        (if the <span class="code ">mandatory</span> flag is set then
+        the <span class="code ">basic.return</span> is sent first) <b>or</b>
+      </li>
+      <li>
+        a message has reached all of the queues (and their mirrors) it
+        was routed to, and, if it requires persistence (i.e. the
+        message has been marked as persistent and the queue is
+        durable) has been persisted to disk.
+      </li>
+    </ul>
+
+    <h3>Notes</h3>
+
+    <p>
+      The broker loses persistent messages if it crashes before
+      said messages are written to disk.  Under certain
+      conditions, this causes the broker to behave in surprising
+      ways.
+    </p>
+
+    <p>
+      For instance, consider this scenario:
+      <ol>
+        <li>a client publishes a persistent message to a durable
+          queue</li>
+        <li>a client consumes the message from the queue (noting
+          that the message is persistent and the queue
+          durable), but doesn't yet ack it,</li>
+        <li>the broker dies and is restarted, and</li>
+        <li>the client reconnects and starts consuming messages.</li>
+      </ol>
+      At this point, the client could reasonably assume that the
+      message will be delivered again.  This is not the case: the
+      restart has caused the broker to lose the message.  In order to
+      guarantee persistence, a client should use confirms.  If the
+      publisher's channel had been in confirm mode, the publisher
+      would <em>not</em> have received an ack for the lost message
+      (since the message hadn't been written to disk yet).
+    </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_1_x/features.html">Features</a></li>
+     <li><a href="/v3_1_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_1_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_1_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_1_x/news.html">News</a></li>
+     <li><a href="/v3_1_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_1_x/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_1_x/confirms.html" class="selected">Confirms</a></li>
+       <li><a href="/v3_1_x/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_1_x/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_1_x/nack.html">basic.nack</a></li>
+       <li><a href="/v3_1_x/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_1_x/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_1_x/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_1_x/ttl.html">TTL</a></li>
+       <li><a href="/v3_1_x/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_1_x/maxlength.html">Length Limit</a></li>
+       <li><a href="/v3_1_x/undeprecated.html">Undeprecation</a></li>
+     </ul></li>
+     <li><a href="/v3_1_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_1_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_1_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_1_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 GoPivotal, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

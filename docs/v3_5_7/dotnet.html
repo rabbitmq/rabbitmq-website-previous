@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - .NET/C# AMQP client library and WCF binding</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html" class="selected">Installation</a></li><li><a href="/v3_5_7/documentation.html">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>.NET/C# AMQP client library and WCF binding</h1>
+    <p>
+      The RabbitMQ .NET client is an implementation of an AMQP 0-9-1 client
+      library for C# (and, implicitly, other .NET languages), and a
+      Microsoft's Windows Communication Foundation (WCF) binding that communicates
+      over RabbitMQ.
+    </p>
+
+    <p>
+      The library is open-source, and is dual-licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">the Apache
+      License v2</a> and <a href="mpl.html">the Mozilla Public License
+      v1.1</a>.
+    </p>
+
+    <p>
+      In order to compile or run the RabbitMQ .NET/C# client library,
+      you will need an appropriate .NET SDK or runtime environment
+      available, respectively.
+    </p>
+
+    <p>
+      The .NET/C# RabbitMQ client library should be used in preference to the
+      WCF binding where possible. The WCF binding suffers from a number
+      of limitations and no further development is planned for it.
+      The limitations are described in the WCF Service Model documentation.
+    </p>
+
+    <h3>Version</h3>
+
+    <p>
+      The current release of the RabbitMQ .NET/C# AMQP library is <b>
+      3.5.7</b>. Consult
+      <a href="/releases/rabbitmq-dotnet-client/">the archive</a> if
+      you want to download a version of the RabbitMQ .NET/C# Client
+      library or documentation other than the above.
+    </p>
+
+    <h2>
+      Download the library and documentation
+    </h2>
+
+    <h3>The library</h3>
+
+    <p>
+      The library is available in several compiled forms, and as
+      source:
+    </p>
+
+    <table class="downloads" border="0" cellpadding="0" cellspacing="0"><tr><th class="desc">Description</th><th>Download </th></tr>
+      <tr><td class="desc" id="">
+	Binary, compiled for .NET 4.0 and newer (zip) - includes
+	example code, the WCF binding and WCF examples
+      </td><td><a class="adownload" href="/releases/rabbitmq-dotnet-client/v3.5.7/rabbitmq-dotnet-client-3.5.7-dotnet-4.0.zip">rabbitmq-dotnet-client-3.5.7-dotnet-4.0.zip</a></td><td class="signature"></td></tr>
+      <tr><td class="desc" id="">
+	Source code and tools (zip)
+      </td><td><a class="adownload" href="/releases/rabbitmq-dotnet-client/v3.5.7/rabbitmq-dotnet-client-3.5.7.zip">rabbitmq-dotnet-client-3.5.7.zip</a></td><td class="signature"></td></tr>
+    </table>
+
+    <h3>The documentation</h3>
+    <p>
+      Please refer to the <a href="dotnet-api-guide.html">API guide</a>. There's
+      also <a href="/releases/rabbitmq-dotnet-client/v3.5.7/rabbitmq-dotnet-client-3.5.7-client-htmldoc/html/index.html">an online API reference</a>.
+    </p>
+
+    <h2>GitHub repository</h2>
+    <p>The .NET/C# RabbitMQ client library, WCF binding, and example programs. Please
+      see the <a href="build-dotnet-client.html">build page</a> for
+      instructions on compiling from source-code.</p>
+
+    <p>
+      For information on how to work with the RabbitMQ GitHub
+      repositories, please see <a href="github.html">this page</a>.
+    </p><table class="downloads" border="0" cellpadding="0" cellspacing="0"><tr><th>Snapshot</th><th>Repository checkout command</th><th>Repository overview</th></tr>
+      <tr><td><a class="adownload" href="https://github.com/rabbitmq/rabbitmq-dotnet-client/archives/master">rabbitmq-dotnet-client</a></td><td><code>git clone https://github.com/rabbitmq/rabbitmq-dotnet-client.git</code></td><td><a class="arepo" href="https://github.com/rabbitmq/rabbitmq-dotnet-client">Browse source</a></td></tr>
+    </table>
+
+    <h2>
+      Strong naming
+    </h2>
+
+    <p>
+      The client assembly is strong named. The public key token is 89e7d7c5feba84ce 
+      and the public part of the signing key is 
+<pre>
+00240000048000009400000006020000002400005253413100040000010001008d20ec856aeeb8
+c3153a77faa2d80e6e43b5db93224a20cc7ae384f65f142e89730e2ff0fcc5d578bbe96fa98a71
+96c77329efdee4579b3814c0789e5a39b51df6edd75b602a33ceabdfcf19a3feb832f31d825416
+8cd7ba5700dfbca301fbf8db614ba41ba18474de0a5f4c2d51c995bc3636c641c8cbe76f45717b
+fcb943b5.
+</pre>
+    </p>
+    <h2>Support</h2>
+    <p>
+      For help compiling or installing RabbitMQ, or for general queries, please <a href="contact.html"> contact us</a>.
+    </p>
+  </div><div id="right-nav"><div id="related-links"><h4>Related Links</h4><ul><li><a href="/v3_5_7/dotnet-api-guide.html">.NET Guide</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

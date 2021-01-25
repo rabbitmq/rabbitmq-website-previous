@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - RabbitMQ tutorial - Routing </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div>
+<div id="sidebar" class="tutorial-four">
+   <ul id="tutorials" xml:base="site/tutorials/tutorials-menu.xml.inc">
+
+        <li id="tutorial-one">
+          <h2><span class="tute-num">1</span> <a href="/v3_5_7/tutorials/tutorial-one-python.html">"Hello World!"</a></h2>
+          <p>
+            The simplest thing that does <em>something</em>
+          </p>
+          <p><img src="/v3_5_7/img/tutorials/python-one.png" width="180" /></p>
+          <p>
+          <a href="/v3_5_7/tutorials/tutorial-one-python.html">Python</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-one-java.html">Java</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-one-ruby.html">Ruby</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-one-php.html">PHP</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-one-dotnet.html">C#</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-one-javascript.html">Javascript</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-one-go.html">Go</a>
+          </p>
+        </li>
+
+        <li id="tutorial-two">
+          <h2><span class="tute-num">2</span> <a href="/v3_5_7/tutorials/tutorial-two-python.html">Work queues</a></h2>
+          <p>
+            Distributing tasks among workers
+          </p>
+          <p><img src="/v3_5_7/img/tutorials/python-two.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_5_7/tutorials/tutorial-two-python.html">Python</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-two-java.html">Java</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-two-ruby.html">Ruby</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-two-php.html">PHP</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-two-dotnet.html">C#</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-two-javascript.html">Javascript</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-two-go.html">Go</a>
+          </p>
+        </li>
+
+        <li id="tutorial-three">
+          <h2><span class="tute-num">3</span> <a href="/v3_5_7/tutorials/tutorial-three-python.html">Publish/Subscribe</a></h2>
+          <p>
+            Sending messages to many consumers at once
+          </p>
+          <p><img src="/v3_5_7/img/tutorials/python-three.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_5_7/tutorials/tutorial-three-python.html">Python</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-three-java.html">Java</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-three-ruby.html">Ruby</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-three-php.html">PHP</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-three-dotnet.html">C#</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-three-javascript.html">Javascript</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-three-go.html">Go</a>
+          </p>
+        </li>
+
+        <li id="tutorial-four">
+          <h2><span class="tute-num">4</span> <a href="/v3_5_7/tutorials/tutorial-four-python.html">Routing</a></h2>
+          <p>
+            Receiving messages selectively
+          </p>
+          <p><img src="/v3_5_7/img/tutorials/python-four.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_5_7/tutorials/tutorial-four-python.html">Python</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-four-java.html">Java</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-four-ruby.html">Ruby</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-four-php.html">PHP</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-four-dotnet.html">C#</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-four-javascript.html">Javascript</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-four-go.html">Go</a>
+          </p>
+        </li>
+
+        <li id="tutorial-five">
+          <h2><span class="tute-num">5</span> <a href="/v3_5_7/tutorials/tutorial-five-python.html">Topics</a></h2>
+          <p>
+            Receiving messages based on a pattern
+          </p>
+          <p><img src="/v3_5_7/img/tutorials/python-five.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_5_7/tutorials/tutorial-five-python.html">Python</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-five-java.html">Java</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-five-ruby.html">Ruby</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-five-php.html">PHP</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-five-dotnet.html">C#</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-five-javascript.html">Javascript</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-five-go.html">Go</a>
+          </p>
+        </li>
+
+        <li id="tutorial-six">
+          <h2><span class="tute-num">6</span> <a href="/v3_5_7/tutorials/tutorial-six-python.html">RPC</a></h2>
+          <p>
+            Remote procedure call implementation
+          </p>
+          <p><img src="/v3_5_7/img/tutorials/python-six.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_5_7/tutorials/tutorial-six-python.html">Python</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-six-java.html">Java</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-six-ruby.html">Ruby</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-six-php.html">PHP</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-six-dotnet.html">C#</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-six-javascript.html">Javascript</a>
+          |
+          <a href="/v3_5_7/tutorials/tutorial-six-go.html">Go</a>
+          </p>
+        </li>
+      </ul>
+</div>
+
+<div id="tutorial">
+
+<h2>Routing</h2>
+<h3>(using <a href="https://github.com/videlalvaro/php-amqplib">php-amqplib</a>)</h3>
+<p><div class="aside" xml:base="site/tutorials/tutorials-help.xml.inc">
+    <h3>Prerequisites</h3>
+    <p>
+      This tutorial assumes RabbitMQ is <a href="/v3_5_7/download.html">installed</a> and running
+      on <span class="code ">localhost</span> on standard port (<span class="code ">5672</span>). In case you use
+      a different host, port or credentials, connections settings would require adjusting.
+    </p>
+
+    <h3>Where to get help</h3>
+    <p>
+        If you're having trouble going through this tutorial you can
+        <a href="https://groups.google.com/forum/#!forum/rabbitmq-users">contact us</a> through the mailing list.
+    </p>
+  </div></p>
+<p>In the <a href="tutorial-three-php.html">previous tutorial</a> we built a
+simple logging system. We were able to broadcast log messages to many
+receivers.</p>
+<p>In this tutorial we're going to add a feature to it - we're going to
+make it possible to subscribe only to a subset of the messages. For
+example, we will be able to direct only critical error messages to the
+log file (to save disk space), while still being able to print all of
+the log messages on the console.</p>
+<h2>Bindings</h2>
+<p>In previous examples we were already creating bindings. You may recall
+code like:</p>
+<div class="highlight"><pre><span class="x">$channel-&gt;queue_bind($queue_name, 'logs');</span>
+</pre></div>
+
+
+<p>A binding is a relationship between an exchange and a queue. This can
+be simply read as: the queue is interested in messages from this
+exchange.</p>
+<p>Bindings can take an extra <span class="code ">routing_key</span> parameter. To avoid the
+confusion with a <span class="code ">$channel::basic_publish</span> parameter we're going to call it a
+<span class="code ">binding key</span>. This is how we could create a binding with a key:</p>
+<div class="highlight"><pre><span class="x">$binding_key = 'black';</span>
+<span class="x">$channel-&gt;queue_bind($queue_name, $exchange_name, $binding_key);</span>
+</pre></div>
+
+
+<p>The meaning of a binding key depends on the exchange type. The
+<span class="code ">fanout</span> exchanges, which we used previously, simply ignored its
+value.</p>
+<h2>Direct exchange</h2>
+<p>Our logging system from the previous tutorial broadcasts all messages
+to all consumers. We want to extend that to allow filtering messages
+based on their severity. For example we may want the script which is
+writing log messages to the disk to only receive critical errors, and
+not waste disk space on warning or info log messages.</p>
+<p>We were using a <span class="code ">fanout</span> exchange, which doesn't give us much
+flexibility - it's only capable of mindless broadcasting.</p>
+<p>We will use a <span class="code ">direct</span> exchange instead. The routing algorithm behind
+a <span class="code ">direct</span> exchange is simple - a message goes to the queues whose
+<span class="code ">binding key</span> exactly matches the <span class="code ">routing key</span> of the message.</p>
+<p>To illustrate that, consider the following setup:</p>
+<div class="diagram">
+  <img src="/v3_5_7/img/tutorials/direct-exchange.png" height="170" />
+  <div class="diagram_source">
+    digraph {
+      bgcolor=transparent;
+      truecolor=true;
+      rankdir=LR;
+      node [style="filled"];
+      //
+      P [label="P", fillcolor="#00ffff"];
+      subgraph cluster_X1 {
+        label="type=direct";
+    color=transparent;
+        X [label="X", fillcolor="#3333CC"];
+      };
+      subgraph cluster_Q1 {
+        label="Q1";
+    color=transparent;
+        Q1 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      subgraph cluster_Q2 {
+        label="Q2";
+    color=transparent;
+        Q2 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      C1 [label=&lt;C&lt;font point-size="7"&gt;1&lt;/font&gt;&gt;, fillcolor="#33ccff"];
+      C2 [label=&lt;C&lt;font point-size="7"&gt;2&lt;/font&gt;&gt;, fillcolor="#33ccff"];
+      //
+      P -&gt; X;
+      X -&gt; Q1 [label="orange"];
+      X -&gt; Q2 [label="black"];
+      X -&gt; Q2 [label="green"];
+      Q1 -&gt; C1;
+      Q2 -&gt; C2;
+    }
+  </div>
+</div>
+
+<p>In this setup, we can see the <span class="code ">direct</span> exchange <span class="code ">X</span> with two queues bound
+to it. The first queue is bound with binding key <span class="code ">orange</span>, and the second
+has two bindings, one with binding key <span class="code ">black</span> and the other one
+with <span class="code ">green</span>.</p>
+<p>In such a setup a message published to the exchange with a routing key
+<span class="code ">orange</span> will be routed to queue <span class="code ">Q1</span>. Messages with a routing key of <span class="code ">black</span>
+or <span class="code ">green</span> will go to <span class="code ">Q2</span>. All other messages will be discarded.</p>
+<h2>Multiple bindings</h2>
+<p><div class="diagram">
+  <img src="/v3_5_7/img/tutorials/direct-exchange-multiple.png" height="170" />
+  <div class="diagram_source">
+    digraph {
+      bgcolor=transparent;
+      truecolor=true;
+      rankdir=LR;
+      node [style="filled"];
+      //
+      P [label="P", fillcolor="#00ffff"];
+      subgraph cluster_X1 {
+        label="type=direct";
+    color=transparent;
+        X [label="X", fillcolor="#3333CC"];
+      };
+      subgraph cluster_Q1 {
+        label="Q1";
+    color=transparent;
+        Q1 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      subgraph cluster_Q2 {
+        label="Q2";
+    color=transparent;
+        Q2 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      C1 [label=&lt;C&lt;font point-size="7"&gt;1&lt;/font&gt;&gt;, fillcolor="#33ccff"];
+      C2 [label=&lt;C&lt;font point-size="7"&gt;2&lt;/font&gt;&gt;, fillcolor="#33ccff"];
+      //
+      P -&gt; X;
+      X -&gt; Q1 [label="black"];
+      X -&gt; Q2 [label="black"];
+      Q1 -&gt; C1;
+      Q2 -&gt; C2;
+    }
+  </div>
+</div></p>
+<p>It is perfectly legal to bind multiple queues with the same binding
+key. In our example we could add a binding between <span class="code ">X</span> and <span class="code ">Q1</span> with
+binding key <span class="code ">black</span>. In that case, the <span class="code ">direct</span> exchange will behave
+like <span class="code ">fanout</span> and will broadcast the message to all the matching
+queues. A message with routing key <span class="code ">black</span> will be delivered to both
+<span class="code ">Q1</span> and <span class="code ">Q2</span>.</p>
+<h2>Emitting logs</h2>
+<p>We'll use this model for our logging system. Instead of <span class="code ">fanout</span> we'll
+send messages to a <span class="code ">direct</span> exchange. We will supply the log severity as
+a <span class="code ">routing key</span>. That way the receiving script will be able to select
+the severity it wants to receive. Let's focus on emitting logs
+first.</p>
+<p>As always, we need to create an exchange first:</p>
+<div class="highlight"><pre><span class="x">$channel-&gt;exchange_declare('direct_logs', 'direct', false, false, false);</span>
+</pre></div>
+
+
+<p>And we're ready to send a message:</p>
+<div class="highlight"><pre><span class="x">$channel-&gt;exchange_declare('direct_logs', 'direct', false, false, false);</span>
+<span class="x">$channel-&gt;basic_publish($msg, 'direct_logs', $severity);</span>
+</pre></div>
+
+
+<p>To simplify things we will assume that 'severity' can be one of
+'info', 'warning', 'error'.</p>
+<h2>Subscribing</h2>
+<p>Receiving messages will work just like in the previous tutorial, with
+one exception - we're going to create a new binding for each severity
+we're interested in.</p>
+<div class="highlight"><pre><span class="x">foreach($severities as $severity) {</span>
+<span class="x">    $channel-&gt;queue_bind($queue_name, 'direct_logs', $severity);</span>
+<span class="x">}</span>
+</pre></div>
+
+
+<h2>Putting it all together</h2>
+<div class="diagram">
+  <img src="/v3_5_7/img/tutorials/python-four.png" height="170" />
+  <div class="diagram_source">
+    digraph {
+      bgcolor=transparent;
+      truecolor=true;
+      rankdir=LR;
+      node [style="filled"];
+      //
+      P [label="P", fillcolor="#00ffff"];
+      subgraph cluster_X1 {
+        label="type=direct";
+    color=transparent;
+        X [label="X", fillcolor="#3333CC"];
+      };
+      subgraph cluster_Q2 {
+        label="amqp.gen-S9b...";
+    color=transparent;
+        Q2 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      subgraph cluster_Q1 {
+        label="amqp.gen-Ag1...";
+    color=transparent;
+        Q1 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      C1 [label=&lt;C&lt;font point-size="7"&gt;1&lt;/font&gt;&gt;, fillcolor="#33ccff"];
+      C2 [label=&lt;C&lt;font point-size="7"&gt;2&lt;/font&gt;&gt;, fillcolor="#33ccff"];
+      //
+      P -&gt; X;
+      X -&gt; Q1 [label="info"];
+      X -&gt; Q1 [label="error"];
+      X -&gt; Q1 [label="warning"];
+      X -&gt; Q2 [label="error"];
+      Q1 -&gt; C2;
+      Q2 -&gt; C1;
+    }
+  </div>
+</div>
+
+<p>The code for <span class="code ">emit_log_direct.php</span> class:</p>
+<div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/vendor/autoload.php'</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">PhpAmqpLib\Connection\AMQPStreamConnection</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">PhpAmqpLib\Message\AMQPMessage</span><span class="p">;</span>
+
+<span class="nv">$connection</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AMQPStreamConnection</span><span class="p">(</span><span class="s1">'localhost'</span><span class="p">,</span> <span class="mi">5672</span><span class="p">,</span> <span class="s1">'guest'</span><span class="p">,</span> <span class="s1">'guest'</span><span class="p">);</span>
+<span class="nv">$channel</span> <span class="o">=</span> <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">channel</span><span class="p">();</span>
+
+<span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">exchange_declare</span><span class="p">(</span><span class="s1">'direct_logs'</span><span class="p">,</span> <span class="s1">'direct'</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+
+<span class="nv">$severity</span> <span class="o">=</span> <span class="nv">$argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="k">if</span><span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$severity</span><span class="p">))</span> <span class="nv">$severity</span> <span class="o">=</span> <span class="s2">"info"</span><span class="p">;</span>
+
+<span class="nv">$data</span> <span class="o">=</span> <span class="nb">implode</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nv">$argv</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+<span class="k">if</span><span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$data</span><span class="p">))</span> <span class="nv">$data</span> <span class="o">=</span> <span class="s2">"Hello World!"</span><span class="p">;</span>
+
+<span class="nv">$msg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AMQPMessage</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+
+<span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">basic_publish</span><span class="p">(</span><span class="nv">$msg</span><span class="p">,</span> <span class="s1">'direct_logs'</span><span class="p">,</span> <span class="nv">$severity</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="s2">" [x] Sent "</span><span class="p">,</span><span class="nv">$severity</span><span class="p">,</span><span class="s1">':'</span><span class="p">,</span><span class="nv">$data</span><span class="p">,</span><span class="s2">" </span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+
+<span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
+<span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
+
+<span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+
+
+<p>The code for <span class="code ">receive_logs_direct.php</span>:</p>
+<div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/vendor/autoload.php'</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">PhpAmqpLib\Connection\AMQPStreamConnection</span><span class="p">;</span>
+
+<span class="nv">$connection</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AMQPStreamConnection</span><span class="p">(</span><span class="s1">'localhost'</span><span class="p">,</span> <span class="mi">5672</span><span class="p">,</span> <span class="s1">'guest'</span><span class="p">,</span> <span class="s1">'guest'</span><span class="p">);</span>
+<span class="nv">$channel</span> <span class="o">=</span> <span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">channel</span><span class="p">();</span>
+
+<span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">exchange_declare</span><span class="p">(</span><span class="s1">'direct_logs'</span><span class="p">,</span> <span class="s1">'direct'</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+
+<span class="k">list</span><span class="p">(</span><span class="nv">$queue_name</span><span class="p">,</span> <span class="p">,)</span> <span class="o">=</span> <span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">queue_declare</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+
+<span class="nv">$severities</span> <span class="o">=</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nv">$argv</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$severities</span> <span class="p">))</span> <span class="p">{</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span><span class="s1">'php://stderr'</span><span class="p">,</span> <span class="s2">"Usage: </span><span class="si">$argv[0]</span><span class="s2"> [info] [warning] [error]</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+    <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">foreach</span><span class="p">(</span><span class="nv">$severities</span> <span class="k">as</span> <span class="nv">$severity</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">queue_bind</span><span class="p">(</span><span class="nv">$queue_name</span><span class="p">,</span> <span class="s1">'direct_logs'</span><span class="p">,</span> <span class="nv">$severity</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">echo</span> <span class="s1">' [*] Waiting for logs. To exit press CTRL+C'</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+
+<span class="nv">$callback</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$msg</span><span class="p">){</span>
+  <span class="k">echo</span> <span class="s1">' [x] '</span><span class="p">,</span><span class="nv">$msg</span><span class="o">-&gt;</span><span class="na">delivery_info</span><span class="p">[</span><span class="s1">'routing_key'</span><span class="p">],</span> <span class="s1">':'</span><span class="p">,</span> <span class="nv">$msg</span><span class="o">-&gt;</span><span class="na">body</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">basic_consume</span><span class="p">(</span><span class="nv">$queue_name</span><span class="p">,</span> <span class="s1">''</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="nv">$callback</span><span class="p">);</span>
+
+<span class="k">while</span><span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">callbacks</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">wait</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
+<span class="nv">$connection</span><span class="o">-&gt;</span><span class="na">close</span><span class="p">();</span>
+
+<span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+
+
+<p>If you want to save only 'warning' and 'error' (and not 'info') log
+messages to a file, just open a console and type:</p>
+<div class="highlight"><pre><span class="nv">$ </span>php receive_logs_direct.php warning error &gt; logs_from_rabbit.log
+</pre></div>
+
+
+<p>If you'd like to see all the log messages on your screen, open a new
+terminal and do:</p>
+<div class="highlight"><pre><span class="nv">$ </span>php receive_logs_direct.php info warning error
+ <span class="o">[</span>*<span class="o">]</span> Waiting <span class="k">for </span>logs. To <span class="nb">exit </span>press CTRL+C
+</pre></div>
+
+
+<p>And, for example, to emit an <span class="code ">error</span> log message just type:</p>
+<div class="highlight"><pre><span class="nv">$ </span>php emit_log_direct.php error <span class="s2">"Run. Run. Or it will explode."</span>
+ <span class="o">[</span>x<span class="o">]</span> Sent <span class="s1">'error'</span>:<span class="s1">'Run. Run. Or it will explode.'</span>
+</pre></div>
+
+
+<p>(Full source code for <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log_direct.php">(emit_log_direct.php source)</a>
+and <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs_direct.php">(receive_logs_direct.php source)</a>)</p>
+<p>Move on to <a href="tutorial-five-php.html">tutorial 5</a> to find out how to listen
+for messages based on a pattern.</p></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

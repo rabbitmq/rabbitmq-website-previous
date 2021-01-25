@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Monitoring</title>
+    
+  </head>
+  <body id="monitoring"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Monitoring</h1>
+    <p class="intro">This document is intended to guide you on which RabbitMQ and system metrics
+      are most important to monitor. Monitoring your RabbitMQ installation is an effective means
+      to intercept issues before they affect the rest of your environment and, eventually, your
+      users.
+    </p>
+    <div class="docSection"><a name="system-metrics" id="system-metrics"></a>
+      <h2 class="docHeading">Infrastructure and Kernel Metrics</h2>
+
+      <p>
+        First step towards a useful monitoring system starts with infrastructure and
+        kernel metrics. There are quite a few of them but some are more important than others.
+        The following metrics should be monitored on all nodes in a RabbitMQ cluster and, if possible,
+        all nodes that host applications:
+
+        <ul>
+          <li>CPU (idle, user, system, iowait)</li>
+          <li>Memory (free, cached, buffered)</li>
+          <li>Disk I/O (reads &amp; writes per unit time, I/O wait percentages)</li>
+          <li>Free Disk Space</li>
+          <li>File descriptors used by <span class="code ">beam.smp</span> vs. max system limit</li>
+          <li>Network throughput (bytes received, bytes sent) vs. maximum network link throughput</li>
+          <li><a href="https://www.kernel.org/doc/Documentation/sysctl/vm.txt">VM</a> statistics (dirty page flushes, writeback volume)</li>
+          <li>System load average (<span class="code ">/proc/loadavg</span>)</li>
+        </ul>
+      </p>
+
+      <p>
+        There is no shortage of existing tools (such as Graphite or Datadog) that collect infrastructure
+        and kernel metrics, store and visualise them over periods of time.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="rabbitmq-metrics" id="rabbitmq-metrics"></a>
+      <h2 class="docHeading">RabbitMQ Metrics</h2>
+      <p>
+        The RabbitMQ <a href="management.html">management plugin</a> provides a starting point for
+        monitoring RabbitMQ metrics. One limitation, however, is that only up to one day's worth of
+        metrics are stored. Storing historical metrics can be an important tool to determine the root
+        cause of issues affecting your users or to plan for future capacity.
+      </p>
+      <p>
+        RabbitMQ metrics are made available through the <a href="management.html#http-api">HTTP API</a>
+        via the <a href="https://cdn.rawgit.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_14/priv/www/api/index.html"><span class="code ">api/queues/<i>vhost</i>/<i>qname</i></span></a>
+        endpoint. It is recommended to collect metrics at 60 second intervals because more frequent
+        collection may place too much load on the RabbitMQ server and negatively affect performance.
+      </p>
+      <p>
+        <table>
+          <thead>
+            <tr><td>Metric</td><td>JSON field name</td></tr>
+          </thead>
+          <tbody>
+            <tr><td>Memory</td><td><span class="code ">memory</span></td></tr>
+            <tr><td>Queued Messages</td><td><span class="code ">messages</span></td></tr>
+            <tr><td>Un-acked Messages</td><td><span class="code ">messages_unacknowledged</span></td></tr>
+            <tr><td>Messages Published</td><td><span class="code ">message_stats.publish</span></td></tr>
+            <tr><td>Message Publish Rate</td><td><span class="code ">message_stats.publish_details.rate</span></td></tr>
+            <tr><td>Messages Delivered</td><td><span class="code ">message_stats.deliver_get</span></td></tr>
+            <tr><td>Message Delivery Rate</td><td><span class="code ">message_stats.deliver_get.rate</span></td></tr>
+            <tr><td>Other Message Stats</td><td><span class="code ">message_stats.*</span> (see <a href="https://rawcdn.githack.com/rabbitmq/rabbitmq-management/master/priv/www/doc/stats.html">this document</a>)</td></tr>
+          </tbody>
+        </table>
+      </p>
+    </div>
+
+    <div class="docSection"><a name="third-party-monitoring-tools" id="third-party-monitoring-tools"></a>
+      <h2 class="docHeading">Third Party Monitoring Tools</h2>
+      <p>
+        The following is an alphabetised list of third-party tools to collect RabbitMQ metrics. These
+        tools have the capability to monitor the recommended system and RabbitMQ metrics.
+      </p>
+      <p>
+        <table>
+          <thead>
+            <tr><td>Plugin</td><td>Online Resource(s)</td></tr>
+          </thead>
+          <tbody>
+            <tr><td>AppDynamics</td><td><a href="https://www.appdynamics.com/community/exchange/extension/rabbitmq-monitoring-extension/">AppDynamics</a>, <a href="https://github.com/Appdynamics/rabbitmq-monitoring-extension">GitHub</a></td></tr>
+            <tr><td><span class="code ">collectd</span></td><td><a href="https://github.com/signalfx/integrations/tree/master/collectd-rabbitmq">GitHub</a></td></tr>
+            <tr><td>DataDog</td><td><a href="https://docs.datadoghq.com/integrations/rabbitmq/">DataDog-RabbitMQ Integration</a>, <a href="https://github.com/DataDog/integrations-core/tree/master/rabbitmq">GitHub</a></td></tr>
+            <tr><td>Ganglia</td><td><a href="https://github.com/ganglia/gmond_python_modules/tree/master/rabbit">GitHub</a></td></tr>
+            <tr><td>Graphite</td><td><a href="http://graphite.readthedocs.io/en/latest/tools.html">Tools that work with Graphite</a></td></tr>
+            <tr><td>Munin</td><td><a href="http://munin-monitoring.org/">Munin homepage</a>, <a href="https://github.com/ask/rabbitmq-munin">GitHub</a></td></tr>
+            <tr><td>Nagios</td><td><a href="https://github.com/nagios-plugins-rabbitmq/nagios-plugins-rabbitmq">GitHub</a></td></tr>
+            <tr><td>New Relic</td><td><a href="https://newrelic.com/plugins/vmware-29/95">NewRelic Plugins</a>, <a href="https://github.com/pivotalsoftware/newrelic_pivotal_agent">GitHub</a></td></tr>
+            <tr><td>Prometheus</td><td><a href="https://github.com/deadtrickster/prometheus_rabbitmq_exporter">Prometheus Plugin</a></td></tr> 
+            <tr><td>Zabbix</td><td><a href="http://blog.thomasvandoren.com/monitoring-rabbitmq-queues-with-zabbix.html">Blog article</a></td></tr>
+            <tr><td>Zenoss</td><td><a href="https://www.zenoss.com/product/zenpacks/rabbitmq">RabbitMQ ZenPack</a>, <a href="http://www.youtube.com/watch?v=CAak2ayFcV0">Instructional Video</a></td></tr>
+          </tbody>
+        </table>
+      </p>
+    </div>
+
+    <div class="docSection"><a name="app-metrics" id="app-metrics"></a>
+      <h2 class="docHeading">Application-level Metrics</h2>
+      <p>
+        A system that uses RabbitMQ, or any messaging-based system, is almost always distributed or can
+        be treated as such. In such systems it is often not immediately obvious which component
+        is problematic. Every single one of them, including applications, should be monitored and
+        investigated.
+      </p>
+      <p>
+       Some infrastructure-level and RabbitMQ metrics can demonstrate
+       presence of an unusual system behaviour or issue but can't pin
+       point the root cause. For example, it is easy to tell that a
+       node is running out of disk space but not always easy to tell why.
+       This is where application metrics come in: they can help identify
+       a run-away publisher, a repeatedly failing consumer, a consumer that cannot
+       keep up with the rate, even a downstream service that's experiencing a slowdown
+       (e.g. a missing index in a database used by the consumers).
+      </p>
+      <p>
+        Some client libraries (e.g. RabbitMQ Java client) and frameworks (e.g. Spring AMQP)
+        provide means of registering metrics collectors or collect metrics out of the box.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="log-collection" id="log-collection"></a>
+      <h2 class="docHeading">Log Aggregation</h2>
+      <p>
+        While not technically a metric, one more piece of information can be very useful
+        in troubleshooting a multi-service distributed system: logs. Consider collecting logs
+        from all RabbitMQ nodes as well as all applications (if possible). Like metrics,
+        logs can provide important clues that will help identify the root cause.
+      </p>
+    </div>
+  </div><div id="right-nav"><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#system-metrics">Infrastructure and Kernel Metrics</a></li><li><a href="#rabbitmq-metrics">RabbitMQ Metrics</a></li><li><a href="#third-party-monitoring-tools">Third Party Monitoring Tools</a></li><li><a href="#app-metrics">Application-level Metrics</a></li><li><a href="#log-collection">Log Aggregation</a></li></ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

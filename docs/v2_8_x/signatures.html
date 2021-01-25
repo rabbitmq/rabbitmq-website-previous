@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v2_8_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v2_8_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v2_8_x/favicon.ico" /><link rel="stylesheet" href="/v2_8_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v2_8_x/js/site.js"></script><script type="text/javascript" src="/v2_8_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Signatures</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v2_8_x/"><img src="/v2_8_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v2_8_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v2_8_x/download.html" class="selected">Installation</a></li><li><a href="/v2_8_x/documentation.html">Documentation</a></li><li><a href="/v2_8_x/getstarted.html">Tutorials</a></li><li><a href="/v2_8_x/services.html">Services</a></li><li><a href="/v2_8_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Signatures</h1>
+      <p class="intro">
+	This page describes the signing process we use when building
+	RabbitMQ release packages, and how to verify the signatures on
+	packages you download.
+      </p>
+
+      <div class="docSection"><a name="signing-process" id="signing-process"></a>
+	<p>
+	  When we build package archive files, both binary and source,
+	  we digitally sign them using <a href="http://www.gnupg.org/">GnuPG</a> and <a href="rabbitmq-signing-key-public.asc">our public signing
+	  key</a>.
+    </p>
+      </div>
+
+      <div class="docSection"><a name="importing-gpg-key" id="importing-gpg-key"></a>
+	<h2 class="docHeading">Importing the signing key</h2>
+	<p>
+	  First, you need to import our <a href="rabbitmq-signing-key-public.asc">gpg key</a>. You can do that
+	  using <a href="http://pgp.mit.edu/">MIT PGP Public Key Server</a>:
+	</p>
+	<pre class="sourcecode">gpg --keyserver pgp.mit.edu --recv-keys 0x056E8E56</pre>
+	<p>
+	  or you can download the key from our website directly:
+	</p>
+	<pre class="sourcecode">wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+gpg --import rabbitmq-signing-key-public.asc</pre>
+      </div>
+
+      <div class="docSection"><a name="checking-signatures" id="checking-signatures"></a>
+	<h2 class="docHeading">Checking signatures</h2>
+	<p>
+	  Now you should be able to check signatures for our packages.
+	  The appropriate command for checking a detached signature is
+	</p>
+	<pre class="sourcecode">gpg --verify <i>filename</i>.asc <i>filename</i></pre>
+	<p>
+	  Here's an example session, after having retrieved a RabbitMQ
+	  source archive and its associated detached signature from
+	  the download area:
+	</p>
+	<pre class="sourcecode">
+$ gpg --verify rabbitmq-server_2.1.0-1_all.deb.asc rabbitmq-server_2.1.0-1_all.deb
+gpg: Signature made Tue 14 Sep 2010 02:28:03 PM BST using DSA key ID 056E8E56
+gpg: Good signature from "RabbitMQ Release Signing Key &lt;info@rabbitmq.com&gt;"
+</pre>
+        <p>
+	  If the signature is invalid, you will see a "BAD signature"
+	  message, and you should not use the package.
+	</p>
+	<p>
+	  If the signature is valid, you should expect a "Good
+	  signature" message; if you've not signed our key, you will
+	  see a "Good signature" message along with a warning about
+	  our key being untrusted.
+        </p>
+	<p>
+	  If you trust our key, you can avoid the warning output by
+	  GnuPG by signing it using your own key (to
+	  create your private key run <span class="code ">gpg --gen-key</span>):
+	</p>
+	<pre>gpg --sign-key 0x056E8E56</pre>
+      </div>
+  </div><div id="right-nav"></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v2_8_x/sitemap.html">Sitemap</a> |
+        <a href="/v2_8_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

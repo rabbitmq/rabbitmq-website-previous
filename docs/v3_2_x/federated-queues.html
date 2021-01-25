@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_2_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_2_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_2_x/favicon.ico" /><link rel="stylesheet" href="/v3_2_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_2_x/js/site.js"></script><script type="text/javascript" src="/v3_2_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Federated Queues</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_2_x/"><img src="/v3_2_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_2_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_2_x/features.html">Features</a></li><li><a href="/v3_2_x/download.html">Installation</a></li><li><a href="/v3_2_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_2_x/getstarted.html">Tutorials</a></li><li><a href="/v3_2_x/services.html">Services</a></li><li><a href="/v3_2_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Federated Queues</h1>
+    <div class="docSection"><a name="overview" id="overview"></a>
+      <p>
+        In addition to <a href="federated-exchanges.html">federated
+        exchanges</a>, RabbitMQ supports federated queues. This
+        feature provides a way of balancing the load of a single queue
+        across nodes or clusters.
+      </p>
+
+      <p>
+        A federated queue links to other
+        queues (called <i>upstream</i> queues). It will retrieve
+        messages from upstream queues in order to satisfy demand for
+        messages from local consumers. The upstream queues do not
+        need to be reconfigured and they do not have to be on the same
+        broker or in the same cluster.
+      </p>
+
+      <p>The following diagram demonstrates several federated and unfederated
+      queues in two RabbitMQ nodes connected using queue federation.</p>
+
+      <img src="/v3_2_x/img/federated_queues00.png" width="700" alt="Overview of federated queues" />
+
+      <p>
+        All of the configuration needed to establish the upstream links
+        and the federated queue is in the broker with the federated queue
+        (<i>downstream</i>).
+      </p>
+
+      <h3>Typical Use Cases</h3>
+      <p>
+        The typical use would be to have the same "logical" queue
+        distributed over many brokers. Each broker would declare a federated
+        queue with all the other federated queues upstream. (The links
+        would form a complete bi-directional graph on <i>n</i> queues.)
+      </p>
+      <p>
+        Such a logical distributed queue is capable of having rather
+        higher capacity than a single queue. It will perform best when
+        there is some degree of locality; i.e. as many messages as
+        possible are consumed from the same queue as they were published
+        to, and the federation mechanism only needs to move messages
+        around in order to perform load balancing.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="usage" id="usage"></a>
+      <h2 class="docHeading">Using Federated Queues</h2>
+      <p>
+        Federated queues are declared just like any other queue, by applications.
+        In order for RabbitMQ to recognize that a queue needs to be federated,
+        and what other nodes messages should be consumed from, <i>downstream</i>
+        (consuming) nodes need to be configured.
+      </p>
+      <p>
+        Configuration is done by declaring <i>policies</i>. A policy is
+        a pattern that queue names are matched against. Matching queues will
+        be federated.
+
+        A federated queue can belong to only one policy. If multiple
+        policies match a queue name, the policy with the highest
+        <i>priority</i> is applied.  When two policies have the same
+        priority, the matching one is chosen non-deterministically.
+
+        <img src="/v3_2_x/img/federated_queues01.png" width="700" alt="Federated queue policies" />
+      </p>
+
+      <p>
+        Policies can be configured manually using RabbitMQ management UI,
+        programmatically with <i>rabbitmqctl</i> or over HTTP API.
+      </p>
+
+      <p>
+        A federated queue can be 'upstream'
+        from another federated queue. One can even form 'loops', for
+        example, queue A declares queue B to be upstream from it, and
+        queue B declares queue A to be upstream from it. More complex
+        multiply-connected arrangements are allowed.
+      </p>
+
+      <h2>How It Works</h2>
+      <p>
+        The federated queue will connect to all its upstream queues
+        using AMQP (optionally <a href="ssl.html">secured with
+        SSL</a>). When declaring or configuring the federated queue
+        each upstream queue is listed with the connection properties
+        to be used to establish the link.
+      </p>
+
+      <p>
+        The federated queue will only retrieve messages when it has run
+        out of messages locally, it has consumers that need messages, and
+        the upstream queue has "spare" messages that are not being
+        consumed. The intent is to ensure that messages are only
+        transferred between federated queues when needed. This is
+        implemented using <a href="consumer-priority.html">consumer priorities</a>.
+      </p>
+
+      <p>
+        If messages are forwarded from one queue to another then message
+        ordering is only preserved for messages which have made exactly
+        the same journey between nodes. In some cases messages which were
+        adjacent when published may take different routes to the same node
+        to be consumed; therefore messages can be reordered in the
+        presence of queue federation.
+      </p>
+
+      <p>
+        Each individual queue applies its arguments separately;
+        for example if you set <span class="code ">x-max-length</span> on a federated
+        queue then that queue will have its length limited (possibly
+        discarding messages when it gets full) but other queues that are
+        federated with it will not be affected. Note in particular that
+        when <a href="ttl.html">per-queue or per-message TTL</a> is in
+        use, a message will have its timer reset when it is transferred to
+        another queue.
+      </p>
+
+      <p>
+        Unlike with federated exchanges, there is no limit to how
+        many times a message can be forwarded between federated queues. In
+        a set of mutually-federated queues, messages will move to where
+        the spare consuming capacity is - so if the spare consuming
+        capacity keeps moving around then so will the messages.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="limitations" id="limitations"></a>
+      <h2 class="docHeading">Limitations</h2>
+      <p>
+        <span class="code ">basic.get</span> cannot retrieve messages over
+        federation if there aren't any in a local queue (on the node
+        the client is connected to). Since <span class="code ">basic.get</span> is a
+        synchronous method, the node serving a request would have to
+        block while contacting all the other nodes to retrieve more
+        messages. This wouldn't sit well with federation's
+        availability promise (partition tolerance).
+      </p>
+
+      <p>
+        Brokers running different versions of RabbitMQ can be connected
+        using federation. However, since queue federation requires
+        consumer priorities, it is not possible to federate a queue with a
+        broker running a RabbitMQ version prior to 3.2.0.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="advanced" id="advanced"></a>
+      <h2 class="docHeading">Pitfalls</h2>
+      <p>
+        Federated queues cannot currently cause messages to
+        traverse multiple hops between brokers based solely on need for
+        messages in one place. For example, if you federate queues on
+        nodes A, B and C, with A and B connected and B and C connected,
+        but not A and C, then if messages are available at A and consumers
+        waiting at C then messages will not be transferred from A to C via
+        B unless there is also a consumer at B.
+      </p>
+
+      <p>
+        It is possible to bind a federated queue to a federated
+        exchange. However, the results may be unexpected to some.
+        Since a federated exchange will retrieve messages from its
+        upstream that match its bindings, any message published to a
+        federated exchange will be copied to any nodes that matching
+        bindings. A federated queue will then move these messages
+        around between nodes, and it is therefore possible to end up
+        with multiple copies of the same message on the same node.
+      </p>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_2_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_2_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_2_x/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_2_x/management.html">Management plugin</a></li>
+       <li><a href="/v3_2_x/federation.html" class="selected">Federation plugin</a><ul>
+         <li><a href="/v3_2_x/federated-exchanges.html">Exchanges</a></li>
+         <li><a href="/v3_2_x/federated-queues.html" class="selected">Queues</a></li>
+         <li><a href="/v3_2_x/federation-reference.html">Reference</a></li>
+       </ul></li>
+       <li><a href="/v3_2_x/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v3_2_x/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_2_x/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_2_x/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_2_x/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_2_x/plugin-development.html">Plugin development</a></li>
+     </ul></li>
+     <li><a href="/v3_2_x/news.html">News</a></li>
+     <li><a href="/v3_2_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_2_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_2_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_2_x/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#overview"></a></li><li><a href="#usage">Using Federated Queues</a></li><li><a href="#limitations">Limitations</a></li><li><a href="#advanced">Pitfalls</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_2_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_2_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

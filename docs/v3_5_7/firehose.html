@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Firehose Tracer</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Firehose Tracer</h1>
+      <div class="docSection">
+	<p>
+	  Sometimes, during development or debugging, it's useful to
+	  be able to see every message that is published, and every
+	  message that is delivered. RabbitMQ has a "firehose"
+	  feature, where the administrator can enable (on a per-node,
+	  per-vhost basis) an exchange to which publish- and
+	  delivery-notifications should be CCed.
+	</p>
+        <p>
+          These notifications are close to what's happening on the
+          wire - for example you will see unacked messages.
+        </p>
+	<p>
+	  When the feature is switched off, it has no effect on
+	  performance; when it is switched on, performance will drop
+	  somewhat due to additional messages being generated and
+	  routed.
+	</p>
+        <div class="docSubsection">
+	  <h3 class="docHeading">Enabling the firehose</h3>
+	  <ol>
+	    <li>
+	      Decide which node, and which vhost, you want to enable
+	      it for. In the examples below, we assume the default
+	      vhost, "<span class="code ">/</span>", and the default node
+	      "<span class="code ">rabbit@(hostname)</span>". Use the
+	      <span class="code ">-n</span> argument to specify a node other than,
+	      and the <span class="code ">-p</span> argument to specify another
+	      vhost.
+	    </li>
+	    <li>
+	      Within your chosen vhost create queues, bind them to the
+	      topic exchange <span class="code ">amq.rabbitmq.trace</span>, and
+	      begin consuming.
+	    </li>
+	    <li>
+	      Run <span class="code ">rabbitmqctl trace_on</span>.
+            </li>
+	  </ol>
+        </div>
+        <div class="docSubsection">
+	  <h3 class="docHeading">Disabling the firehose</h3>
+	  <ol>
+	    <li>
+	      Run <span class="code ">rabbitmqctl trace_off</span>.
+	    </li>
+	    <li>
+	      Clean up the queues used by the firehose.
+	    </li>
+	  </ol>
+          <p>
+            Note that the firehose state is not persistent; it will
+            default of off at server start time.
+          </p>
+        </div>
+        <div class="docSubsection">
+	  <h3 class="docHeading">Firehose notification format</h3>
+	  <p>
+	    The firehose publishes messages to the topic exchange
+	    <span class="code ">amq.rabbitmq.trace</span> with
+	  </p>
+	  <ul>
+	    <li>
+	      routing key either
+	      "<span class="code ">publish.<i>exchangename</i></span>", for messages
+	      entering the broker, or
+	      "<span class="code ">deliver.<i>queuename</i></span>", for messages
+	      leaving the broker;
+	    </li>
+	    <li>
+	      headers containing metadata about the original message:
+              <p>
+                <table>
+                  <tr><th>Header</th><th>Type</th><th>Description</th></tr>
+                  <tr>
+                    <td>exchange_name</td>
+                    <td>longstr</td>
+                    <td>
+                      name of the exchange to which the message was
+                      published
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>routing_keys</td>
+                    <td>array</td>
+                    <td>
+                      routing key plus contents of
+                      <a href="sender-selected.html"><span class="code ">CC</span> and
+                      <span class="code ">BCC</span> headers</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>properties</td>
+                    <td>table</td>
+                    <td><a href="amqp-0-9-1-reference.html#class.basic">content properties</a></td>
+                  </tr>
+                  <tr>
+                    <td>node</td>
+                    <td>longstr</td>
+                    <td>Erlang node on which the trace message was generated</td>
+                  </tr>
+                  <tr>
+                    <td>redelivered</td>
+                    <td>signedint</td>
+                    <td>
+                      whether the message has its redelivered flag set
+                      (messages leaving the broker only)
+                    </td>
+                  </tr>
+                </table>
+              </p>
+	    </li>
+	    <li>
+	      body corresponding to the body of the original message
+	    </li>
+	  </ul>
+        </div>
+      </div>
+      <div class="docSection">
+        <h2 class="docHeading">Tracing plugin</h2>
+        <p>
+          The <span class="code ">rabbitmq_tracing</span> <a href="plugins.html">plugin</a> builds on top of the tracer
+          and provides a GUI to capture traced messages and log them
+          in text or JSON format files.
+        </p>
+      </div>
+
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_5_7/configure.html">Configuration</a></li>
+       <li><a href="/v3_5_7/ssl.html">TLS/SSL Support</a></li>
+       <li><a href="/v3_5_7/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_5_7/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_5_7/clustering.html">Clustering</a></li>
+       <li><a href="/v3_5_7/ha.html">High Availability</a></li>
+       <li><a href="/v3_5_7/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_5_7/access-control.html">Access Control (Authorisation)</a></li>
+       <li><a href="/v3_5_7/production-checklist.html">Production Checklist</a></li>
+       <li><a href="/v3_5_7/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_5_7/alarms.html">Alarms</a></li>
+       <li><a href="/v3_5_7/networking.html">Networking</a></li>
+       <li><a href="/v3_5_7/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_5_7/firehose.html" class="selected">Firehose / Tracing</a></li>
+       <li><a href="/v3_5_7/manpages.html">Manual Pages</a></li>
+       <li><a href="/v3_5_7/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

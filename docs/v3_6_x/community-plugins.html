@@ -1,0 +1,373 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Community Plugins</title>
+    
+  </head>
+  <body id="community-plugins"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Community Plugins</h1>
+      <div class="docSection"><a name="overview" id="overview"></a>
+        <p>
+          For your convenience, we offer binary downloads of plugins
+          which have been contributed by authors in the
+          community. These plugins do not ship with the RabbitMQ
+          server itself; you can download them from
+          our community plugin archive.
+        </p>
+        <p>
+          The plugins are available compiled against various releases
+          of RabbitMQ.
+        </p>
+        <p>
+          We offer no guarantee that these will even work
+          against a given release of RabbitMQ. We build them at
+          release time, and also when requested to by a plugin
+          author.
+        </p>
+        <p>
+          The download links on this page let you download the latest
+          build of the plugin, compiled against the latest feature
+          release of RabbitMQ. Bugfix releases do not affect plugin
+          compatibility. For older versions of plugins
+          see <a href="https://dl.bintray.com/rabbitmq/community-plugins/">the archive</a>. See also
+          <a href="installing-plugins.html">how to install additional
+          plugins</a>.
+        </p>
+
+        <p>
+          When RabbitMQ is upgraded, all community plugins must be re-installed.
+          This may mean installing newer versions of them. Alternatively,
+          they can be disabled before or during the upgrade.
+        </p>
+
+        <p>
+          If you are the author of a plugin and would like it listed
+          here, please <a href="contact.html">get in touch</a>!
+        </p>
+      </div>
+      <div class="docSection"><a name="routing" id="routing"></a>
+        <h2 class="docHeading">Routing</h2>
+
+        <table class="plugins">
+          <tr><th>rabbitmq_lvc_exchange</th></tr><tr><td>
+            The last value exchange acts like a direct exchange (binding
+            keys are compared for equality with routing keys); but it
+            also keeps track of the last value that was published with
+            each routing key, and when a queue is bound, it
+            automatically enqueues the last value for the binding key.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_lvc/_latestVersion#files">Download</a></li>
+              <li>Maintainer: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-lvc-exchange">rabbitmq/rabbitmq/rabbitmq-lvc-exchange</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_rtopic_exchange</th></tr><tr><td>
+            Adds a reverse topic exchange which lets you provide
+            routing patterns at publishing time, instead of at
+            binding time.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_rtopic_exchange/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Alvaro Videla</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-rtopic-exchange">rabbitmq/rabbitmq-rtopic-exchange</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_recent_history_exchange</th></tr><tr><td>
+            <i>
+              As of RabbitMQ 3.6.0 the <a href="https://github.com/rabbitmq/rabbitmq-recent-history-exchange#readme">recent history exchange plugin</a>
+              is provided with the broker's package.
+            </i>
+          </td></tr>
+
+
+          <tr><th>rabbitmq_delayed_message_exchange</th></tr><tr><td>
+            A plugin that adds delayed-messaging (or
+            scheduled-messaging) to RabbitMQ.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_delayed_message_exchange/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Alvaro Videla</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-delayed-message-exchange">rabbitmq/rabbitmq-delayed-message-exchange</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_routing_node_stamp</th></tr><tr><td>
+            A plugin that stamps a message with the node who first
+            received it.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_routing_node_stamp/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-routing-node-stamp">rabbitmq/rabbitmq-routing-node-stamp</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_message_timestamp</th></tr><tr><td>
+            A plugin that adds a timestamp when a message first enters
+            RabbitMQ.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_message_timestamp/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-message-timestamp">rabbitmq/rabbitmq-message-timestamp</a></li>
+            </ul>
+          </td></tr>
+        </table>
+      </div>
+
+      <div class="docSection"><a name="auth" id="auth"></a>
+        <h2 class="docHeading">Authentication / Authorisation</h2>
+
+        <table class="plugins">
+          <tr><th>rabbitmq_auth_backend_http</th></tr><tr><td>
+            Provides the ability for your RabbitMQ server to perform
+            authentication (determining who can log in) and
+            authorisation (determining what permissions they have)
+            by making requests to an HTTP server.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_auth_backend_http/_latestVersion#files">Download for RabbitMQ 3.6.7+</a></li>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_auth_backend_http/v3.6.x#files">Download for RabbitMQ 3.6.0 through 3.6.6</a></li>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-auth-backend-http">rabbitmq/rabbitmq-auth-backend-http</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_auth_backend_amqp</th></tr><tr><td>
+            Provides the ability for your RabbitMQ server to perform
+            authentication and authorisation over AMQP itself.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_auth_backend_amqp/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-auth-backend-amqp">rabbitmq/rabbitmq-auth-backend-amqp</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_auth_backend_ip_range</th></tr><tr><td>
+            Provides the ability for your RabbitMQ server to perform
+            authorisation based on the client IP address.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_auth_backend_ip_range/_latestVersion#files">Download</a></li>
+              <li>Authors: <b>Petr Gotthard</b></li>
+              <li>Github: <a href="https://github.com/gotthardp/rabbitmq-auth-backend-ip-range">gotthardp/rabbitmq-auth-backend-ip-range</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_trust_store</th></tr><tr><td>
+            Provides support for TLS (x509) certificate whitelisting.
+            All plugins which use the global TLS options will be
+            configured with the same whitelist. This plugin is provided with
+            the broker's package.
+            <ul>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-trust-store">rabbitmq/rabbitmq-trust-store</a></li>
+            </ul>
+          </td></tr>
+        </table>
+      </div>
+
+      <div class="docSection"><a name="mgmt" id="mgmt"></a>
+        <h2 class="docHeading">Management</h2>
+        <table class="plugins">
+          <tr><th>rabbitmq_top</th></tr><tr><td>
+            Adds a "top" like view of busy processes to the
+            management plugin. This plugin is provided with the broker's
+            package.
+            <ul>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-top">rabbitmq/rabbitmq-top</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_management_exchange</th></tr><tr><td>
+            Adds an exchange type which allows you to connect to the
+            management API using AMQP rather than HTTP.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_management_exchange/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-management-exchange">rabbitmq/rabbitmq-management-exchange</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_event_exchange</th></tr><tr><td>
+            <i>
+              As of RabbitMQ 3.6.0 the <a href="https://github.com/rabbitmq/rabbitmq-event-exchange#readme">event exchange plugin</a>
+              is provided with the broker's package.
+            </i>
+          </td></tr>
+
+          <tr><th>rabbitmq_management_themes</th></tr><tr><td>
+            Adds the possibility to customize the management web UI
+            look.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_management_themes/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-management-themes">rabbitmq/rabbitmq-management-themes</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_boot_steps_visualiser</th></tr><tr><td>
+            Adds a tab to the management UI which displays boot steps
+            in a graph. This is a debugging tool: it is of no use in a
+            production broker.
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_boot_steps_visualiser/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Alvaro Videla</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-boot-steps-visualiser">rabbitmq/rabbitmq-boot-steps-visualiser</a></li>
+            </ul>
+          </td></tr>
+        </table>
+      </div>
+
+      <div class="docSection"><a name="distributed" id="distributed"></a>
+        <h2 class="docHeading">Clustering and Distributed RabbitMQ</h2>
+        <table class="plugins">
+          <tr><th>autocluster</th></tr><tr><td>
+            Adds the possibility to automatically cluster RabbitMQ nodes
+            using Consul, etcd or DNS for service discovery.
+            <ul>
+              <li><r:community-plugin-link xmlns:r="http://www.rabbitmq.com/namespaces/ad-hoc/conformance"></r:community-plugin-link></li>
+              <li>Author: <b>Gavin M. Roy</b></li>
+              <li>Github: <a href="https://github.com/aweber/rabbitmq-autocluster">aweber/rabbitmq-autocluster</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_clusterer</th></tr><tr><td>
+            Provides an alternative way of cluster formation. This plugin is deprecated.
+
+            <ul>
+              <li><a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_clusterer/_latestVersion#files">Download</a></li>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-clusterer">rabbitmq/rabbitmq-clusterer</a></li>
+            </ul>
+          </td></tr>
+        </table>
+      </div>
+
+      <div class="docSection"><a name="logging" id="logging"></a>
+        <h2 class="docHeading">Logging</h2>
+        <table class="plugins">
+          <tr><th>lager</th></tr><tr><td>
+            Basho's <i>Lager</i> logging framework as a RabbitMQ plugin.
+            <ul>
+              <li>Download: <a href="https://bintray.com/rabbitmq/community-plugins/goldrush/_latestVersion#files">goldrush</a></li>
+              <li>Download: <a href="https://bintray.com/rabbitmq/community-plugins/lager/_latestVersion#files">lager</a></li>
+            </ul>
+            <ul>
+              <li>Author: <b>Basho Technologies</b></li>
+              <li>Github (Lager): <a href="https://github.com/basho/lager">basho/lager</a></li>
+              <li>Github (RabbitMQ packaging / notes): <a href="https://github.com/hyperthunk/rabbitmq-lager">hyperthunk/rabbitmq-lager</a></li>
+            </ul>
+          </td></tr>
+        </table>
+      </div>
+
+      <div class="docSection"><a name="queues" id="queues"></a>
+        <h2 class="docHeading">Queues</h2>
+        <table class="plugins">
+          <tr><th>rabbitmq_priority_queue</th></tr><tr><td>
+            <i>
+              As of RabbitMQ 3.5.0 the <a href="priority.html">priority queue</a> plugin is
+              integrated into the broker. Users of the plugin
+              upgrading from previous versions of RabbitMQ should:
+            </i>
+            <ul>
+              <li>Install the new version of RabbitMQ</li>
+              <li>Invoke: <span class="code ">rabbitmq-plugins disable rabbitmq_priority_queue</span></li>
+              <li>Start the server</li>
+            </ul>
+          </td></tr>
+        </table>
+        <table class="plugins">
+          <tr><th>rabbitmq_sharding</th></tr><tr><td>
+            <i>
+              As of RabbitMQ 3.6.0 the <a href="https://github.com/rabbitmq/rabbitmq-sharding#readme">sharding plugin</a>
+              is provided with the broker's package.
+            </i>
+          </td></tr>
+        </table>
+      </div>
+
+      <div class="docSection"><a name="protocols" id="protocols"></a>
+        <h2 class="docHeading">Protocols</h2>
+        <table class="plugins">
+
+
+          <tr><th>rabbitmq_coap_pubsub</th></tr><tr><td>
+            Implements the Publish-Subscribe Broker for the Constrained
+            Application Protocol (CoAP) as specified in the
+            <a href="https://www.ietf.org/id/draft-koster-core-coap-pubsub-02.txt">draft-koster-core-coap-pubsub-02</a>.
+            <ul>
+              <li>Download: <a href="https://bintray.com/rabbitmq/community-plugins/gen_coap/_latestVersion#files">gen_coap</a></li>
+              <li>Download: <a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_coap_pubsub/_latestVersion#files">rabbitmq_coap_pubsub</a></li>
+            </ul>
+            <ul>
+              <li>Authors: <b>Petr Gotthard</b></li>
+              <li>GitHub: <a href="https://github.com/gotthardp/rabbitmq-coap-pubsub">gotthardp/rabbitmq-coap-pubsub</a></li>
+            </ul>
+          </td></tr>
+          <tr><th>rabbitmq_email</th></tr><tr><td>
+            Maps SMTP to AMQP (to convert an incoming email to an AMQP
+            message) and AMQP to SMTP (to send an email from an AMQP message).
+            <ul>
+              <li>Download: <a href="https://bintray.com/rabbitmq/community-plugins/gen_smtp/_latestVersion#files">gen_smtp</a></li>
+              <li>Download: <a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_email/_latestVersion#files">rabbitmq_email</a></li>
+            </ul>
+            <ul>
+              <li>Authors: <b>Petr Gotthard</b></li>
+              <li>GitHub: <a href="https://github.com/gotthardp/rabbitmq-email">gotthardp/rabbitmq-email</a></li>
+            </ul>
+          </td></tr>
+          <tr><th>pgsql_listen_exchange</th></tr><tr><td>
+            Translates PostgreSQL NOTIFY messages to AMQP messages and
+            publishes them to bound queues. The PostgreSQL NOTIFY
+            message channel is used as the routing key for the message
+            using direct exchange style routing mechanics.
+            <ul>
+              <li>Author: <b>Gavin M. Roy</b></li>
+              <li>Github: <a href="https://github.com/aweber/pgsql-listen-exchange">aweber/pgsql-listen-exchange</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_web_mqtt</th></tr><tr><td>
+            Provides support for MQTT-over-WebSockets.
+            <ul>
+              <li>Download: <a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_web_mqtt/_latestVersion#files">rabbitmq_web_mqtt</a></li>
+              <li>Author: <b>Team RabbitMQ</b></li>
+              <li>Github: <a href="https://github.com/rabbitmq/rabbitmq-web-mqtt">rabbitmq/rabbitmq-web-mqtt</a></li>
+            </ul>
+          </td></tr>
+        </table>
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+   
+     <li><a href="/install-windows.html">Install: Windows</a></li>
+     <li><a href="/install-debian.html">Install: Debian / Ubuntu</a></li>
+     <li><a href="/install-rpm.html">Install: RPM-based Linux</a></li>
+     <li><a href="/install-standalone-mac.html">Install: Mac OS X</a></li>
+     <li><a href="/install-homebrew.html">Install: Homebrew</a></li>
+     <li><a href="/install-windows-manual.html">Install: Windows (manual)</a></li>
+     <li><a href="/install-generic-unix.html">Install: Generic Unix</a></li>
+     <li><a href="/install-solaris.html">Install: Solaris</a></li>
+     <li class="gap-after"><a href="/ec2.html">Install: EC2</a></li>
+     <li><a href="/platforms.html">Supported Platforms</a></li>
+     <li><a href="/changelog.html">Changelog</a></li>
+     <li><a href="/which-erlang.html">Erlang Versions</a></li>
+     <li class="gap-after"><a href="/signatures.html">Signed Packages</a></li>
+     <li><a href="/java-client.html">Java Client Downloads</a></li>
+     <li><a href="/dotnet.html">.NET Client Downloads</a></li>
+     <li><a href="/erlang-client.html">Erlang Client Downloads</a></li>
+     <li class="gap-after"><a href="/community-plugins.html" class="selected">Community Plugins</a></li>
+     <li><a href="/snapshots.html">Snapshots</a></li>
+     
+   
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#overview"></a></li><li><a href="#routing">Routing</a></li><li><a href="#auth">Authentication / Authorisation</a></li><li><a href="#mgmt">Management</a></li><li><a href="#distributed">Clustering and Distributed RabbitMQ</a></li><li><a href="#logging">Logging</a></li><li><a href="#queues">Queues</a></li><li><a href="#protocols">Protocols</a></li></ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

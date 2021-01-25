@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Exchange to Exchange Bindings</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html">Installation</a></li><li><a href="/v3_4_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Exchange to Exchange Bindings</h1>
+    <p>
+      The <span class="code ">queue.bind</span> AMQP method binds a queue to an
+      exchange so that messages flow (subject to various criteria)
+      from the exchange (the <em>source</em>) to the queue (the
+      <em>destination</em>). We have introduced an
+      <span class="code ">exchange.bind</span> AMQP method which binds one
+      exchange to another exchange. The binding is semantically
+      identical to exchange-to-queue bindings: unidirectional,
+      binding keys and exchange types operate as normal, but both
+      endpoints (the source and destination) of the binding are
+      exchanges. This allows far richer routing topologies to be
+      created. Note the <span class="code ">source</span> and
+      <span class="code ">destination</span> fields in the
+      <span class="code ">exchange.bind</span> method reflect the flow of
+      messages: from the exchange at the source, and to the
+      exchange at the destination.
+    </p>
+
+    <p>
+      Just like with <span class="code ">queue.bind</span>, multiple distinct
+      bindings can be created between the same
+      binding-endpoints. We detect and eliminate cycles during
+      message delivery, and ensure that transitively, over any
+      routing topology, for every queue to which a given message
+      is routed, each queue will receive exactly one copy of that
+      message. Exchanges which are declared as
+      <span class="code ">auto-delete</span> will still be removed when all
+      their bindings are removed, regardless of whether those
+      bindings are to queues or exchanges. Note that an
+      auto-delete exchange will only be deleted when bindings for
+      which the exchange is the <em>source</em> are removed: if
+      you add exchange-to-exchange bindings for which the given
+      exchange is the <em>destination</em> then that exchange will
+      not be auto-deleted on removal of those bindings.
+    </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_4_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_4_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_4_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_4_x/news.html">News</a></li>
+     <li><a href="/v3_4_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_4_x/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_4_x/confirms.html">Confirms</a></li>
+       <li><a href="/v3_4_x/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_4_x/consumer-prefetch.html">Consumer Prefetch</a></li>
+       <li><a href="/v3_4_x/consumer-priority.html">Consumer Priorities</a></li>
+       <li><a href="/v3_4_x/direct-reply-to.html">Direct reply-to</a></li>
+       <li><a href="/v3_4_x/connection-blocked.html">Blocked Connections</a></li>
+       <li><a href="/v3_4_x/nack.html">basic.nack</a></li>
+       <li><a href="/v3_4_x/e2e.html" class="selected">e2e bindings</a></li>
+       <li><a href="/v3_4_x/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_4_x/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_4_x/ttl.html">TTL</a></li>
+       <li><a href="/v3_4_x/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_4_x/maxlength.html">Length Limit</a></li>
+       <li><a href="/v3_4_x/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_4_x/auth-notification.html">Auth Failure</a></li>
+       <li><a href="/v3_4_x/undeprecated.html">Undeprecation</a></li>
+     </ul></li>
+     <li><a href="/v3_4_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_4_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

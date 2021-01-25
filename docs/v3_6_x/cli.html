@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Command Line Tools </title>
+    
+  </head>
+  <body id="cli"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Command Line Tools </h1>
+
+
+<p>RabbitMQ comes with multiple command line tools:</p>
+<ul>
+<li><a href="/man/rabbitmqctl.1.man.html">rabbitmqctl</a> for general administrative/operator tasks</li>
+<li><a href="/man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a> for plugin management</li>
+<li><a href="/management-cli.html">rabbitmqadmin</a> for operator tasks over <a href="/management.html">HTTP API</a></li>
+</ul>
+<p>Different tools cover different usage scenarios. For example, <span class="code ">rabbitmqctl</span> is usually
+only available to RabbitMQ administrator given that it provides full control over a node,
+including virtual host, user and permission management, destructive operations
+on node's data and so on.</p>
+<p>Most RabbitMQ tools use a shared secret (Erlang cookie) authentication mechanism. This
+implies that <a href="/networking.html">inter-node and CLI communication ports</a> (by default) must be open
+for external connections on the target node.</p>
+<p><span class="code ">rabbitmqadmin</span> is built on top of the HTTP API and uses a different mechanism, and only
+HTTP API port open.</p>
+<h2>rabbitmqctl</h2>
+<p><a href="/man/rabbitmqctl.1.man.html">rabbitmqctl</a> is the original CLI tool that ships with RabbitMQ.
+It supports a wide range of operations, mostly administrative (operational) in nature.</p>
+<p>This includes</p>
+<ul>
+<li>Stopping node</li>
+<li>Access to node status, effective configuration, health checks</li>
+<li>Virtual host management</li>
+<li>User and permission management</li>
+<li>Policy management</li>
+<li>Listing queues, connections, channels, exchanges, consumers</li>
+<li>Cluster membership management</li>
+</ul>
+<p>and more.</p>
+<p><span class="code ">rabbitmqctl</span> uses shared secret authentication (described below) with server nodes.</p>
+<h2>rabbitmq-plugins</h2>
+<p><a href="/man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a> is a tool that manages plugins:
+lists, enables and disables them. It ships with RabbitMQ.</p>
+<p>It supports both online (when target node is running) and offline mode (changes
+take effect on node restart).</p>
+<p><span class="code ">rabbitmq-plugins</span> uses shared secret authentication (described below) with server nodes.</p>
+<h2>How CLI tools Authenticate Nodes (and Nodes to Each Other): the Erlang Cookie</h2>
+<p>RabbitMQ nodes and CLI tools (with the exception of <span class="code ">rabbitmqadmin</span>) use a
+cookie to determine whether they are allowed to communicate with
+each other. For a CLI tool and a node to be able to communicate they must have
+the same shared secret called the Erlang cookie. The cookie is
+just a string of alphanumeric characters up to 255 characters in size.
+It is usually stored in a local file. The file
+must be only accessible to the owner (e.g. have UNIX permissions of <span class="code ">600</span> or similar).
+Every cluster node must have the same cookie.</p>
+<p>If the file does not exist, Erlang VM will automatically create
+one with a randomly generated value when the RabbitMQ server
+starts up.</p>
+<p>Erlang cookie management is best done using automation tools such as Chef, BOSH, Docker
+or similar.</p>
+<h3>Cookie File Locations</h3>
+<h4>Linux, MacOS, *BSD</h4>
+<p>On UNIX systems, the cookie will be typically
+located in <span class="code ">/var/lib/rabbitmq/.erlang.cookie</span> (used by the server)
+and <span class="code ">$HOME/.erlang.cookie</span> (used by CLI tools). Note that since the value
+of <span class="code ">$HOME</span> varies from user to user, it's necessary to place a copy of
+the cookie file for each user that will be using the CLI tools. This could be one
+non-privileged user and <span class="code ">root</span>.</p>
+<h4>Windows</h4>
+<p>On Windows, the locations are <span class="code ">C:\Users\\{Username}\.erlang.cookie</span> (<span class="code ">%HOMEDRIVE% + %HOMEPATH%\\.erlang.cookie</span>)
+or <span class="code ">C:\Documents and Settings\&lt;i&gt;Current User&lt;/i&gt;\.erlang.cookie</span>, and
+<span class="code ">C:\Windows\.erlang.cookie</span> for RabbitMQ Windows service.
+If Windows service is used, the cookie should be placed in both places.</p>
+<h4>Runtime Arguments</h4>
+<p>As an alternative, you can add the option "<span class="code ">-setcookie &lt;i&gt;value&lt;/i&gt;</span>"
+in the <span class="code ">RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS</span> <a href="/configure.html">environment variable value</a>:</p>
+<pre class="sourcecode ini">
+RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="-setcookie cookie-value"
+</pre>
+
+<p>This is the least secure option and generally not recommended.</p>
+<h3>Authentication Failures</h3>
+<p>When the cookie is misconfigured (for example, not identical), RabbitMQ will log errors
+such as "Connection attempt from disallowed node" and "Could not auto-cluster". When
+a CLI tool such as <span class="code ">rabbitmqctl</span> fails to authenticate with RabbitMQ,
+the message usually says</p>
+<pre class="sourcecode ini">
+* epmd reports node 'rabbit' running on port 25672 
+* TCP connection succeeded but Erlang distribution failed 
+* suggestion: hostname mismatch? 
+* suggestion: is the cookie set correctly? 
+* suggestion: is the Erlang distribution using TLS? 
+</pre>
+
+<p>This means that TCP connection from a CLI tool to a RabbitMQ node
+succeded but authentication attempt was rejected by the server. The
+message also mentions several most common reasons for that, which are
+covered next.</p>
+<h4>Possible Reason 1: Misplaced or Missing Cookie File</h4>
+<p>An incorrectly placed cookie file or cookie value mismatch are most
+common scenarios for such failures.</p>
+<p>RabbitMQ node logs its cookie hash on start. CLI tools print their
+cookie hash value when they fail to authenticate with the target node.</p>
+<p>When a recent Erlang/OTP version is used, authentication failures contain
+more information and cookie mismatches can be identified better:</p>
+<pre class="sourcecode ini">
+rabbit@warp10:
+  * connected to epmd (port 4369) on warp10
+  * epmd reports node 'rabbit' running on port 25672
+  * TCP connection succeeded but Erlang distribution failed
+
+  * Authentication failed (rejected by the remote node), please check the Erlang cookie
+
+current node details:
+- node name: 'rabbitmq-cli-63@warp10'
+- home dir: /home/username
+- cookie hash: Sg08R8+G85EYHZ3H/9NUfg==
+</pre>
+
+<h4>Possible Reason 2: Inter-node Connections Require TLS</h4>
+<p>If RabbitMQ is set up to <a href="http://www.rabbitmq.com/clustering-ssl.html">encrypt inter-node and CLI connections using TLS</a>,
+CLI tools also must use TLS and therefore require additional options.
+Non-TLS connections from other nodes and CLI tools will fail.</p>
+<h4>Possible Reason 3: Hostname Mismatch</h4>
+<p>Other reasons include a hostname mismatch in node name used by the target RabbitMQ node and that provided
+to the CLI tool (e.g. via the <span class="code ">-n</span> flag). For example, if a node runs using <span class="code ">rabbit@rmq1.eng.megacorp.local</span>
+as its name but <span class="code ">rabbitmqctl</span> is invoked as</p>
+<pre class="sourcecode ini">
+rabbitmqctl status -n rabbit@rmq-dev.eng.megacorp.local
+</pre>
+
+<p>then even if <span class="code ">rmq-dev.eng.megacorp.local</span> and <span class="code ">rmq1.eng.megacorp.local</span> resolve to the same IP address,
+the server will reject <span class="code ">rabbitmqctl</span>'s authentication attempt. This scenario is relatively
+rare.</p>
+<p>When a recent Erlang/OTP version is used, authentication failures contain
+more information and hostname mismatches can be identified better:</p>
+<pre class="sourcecode ini">
+rabbit@localhost:
+  * connected to epmd (port 4369) on localhost
+  * epmd reports node 'rabbit' running on port 25672
+  * TCP connection succeeded but Erlang distribution failed
+
+  * Hostname mismatch: node "rabbit@warp10" believes its host is different. Please ensure that hostnames resolve the same way locally and on "rabbit@warp10"
+
+current node details:
+- node name: 'rabbitmq-cli-30@warp10'
+- home dir: /Users/antares
+- cookie hash: Sg08R8+G85EYHZ3H/9NUfg==
+</pre>
+
+<h4>Other Possible Reasons</h4>
+<p>Just like with any network connection, CLI-to-node connections can fail due to</p>
+<ul>
+<li>Hostname resolution issues</li>
+<li>IP routing issues</li>
+<li>TCP port access (firewalls, etc) issues</li>
+</ul>
+<p>and so on.</p>
+<p><a href="/networking.html">RabbitMQ Networking guide</a> contains a section on troubleshooting of networking-related issues.</p>
+<h2>rabbitmqadmin</h2>
+<p><a href="/management-cli.html">rabbitmqadmin</a> is a command line tool that's built on top of <a href="/management.html">RabbitMQ HTTP API</a>.
+It is not a replacement for <span class="code ">rabbitmqctl</span> and provides access to a subset of most commonly
+performed operations provided by the <a href="/management.html">management UI</a>.</p>
+<p>The tool requires Python 2.7.9 or a more recent version.</p>
+<p><span class="code ">rabbitmqadmin</span> uses HTTP API authentication mechanism (basic HTTP authentication). It has to be
+downloaded separately from a running node or <a href="https://github.com/rabbitmq/rabbitmq-management/blob/stable/bin/rabbitmqadmin">GitHub</a>.</p></div><div id="right-nav"></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

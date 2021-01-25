@@ -1,0 +1,449 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - RabbitMQ STOMP Adapter </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>RabbitMQ STOMP Adapter </h1>
+
+
+<p>The <a href="http://stomp.github.com">STOMP</a> plugin adds support for the STOMP
+protocol to <a href="http://www.rabbitmq.com">RabbitMQ</a>. The adapter supports
+<a href="http://stomp.github.com/stomp-specification-1.0.html">STOMP 1.0</a>,
+<a href="http://stomp.github.com/stomp-specification-1.1.html">STOMP 1.1</a> and
+<a href="http://stomp.github.com/stomp-specification-1.2.html">STOMP 1.2</a>.
+with some extensions and restrictions (described <a href="#pear">here</a>).</p>
+<h2><a id="ifb"></a>Installing from binary</h2>
+<p>The STOMP adapter is included in the RabbitMQ distribution.  To enable
+it, use <a href="/v3_5_7/man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a>:</p>
+<pre><span class="code ">rabbitmq-plugins enable rabbitmq_stomp
+</span></pre>
+<h2><a id="caifs"></a>Compiling and installing from source</h2>
+<p>To build the STOMP adapter from source, follow the instructions for
+building the umbrella repository contained in the
+<a href="/v3_5_7/plugin-development.html">Plugin Development Guide</a>.</p>
+<p>You need to install the <span class="code ">rabbitmq_stomp.ez</span> and <span class="code ">amqp_client.ez</span> packages.</p>
+<h2><a id="cta"></a>Configuring the adapter</h2>
+<p>When no configuration is specified the STOMP Adapter will listen on
+all interfaces on port 61613 and have a default user login/passcode
+of <span class="code ">guest</span>/<span class="code ">guest</span>.</p>
+<p>To change this, edit your
+<a href="/v3_5_7/configure.html#configuration-file">Configuration file</a>,
+to contain a <span class="code ">tcp_listeners</span> variable for the <span class="code ">rabbitmq_stomp</span> application.</p>
+<p>For example, a complete configuration file which changes the listener
+port to 12345 would look like:</p>
+<pre><span class="code ">[
+  {rabbitmq_stomp, [{tcp_listeners, [12345]}]}
+].
+</span></pre>
+<p>while one which changes the listener to listen only on localhost (for
+both IPv4 and IPv6) would look like:</p>
+<pre><span class="code ">[
+  {rabbitmq_stomp, [{tcp_listeners, [{"127.0.0.1", 61613},
+                                     {"::1",       61613}]}]}
+].
+</span></pre>
+<h2>TLS/SSL Support</h2>
+<p>To use SSL for STOMP connections, <a href="/v3_5_7/ssl.html">SSL must be configured</a> in the broker. To enable
+STOMP SSL connections, add a listener configuration to the
+<span class="code ">ssl_listeners</span> variable for the <span class="code ">rabbitmq_stomp</span> application. For example:</p>
+<pre><span class="code ">[{rabbit,          [
+                    {ssl_options, [{cacertfile, "/path/to/tls/ca/cacert.pem"},
+                                   {certfile,   "/path/to/tls/server/cert.pem"},
+                                   {keyfile,    "/path/to/tls/server/key.pem"},
+                                   {verify,     verify_peer},
+                                   {fail_if_no_peer_cert, true}]}
+                   ]},
+  {rabbitmq_stomp, [{tcp_listeners, [61613]},
+                    {ssl_listeners, [61614]}]}
+].
+</span></pre>
+<p>This configuration creates a standard TCP listener on port 61613 and
+an SSL listener on port 61614.</p>
+<h3><a id="cta.du"></a>Default User</h3>
+<p>The RabbitMQ STOMP adapter allows <span class="code ">CONNECT</span> frames to omit the <span class="code ">login</span>
+and <span class="code ">passcode</span> headers if a default is configured.</p>
+<p>To configure a default login and passcode, add a <span class="code ">default_user</span>
+section to the <span class="code ">rabbitmq_stomp</span> application configuration. For example:</p>
+<pre><span class="code ">[
+  {rabbitmq_stomp, [{default_user, [{login, "guest"},
+                                    {passcode, "guest"}]}]}
+].
+</span></pre>
+<p>The configuration example above makes <span class="code ">guest</span>/<span class="code ">guest</span> the default
+login/passcode pair.</p>
+<h3><a id="cta.ssl"></a>Authentication with SSL client certificates</h3>
+<p>The STOMP adapter can authenticate SSL-based connections by extracting
+a name from the client's SSL certificate, without using a password.</p>
+<p>For safety the server must be configured with the SSL options
+<span class="code ">fail_if_no_peer_cert</span> set to <span class="code ">true</span> and <span class="code ">verify</span> set to <span class="code ">verify_peer</span>, to
+force all SSL clients to have a verifiable client certificate.</p>
+<p>To switch this feature on, set <span class="code ">ssl_cert_login</span> to <span class="code ">true</span> for the
+<span class="code ">rabbitmq_stomp</span> application. For example:</p>
+<pre><span class="code ">[
+  {rabbitmq_stomp, [{ssl_cert_login, true}]}
+].
+</span></pre>
+<p>By default this will set the username to an RFC4514-ish string form of
+the certificate's subject's Distinguished Name, similar to that
+produced by OpenSSL's "-nameopt RFC2253" option.</p>
+<p>To use the Common Name instead, add:</p>
+<pre><span class="code ">{rabbit, [{ssl_cert_login_from, common_name}]}
+</span></pre>
+<p>to your configuration.</p>
+<p>Note that:</p>
+<ul>
+<li>The authenticated user must exist in the configured authentication / authorisation backend(s).</li>
+<li>Clients must <strong>not</strong> supply <span class="code ">login</span> and <span class="code ">passcode</span> headers.</li>
+</ul>
+<h3><a id="cta.ic"></a>Implicit Connect</h3>
+<p>If you configure a default user or use SSL client certificate
+authentication, you can also choose to allow clients to omit the
+<span class="code ">CONNECT</span> frame entirely. In this mode, if the first frame sent on a
+session is not a <span class="code ">CONNECT</span>, the client is automatically connected as
+the default user or the user supplied in the SSL certificate.</p>
+<p>To enable implicit connect, set <span class="code ">implicit_connect</span> to <span class="code ">true</span> for the
+<span class="code ">rabbit_stomp</span> application. For example:</p>
+<pre><span class="code ">[
+  {rabbitmq_stomp, [{default_user,     [{login, "guest"},
+                                        {passcode, "guest"}]},
+                    {implicit_connect, true}]}
+].
+</span></pre>
+<p>Implicit connect is <em>not</em> enabled by default.</p>
+<p><strong>Note:</strong> A client causing an implicit connect will <em>not</em> receive a
+<span class="code ">CONNECTED</span> frame from the server.</p>
+<h3><a id="cta.tta"></a>Testing the Adapter</h3>
+<p>If the default STOMP adapter is running, you should be able to connect to port 61613
+using a STOMP client of your choice. In a pinch, <span class="code ">telnet</span> or netcat
+(<span class="code ">nc</span>) will do nicely. For example:</p>
+<pre><span class="code ">  $ nc localhost 61613
+  CONNECT
+
+  ^@
+: CONNECTED
+: session:session-QaDdyL5lg5dUx0vSWrnVNg==
+: heart-beat:0,0
+: version:1.0
+:
+  DISCONNECT
+
+  ^@
+:
+  $
+</span></pre>
+<p>Here <span class="code ">$</span> is the command prompt; responses are prefixed with <span class="code ">:</span>
+(your session-id may vary);
+and Ctrl-@ (<span class="code ">^@</span>) inserts a zero byte into the stream.
+We connect as the default user (note the blank line
+after the <span class="code ">CONNECT</span> line) getting a <span class="code ">CONNECTED</span> response indicating
+that the STOMP adapter is listening and running.
+The <span class="code ">DISCONNECT</span> frame
+causes the connection to be dropped.</p>
+<p>The script <span class="code ">test.py</span> runs a suite of tests and this can be run
+using <span class="code ">make test</span> against a STOMP adapter built from source.
+See <a href="#caifs">Compiling and installing from source</a> above.</p>
+<h2><a id="d"></a>Destinations</h2>
+<p>The STOMP specification does not prescribe what kinds of destinations
+a broker must support, instead the value of the <span class="code ">destination</span> header
+in <span class="code ">SEND</span> and <span class="code ">MESSAGE</span> frames is broker-specific. The RabbitMQ STOMP
+adapter supports a number of different destination types:</p>
+<ul>
+<li><span class="code ">/exchange</span> -- <span class="code ">SEND</span> to arbitrary routing keys and <span class="code ">SUBSCRIBE</span> to
+arbitrary binding patterns;</li>
+<li><span class="code ">/queue</span> -- <span class="code ">SEND</span> and <span class="code ">SUBSCRIBE</span> to queues managed by the STOMP
+gateway;</li>
+<li><span class="code ">/amq/queue</span> -- <span class="code ">SEND</span> and <span class="code ">SUBSCRIBE</span> to queues created outside the
+STOMP gateway;</li>
+<li><span class="code ">/topic</span> -- <span class="code ">SEND</span> and <span class="code ">SUBSCRIBE</span> to transient and durable topics;</li>
+<li><span class="code ">/temp-queue/</span> -- create temporary queues (in <span class="code ">reply-to</span> headers only).</li>
+</ul>
+<h4>AMQP Semantics</h4>
+<p>The <span class="code ">destination</span> header on a <span class="code ">MESSAGE</span> frame is set as though the
+message originated from a <span class="code ">SEND</span> frame:</p>
+<ul>
+<li>messages published to the default exchange are given the destination
+<span class="code ">/queue/</span><em>queuename</em>;</li>
+<li>messages published to <span class="code ">amq.topic</span> are given the destination
+<span class="code ">/topic/</span><em>routing_key</em>;</li>
+<li>all other messages are given the destination
+<span class="code ">/exchange/</span><em>exchange_name</em>[<span class="code ">/</span><em>routing_key</em>].</li>
+</ul>
+<p>If <span class="code ">/</span>, <span class="code ">%</span> or non-ascii bytes are in the <em>queuename</em>, <em>exchange_name</em>
+or <em>routing_key</em>, they are each replaced with the sequence <span class="code ">%</span><em>dd</em>,
+where <em>dd</em> is the hexadecimal code for the byte.</p>
+<p>Because of these rules the destination on a <span class="code ">MESSAGE</span> frame may not
+exactly match that on a <span class="code ">SEND</span> that published it.</p>
+<h3><a id="d.ed"></a>Exchange Destinations</h3>
+<p>Any exchange/queue or exchange/routing-key combination can be accessed
+using destinations prefixed with <span class="code ">/exchange</span>.</p>
+<p>For <span class="code ">SUBSCRIBE</span> frames, a destination of the form
+<span class="code ">/exchange/&lt;name&gt;[/&lt;pattern&gt;]</span> can be used. This destination:</p>
+<ul>
+<li>creates an exclusive, auto-delete queue on <span class="code ">&lt;name&gt;</span> exchange;</li>
+<li>if <span class="code ">&lt;pattern&gt;</span> is supplied, binds the queue to <span class="code ">&lt;name&gt;</span> exchange
+   using <span class="code ">&lt;pattern&gt;</span>; and</li>
+<li>registers a subscription against the queue, for the current STOMP session.</li>
+</ul>
+<p>For <span class="code ">SEND</span> frames, a destination of the form
+<span class="code ">/exchange/&lt;name&gt;[/&lt;routing-key&gt;]</span> can be used. This destination:</p>
+<ul>
+<li>sends to exchange <span class="code ">&lt;name&gt;</span> with the routing key <span class="code ">&lt;routing-key&gt;</span>.</li>
+</ul>
+<p><strong>Note:</strong> Exchange destinations are <em>not</em> suitable for
+consuming messages from an existing queue. A new queue is created for
+each subscriber and is bound to the specified exchange using the
+supplied routing key. To work with existing queues, use
+<a href="#d.aqd"><span class="code ">/amq/queue</span></a> destinations.</p>
+<h3><a id="d.qd"></a>Queue Destinations</h3>
+<p>For simple queues, destinations of the form <span class="code ">/queue/&lt;name&gt;</span> can be
+used.</p>
+<p>Queue destinations deliver each message to at most one
+subscriber. Messages sent when no subscriber exists will be queued
+until a subscriber connects to the queue.</p>
+<h4>AMQP Semantics</h4>
+<p>For <span class="code ">SUBSCRIBE</span> frames, these destinations create a shared queue <span class="code ">&lt;name&gt;</span>. A
+subscription against the queue <span class="code ">&lt;name&gt;</span> is created for the current STOMP
+session.</p>
+<p>For <span class="code ">SEND</span> frames, a shared queue <span class="code ">&lt;name&gt;</span> is created on the <em>first</em> <span class="code ">SEND</span> to
+this destination in this session, but not subsequently. The message is sent to
+the default exchange with the routing key <span class="code ">&lt;name&gt;</span>.</p>
+<h3><a id="d.aqd"></a>AMQ Queue Destinations</h3>
+<p>To address existing queues created outside the STOMP adapter,
+destinations of the form <span class="code ">/amq/queue/&lt;name&gt;</span> can be used.</p>
+<h4>AMQP Semantics</h4>
+<p>For both <span class="code ">SEND</span> and <span class="code ">SUBSCRIBE</span> frames no queue is created.
+For <span class="code ">SUBSCRIBE</span> frames, it is an error if the queue does not exist.</p>
+<p>For <span class="code ">SEND</span> frames, the message is sent directly to the existing queue named
+<span class="code ">&lt;name&gt;</span> via the default exchange.</p>
+<p>For <span class="code ">SUBSCRIBE</span> frames, a subscription against the existing queue <span class="code ">&lt;name&gt;</span> is
+created for the current STOMP session.</p>
+<h3><a id="d.td"></a>Topic Destinations</h3>
+<p>For simple topic destinations which deliver a copy of each message to
+all active subscribers, destinations of the form <span class="code ">/topic/&lt;name&gt;</span> can
+be used. Topic destinations support all the routing patterns of AMQP
+topic exchanges.</p>
+<p>Messages sent to a topic destination that has no active subscribers
+are simply discarded.</p>
+<h4>AMQP Semantics</h4>
+<p>For <span class="code ">SEND</span> frames, the message is sent to the <span class="code ">amq.topic</span> exchange
+with the routing key <span class="code ">&lt;name&gt;</span>.</p>
+<p>For <span class="code ">SUBSCRIBE</span> frames, an exclusive queue is created and bound to the
+<span class="code ">amq.topic</span> exchange with routing key <span class="code ">&lt;name&gt;</span>. A subscription is
+created against the exclusive queue.</p>
+<h3><a id="d.dts"></a>Durable Topic Subscriptions</h3>
+<p>The STOMP adapter supports durable topic subscriptions. Durable
+subscriptions allow clients to disconnect from and reconnect to the
+STOMP broker as needed, without missing messages that are sent to the
+topic.</p>
+<p>Topics are neither durable nor transient, instead <strong><em>subscriptions</em></strong>
+are durable or transient. Durable and transient can be mixed against a
+given topic.</p>
+<h4>Creating a Durable Subscription</h4>
+<p>To create a durable subscription, set the <span class="code ">persistent</span> header to
+<span class="code ">true</span> in the <span class="code ">SUBSCRIBE</span> frame. When creating a durable subscription,
+the <span class="code ">id</span> header must be specified. For example:</p>
+<pre><span class="code ">SUBSCRIBE
+destination:/topic/my-durable
+id:1234
+persistent:true
+</span></pre>
+<h4>AMQP Semantics</h4>
+<p>For <span class="code ">SEND</span> frames, the message is sent to the <span class="code ">amq.topic</span> exchange
+with the routing key <span class="code ">&lt;name&gt;</span>.</p>
+<p>For <span class="code ">SUBSCRIBE</span> frames, a <em>shared</em> queue is created for each distinct
+subscription ID x destination pair, and bound to the <span class="code ">amq.topic</span>
+exchange with routing key <span class="code ">&lt;name&gt;</span>. A subscription is created against
+the queue.</p>
+<h4>Deleting a Durable Subscription</h4>
+<p>To permanently delete a durable subscription, send an <span class="code ">UNSUBSCRIBE</span> frame for
+the subscription ID with the <span class="code ">persistent</span> header set to <span class="code ">true</span>. For example:</p>
+<pre><span class="code ">UNSUBSCRIBE
+id:1234
+persistent:true
+</span></pre>
+<h3><a id="d.tqd"></a>Temp Queue Destinations</h3>
+<p>Temp queue destinations allow you to define temporary destinations
+in the <span class="code ">reply-to</span> header of a <span class="code ">SEND</span> frame.</p>
+<p>Temp queues are managed by the broker and their identities are private to
+each session -- there is no need to choose distinct names for
+temporary queues in distinct sessions.</p>
+<p>To use a temp queue, put the <span class="code ">reply-to</span> header on a <span class="code ">SEND</span> frame and
+use a header value starting with <span class="code ">/temp-queue/</span>. For example:</p>
+<pre><span class="code ">SEND
+destination:/queue/reply-test
+reply-to:/temp-queue/foo
+
+Hello World!
+</span></pre>
+<p>This frame creates a temporary queue (with a generated name) that is private
+to the session and automatically subscribes to that queue.
+A different session that uses <span class="code ">reply-to:/temp-queue/foo</span> will have a new,
+distinct queue created.</p>
+<p>The internal subscription id is a concatenation of the string
+<span class="code ">/temp-queue/</span> and the temporary queue (so <span class="code ">/temp-queue/foo</span>
+in this example). The subscription id can be used to identify reply
+messages. Reply messages cannot be identified from the <span class="code ">destination</span>
+header, which will be different from the value in the <span class="code ">reply-to</span>
+header. The internal subscription uses auto-ack mode and it cannot be
+cancelled.</p>
+<p>The <span class="code ">/temp-queue/</span> destination is <strong><em>not</em></strong> the name of the destination
+that the receiving client uses when sending the reply. Instead, the
+receiving client can obtain the (real) reply destination queue name
+from the <span class="code ">reply-to</span> header of the <span class="code ">MESSAGE</span> frame.  This reply
+destination name can then be used as the value of the <span class="code ">destination</span>
+header in the <span class="code ">SEND</span> frame sent in reply to the received
+<span class="code ">MESSAGE</span>.</p>
+<p>Reply destination queue names are opaque and cannot be inferred from
+the <span class="code ">/temp-queue/</span> name.</p>
+<p><span class="code ">SEND</span> and <span class="code ">SUBSCRIBE</span> frames <strong><em>must not</em></strong> contain <span class="code ">/temp-queue</span>
+destinations in the <span class="code ">destination</span> header. Messages cannot be sent to
+<span class="code ">/temp-queue</span> destinations, and subscriptions to reply queues are
+created automatically.</p>
+<h4>AMQP 0-9-1 Semantics</h4>
+<p>Each <span class="code ">/temp-queue/</span> corresponds to a distinct anonymous, exclusive,
+auto delete queue. As such, there is no need for explicit clean up of
+reply queues.</p>
+<h3><a id="d.ugqn"></a>User generated queue names for Topic and Exchange destinations</h3>
+<p>When subscribing to an <span class="code ">exchange</span> or <span class="code ">topic</span> destination, RabbitMQ would generate
+a queue name by default. Starting with version 3.5.7, is it possible to provide
+a custom name using the <span class="code ">x-queue-name</span> header:</p>
+<pre><span class="code ">SUBSCRIBE
+destination:/topic/alarms
+x-queue-name:my-alarms-queue
+</span></pre>
+<h2>Using Policies with STOMP</h2>
+<p>RabbitMQ <a href="https://www.rabbitmq.com/parameters.html#policies">policies</a> allow for flexible,
+centralised attribute configuration of queues and exchanges. Policies can
+be used with queues used by the STOMP plugin.</p>
+<p>Policies make it possible to use more RabbitMQ features with STOMP:</p>
+<ul>
+<li><a href="/v3_5_7/ha.html">Mirrored queues</a></li>
+<li><a href="/v3_5_7/dlx.html">Dead lettering</a></li>
+<li><a href="/v3_5_7/ttl.html">Queue leases and per-queue message TTL</a></li>
+<li><a href="/v3_5_7/maxlength.html">Queue length limits</a></li>
+</ul>
+<p>All server-named queues created by the STOMP plugin are prefixed with <span class="code ">stomp-</span>
+which makes it easy to match the queues in a policy. For example, to limit
+STOMP queue length to 1000 messages, create the following policy:</p>
+<pre>rabbitmqctl set_policy stomp-queues "^stomp-" '{"max-length":1000}' --apply-to queues</pre>
+
+<p>Note that only one policy is applied to a queue at a time, so to specify
+multiple arguments (e.g. queue length limit and dead lettering) one
+needs to put them into a single policy.</p>
+<h2><a id="pear"></a>Protocol Extensions and Restrictions</h2>
+<p>The RabbitMQ STOMP adapter relaxes the protocol on <span class="code ">CONNECT</span>
+and supports a number of non-standard headers on certain
+frames. These extra headers provide access to features that are not
+described in the STOMP specs. In addition, we prohibit some headers which
+are reserved for server use. The details are given below.</p>
+<h3><a id="pear.c"></a>Connection and Virtual Hosts</h3>
+<p>The <span class="code ">CONNECT</span> (or <span class="code ">STOMP</span>) frame in
+<a href="http://stomp.github.com/stomp-specification-1.1.html">STOMP 1.1</a> has a
+mandatory <span class="code ">host</span> header (to select the virtual host to use for the
+connection). The RabbitMQ adapter allows this to be optional.</p>
+<p>When omitted, the default virtual host (<span class="code ">/</span>) is presumed.
+To configure a different default virtual host, add a <span class="code ">default_vhost</span>
+section to the <span class="code ">rabbitmq_stomp</span> application configuration, e.g.</p>
+<pre><span class="code ">[
+  {rabbitmq_stomp, [{default_vhost, &lt;&lt;"/"&gt;&gt;}]}
+].
+</span></pre>
+<p>If a <span class="code ">host</span> header is specified it must be one of the
+virtual hosts known to the RabbitMQ server, otherwise the connection is
+rejected. The <span class="code ">host</span> header is respected even if the STOMP 1.0 version is
+negotiated at the time of the connect.</p>
+<h3><a id="pear.mp"></a>Message Persistence</h3>
+<p>On the <span class="code ">SEND</span> frame, the STOMP adapter supports the inclusion of a <span class="code ">persistent</span> header.</p>
+<p>Setting the <span class="code ">persistent</span> header to <span class="code ">true</span> has the effect of making the message persistent.</p>
+<p>Receipts for <span class="code ">SEND</span> frames with <span class="code ">persistent:true</span> are not sent until a
+confirm is received from the broker. The exact semantics for confirms
+on persistent messages can be found <a href="confirms.html">here</a>.</p>
+<p><span class="code ">MESSAGE</span> frames for persistent messages will contain a <span class="code ">persistent:true</span>
+header.</p>
+<h3><a id="ack-nack">ACK and NACK</a></h3>
+<p>RabbitMQ STOMP plugin supports <span class="code ">auto</span>, <span class="code ">client</span>, and <span class="code ">client-individual</span>
+subscription headers that affect how <span class="code ">ACK</span> on <span class="code ">NACK</span> operations work.</p>
+<p>The <span class="code ">auto</span> mode uses automatic acknowledgements. The <span class="code ">client</span> mode is manual
+(client-driven) acknowledgements of multiple messages at once. The <span class="code ">client-individual</span>
+is for message-by-message manual acknowledgement.</p>
+<p><span class="code ">NACK</span> frames can optionally carry the <span class="code ">requeue</span> header which controls whether
+the message will be requeued or discarded/dead lettered. Default value is <span class="code ">true</span>.</p>
+<h3><a id="pear.p"></a>Prefetch</h3>
+<p>The prefetch count for all subscriptions is set to unlimited by
+default. This can be controlled by setting the <span class="code ">prefetch-count</span> header
+on <span class="code ">SUBSCRIBE</span> frames to the desired integer count.</p>
+<h3><a id="pear.hpos"></a>Header prohibited on <span class="code ">SEND</span></h3>
+<p>It is not permitted to set a <span class="code ">message-id</span> header on a <span class="code ">SEND</span> frame.
+The header and its value is set by the server on a <span class="code ">MESSAGE</span> frame sent
+to a client.</p>
+<h3><a id="pear.ap"></a>Queue Properties</h3>
+<p><span class="code ">SEND</span> frames also allow headers corresponding to the <em>AMQP properties</em>
+available when publishing messages. These headers are also set on
+<span class="code ">MESSAGE</span> frames sent to clients.</p>
+<p>All non-deprecated AMQP 0-9-1 properties (<span class="code ">content-type</span>,
+<span class="code ">content-encoding</span>, <span class="code ">headers</span>, <span class="code ">delivery-mode</span>, <span class="code ">priority</span>,
+<span class="code ">correlation-id</span>, <span class="code ">reply-to</span>, <span class="code ">expiration</span>, <span class="code ">message-id</span>, <span class="code ">timestamp</span>,
+<span class="code ">type</span>, <span class="code ">user-id</span> and <span class="code ">app-id</span>) are supported. The following special
+rules apply:</p>
+<ul>
+<li><span class="code ">amqp-message-id</span> in STOMP is converted to <span class="code ">message-id</span> in AMQP, and
+  vice-versa.</li>
+<li>The <span class="code ">reply-to</span> header causes temporary queues to be created (see
+  <a href="#d.tqd">Temp Queue Destinations</a> above).</li>
+<li>Some x-prefixed STOMP headers are translated into optional queue arguments
+  (see below).</li>
+</ul>
+<h3>Optional Queue Properties</h3>
+<p>As of RabbitMQ 3.5.5, SEND and SUBSCRIBE frames accepts a set of headers to configure the queue behaviour,
+for example, use <a href="/v3_5_7/ttl.html">TTL</a> or similar extensions.</p>
+<p>The list of supported headers is</p>
+<ul>
+<li><a href="/v3_5_7/ttl.html#per-message-ttl">x-message-ttl</a></li>
+<li><a href="/v3_5_7/ttl.html#queue-ttl">x-expires</a></li>
+<li><a href="/v3_5_7/maxlength.html">x-max-length</a></li>
+<li><a href="/v3_5_7/maxlength.html">x-max-length-bytes</a></li>
+<li><a href="/v3_5_7/dlx.html">x-dead-letter-exchange</a></li>
+<li><a href="/v3_5_7/dlx.html">x-dead-letter-routing-key</a></li>
+<li><a href="/v3_5_7/priority.html">x-max-priority</a></li>
+</ul>
+<p>For example, if you want to use priority queues with STOMP, you
+can SUBSCRIBE (or SEND) with the following header:</p>
+<pre><span class="code ">SUBSCRIBE
+destination:/queue/my-priority-queue
+x-max-priority:5
+</span></pre>
+<h3>Queue Immutability</h3>
+<p>Once a queue is declared, its properties cannot be changed. Optional arguments
+can be modified with <a href="/v3_5_7/parameters.html">policies</a>. Otherwise the queue has to be deleted
+and re-declared. This is true for STOMP clients as well as AMQP 0-9-1.</p></div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_5_7/management.html">Management plugin</a></li>
+       <li><a href="/v3_5_7/federation.html">Federation plugin</a></li>
+       <li><a href="/v3_5_7/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v3_5_7/stomp.html" class="selected">STOMP plugin</a></li>
+       <li><a href="/v3_5_7/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_5_7/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_5_7/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_5_7/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/v3_5_7/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

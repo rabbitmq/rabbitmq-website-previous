@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Amazon EC2</title>
+    
+  </head>
+  <body id="ec2"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Amazon EC2</h1>
+<div class="docSection"><a name="ec2" id="ec2"></a>
+
+  <p>This guide assumes familiarity with the general <a href="/clustering.html">clustering guide</a>.</p>
+
+  <div class="docSubsection"><a name="overview" id="overview"></a>
+    <h3 class="docHeading">Overview</h3>
+    <p>
+      Using RabbitMQ on EC2 is quite similar running it on other
+      platforms. However, the are certain minor aspects to EC2 that need
+      to be accounted for. They primarily have to do with hostnames and their resolution.
+    </p>
+
+    <p>
+      This guide uses traditional RabbitMQ clustering. It is worth noting that
+      alternative solutions are available and can be more suitable for automation:
+
+      <ul>
+        <li><a href="/clustering.html">Auto-configuration of a cluster</a> (part of RabbitMQ core)</li>
+        <li>
+          <a href="https://github.com/rabbitmq/rabbitmq-autocluster">rabbitmq-autocluster</a>: forms
+          clusters using round-robin DNS (e.g. <a href="http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html">with Route 53</a>), <a href="https://www.consul.io/">Consul</a> or <a href="https://github.com/coreos/etcd">etcd</a>.
+        </li>
+      </ul>
+
+      <a href="https://github.com/rabbitmq/chef-cookbook">RabbitMQ Chef cookbook</a> and <a href="https://github.com/puppetlabs/puppetlabs-rabbitmq">RabbitMQ Puppet module</a> can help with automating cluster provisioning.
+    </p>
+  </div>
+
+  <div class="docSubsection"><a name="machine_images" id="machine_images"></a>
+    <h3 class="docHeading">AMIs</h3>
+    <p>
+      Pivotal currently does not provide AMI images with RabbitMQ pre-provisioned.
+      RabbitMQ works well on up-to-date Ubuntu and CentOS AMIs.
+    </p>
+  </div>
+
+  <div class="docSubsection"><a name="instance_type" id="instance_type"></a>
+    <h3 class="docHeading">Choose instance type</h3>
+    <p>
+      First, you need to choose what instance type to run. RabbitMQ
+      will work on every instance type, but there are a few considerations
+      worth bearing in mind:
+    </p>
+    <ul>
+      <li>
+	RabbitMQ will work on 32-bit operating system, but for
+	production usage we recommend 64-bit instances.
+      </li>
+      <li>
+	RabbitMQ by default will take advantage of all the processors
+	in the system. However a single strong CPU configuration might
+	behave slightly better than a collection of weak processors.
+      </li>
+      <li>
+	In some cases RabbitMQ requires substantial amounts of memory.
+	Make sure that your host does have <a href="/memory.html">enough RAM</a> and always have
+	at least a few gigabytes of swap space enabled.
+      </li>
+    </ul>
+  </div>
+
+
+  <div class="docSubsection"><a name="os_type" id="os_type"></a>
+    <h3 class="docHeading">Choose operating system</h3>
+    <p>
+      Although RabbitMQ is tested with most major Linux distributions,
+      Ubuntu support for Amazon EC2 seems to be strongest. You can
+      get the list of Ubuntu AMI images here:
+
+      <pre>
+      <a href="http://uec-images.ubuntu.com/releases/">http://uec-images.ubuntu.com/releases/</a></pre>
+
+      You may find more information
+      in <a href="https://help.ubuntu.com/community/EC2StartersGuide">Ubuntu
+      EC2 Starters Guide</a>.
+    </p>
+  </div>
+
+
+  <div class="docSubsection"><a name="install" id="install"></a>
+    <h3 class="docHeading">Install RabbitMQ</h3>
+    <p>
+      Ubuntu ships with RabbitMQ but it's often not the latest
+      version. If you want the recent version, you may use
+      our <a href="install-debian.html">Debian
+      repository</a>. Here is a shell
+      script <span class="code ">rabbitmq-user-data.sh</span> that automates
+      RabbitMQ installation on Ubuntu:
+    </p>
+    <pre class="sourcecode bash">
+#!/bin/sh
+cat &lt;&lt;EOF &gt; /etc/apt/sources.list.d/rabbitmq.list
+deb http://www.rabbitmq.com/debian/ testing main
+EOF
+
+curl https://www.rabbitmq.com/rabbitmq-release-signing-key.asc -o /tmp/rabbitmq-release-signing-key.asc
+apt-key add /tmp/rabbitmq-release-signing-key.asc
+rm /tmp/rabbitmq-release-signing-key.asc
+
+apt-get -qy update
+apt-get -qy install rabbitmq-server</pre>
+
+    <p>
+      Instead of running it manually, you can tell the instance to run
+      this script automatically during the first start. You can do it
+      using the <span class="code ">user-data-file</span> command line option for
+      the <span class="code ">ec2-run-instances</span> command. For example:
+
+      <pre class="sourcecode bash">ec2-run-instances ami-XXX \
+    --key ${EC2_KEYPAIR} \
+    --instance-type m1.large \
+    --region eu-west-1 \
+    --user-data-file rabbitmq-user-data.sh</pre>
+
+      Put your chosen AMI id in the place of <span class="code ">ami-XXX</span>. The
+      string <span class="code ">${EC2_KEYPAIR}</span> should be replaced with the
+      public ssh keypair name that is going to be used to log in to
+      the instance. You can find more information
+      about <span class="code ">ec2-run-instances</span> command in
+      <a href="http://docs.amazonwebservices.com/AWSEC2/latest/GettingStartedGuide/">EC2 Getting Started Guide</a>.
+    </p>
+  </div>
+
+  <div class="docSubsection"><a name="ebs" id="ebs"></a>
+    <h3 class="docHeading">Persistent Data on EBS Devices</h3>
+    <p>
+      RabbitMQ writes data to the following directories on Ubuntu:
+      <ul>
+	<li>
+	  <span class="code ">/var/lib/rabbitmq/</span> to store persistent data
+	  like the messages or queues
+	</li>
+
+	<li>
+	  <span class="code ">/var/log/rabbitmq/</span> to store logs
+	</li>
+      </ul>
+
+      See the <a href="/relocate.html">File and Directory Locations</a> for details.
+    </p>
+
+    <p>
+      If you choose to use EBS block device to store RabbitMQ node data directory, just
+      link these directories to your EBS device. Stop RabbitMQ
+      before making any changes to the data directory:
+      <pre class="sourcecode bash">sudo service rabbitmq-server stop</pre>
+    </p>
+    <p>
+      Note that EBS volumes have an <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html">IOPS
+      limits</a>, which can impact thoughput and RabbitMQ message
+      store operations. If an EBS volume hits the limit, disk writes
+      will worsen. It is also possible that the RabbitMQ message store
+      compaction (garbage collection of on-disk data) can fall behind
+      disk writes, which means the disk will be filled up quicker than
+      disk space can be reclaimed after messages were consumed and
+      acknowledged. This will eventually lead to <a href="/alarms.html">resource
+      alarms</a> and publisher throttling. Please make sure the limit
+      is high enough and set up I/O operation rate monitoring.
+    </p>
+  </div>
+</div>
+
+<div class="docSection"><a name="default-user-access" id="default-user-access"></a>
+  <h2 class="docHeading">Default user access</h2>
+  <p xmlns="">
+    The broker creates a user <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> with password
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span>. Unconfigured clients will in general use these
+    credentials. <strong>By default, these credentials can only be
+    used when connecting to the broker as localhost</strong> so you
+    will need to take action before connecting from any other
+    machine.
+  </p>
+  <p xmlns="">
+    See the documentation on <a href="access-control.html">access
+    control</a> for information on how to create more users, delete
+    the <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> user, or allow remote access to the
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> user.
+  </p>
+</div>
+<div class="docSection"><a name="issues-hostname" id="issues-hostname"></a>
+  <h2 class="docHeading">Hostname Changes</h2>
+  <p xmlns="">
+    RabbitMQ nodes use hostnames to communicate with each other. Therefore,
+    all node names must be able to resolve names of all cluster peers. This is
+    also true for tools such as <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl</span>.
+  </p>
+  <p xmlns="">
+    In addition to that, by default RabbitMQ names the database directory using the
+    current hostname of the system. If the hostname
+    changes, a new empty database is created. To avoid data loss it's
+    crucial to set up a fixed and resolvable hostname.
+
+    Whenever the hostname changes you should restart RabbitMQ:
+<pre class="sourcecode">$ /etc/init.d/rabbitmq-server restart</pre>
+  </p>
+  <p xmlns="">
+    A similar effect can be achieved by using <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbit@localhost</span>
+    as the broker nodename.
+    The impact of this solution is that clustering will not work, because
+    the chosen hostname will not resolve to a routable address from remote
+    hosts. The <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl</span> command will similarly fail when
+    invoked from a remote host. A more sophisticated solution that does not
+    suffer from this weakness is to use DNS, e.g. 
+    <a href="http://aws.amazon.com/route53/">Amazon Route 53</a> if running
+    on EC2. If you want to use the full hostname for your nodename (RabbitMQ
+    defaults to the short name), and that full hostname is resolveable using DNS,
+    you may want to investigate setting the environment variable
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">RABBITMQ_USE_LONGNAME=true</span>.
+  </p>
+  <p xmlns="">
+    See the <a href="/clustering.html#overview-hostname-requirements">hostname resolution guide</a> for more information.
+  </p>
+</div>
+<div class="docSection"><a name="firewall" id="firewall"></a>
+    <h2 class="docHeading">Firewalled nodes</h2>
+    <p xmlns="">
+        The case for firewalled clustered nodes exists when nodes
+        are in a data center or on a reliable network, but separated
+        by firewalls. Again, clustering is not recommended over a WAN or
+        when network links between nodes are unreliable.
+    </p>
+    <p xmlns="">
+      In the most common configuration you will need to open
+      a number of standard ports:
+
+      <ul>
+  <li>4369: <a href="http://erlang.org/doc/man/epmd.html">epmd</a>, a peer discovery service used by RabbitMQ nodes and CLI tools</li>
+  <li>5672, 5671: used by AMQP 0-9-1 and 1.0 clients without and with TLS</li>
+  <li>
+    25672: used by Erlang distribution for inter-node and CLI tools communication
+    and is allocated from a dynamic range (limited to a single port by default,
+    computed as AMQP port + 20000). See <a href="/networking.html">networking guide</a> for details.
+  </li>
+  <li>15672: <a href="/management.html">HTTP API</a> clients and <a href="/management-cli.html">rabbitmqadmin</a> (only if the <a href="/management.html">management plugin</a> is enabled)</li>
+  <li>61613, 61614: <a href="https://stomp.github.io/stomp-specification-1.2.html">STOMP clients</a> without and with TLS (only if the <a href="/stomp.html">STOMP plugin</a> is enabled)</li>
+  <li>1883, 8883: (<a href="http://mqtt.org/">MQTT clients</a> without and with TLS, if the <a href="/mqtt.html">MQTT plugin</a> is enabled</li>
+  <li>15674: STOMP-over-WebSockets clients (only if the <a href="/web-stomp.html">Web STOMP plugin</a> is enabled)</li>
+  <li>15675: MQTT-over-WebSockets clients (only if the <a href="/web-mqtt.html">Web MQTT plugin</a> is enabled)</li>
+</ul>
+
+      See <a href="/networking.html">RabbitMQ Networking guide</a> for details.
+    </p>
+</div>
+<div class="docSection"><a name="erlang" id="erlang"></a>
+  <h2 class="docHeading">Erlang Versions Across the Cluster</h2>
+  <p xmlns="">
+  All nodes in a cluster must run the same minor <a href="/which-erlang.html">version of Erlang</a>: <span xmlns="http://www.w3.org/1999/xhtml" class="code ">19.3.4</span>
+  and <span xmlns="http://www.w3.org/1999/xhtml" class="code ">19.3.6</span> can be mixed but <span xmlns="http://www.w3.org/1999/xhtml" class="code ">19.0.1</span> and <span xmlns="http://www.w3.org/1999/xhtml" class="code ">19.3.6</span> (or <span xmlns="http://www.w3.org/1999/xhtml" class="code ">17.5</span> and <span xmlns="http://www.w3.org/1999/xhtml" class="code ">19.3.6</span>) cannot.
+  Compatibility between individual Erlang/OTP patch versions
+  can vary between releases but that's generally rare.
+  </p>
+</div>
+
+  <p>
+    If you have any comments please <a href="contact.html">let us know</a>.
+  </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+   
+     <li><a href="/install-windows.html">Install: Windows</a></li>
+     <li><a href="/install-debian.html">Install: Debian / Ubuntu</a></li>
+     <li><a href="/install-rpm.html">Install: RPM-based Linux</a></li>
+     <li><a href="/install-standalone-mac.html">Install: Mac OS X</a></li>
+     <li><a href="/install-homebrew.html">Install: Homebrew</a></li>
+     <li><a href="/install-windows-manual.html">Install: Windows (manual)</a></li>
+     <li><a href="/install-generic-unix.html">Install: Generic Unix</a></li>
+     <li><a href="/install-solaris.html">Install: Solaris</a></li>
+     <li class="gap-after"><a href="/ec2.html" class="selected">Install: EC2</a></li>
+     <li><a href="/platforms.html">Supported Platforms</a></li>
+     <li><a href="/changelog.html">Changelog</a></li>
+     <li><a href="/which-erlang.html">Erlang Versions</a></li>
+     <li class="gap-after"><a href="/signatures.html">Signed Packages</a></li>
+     <li><a href="/java-client.html">Java Client Downloads</a></li>
+     <li><a href="/dotnet.html">.NET Client Downloads</a></li>
+     <li><a href="/erlang-client.html">Erlang Client Downloads</a></li>
+     <li class="gap-after"><a href="/community-plugins.html">Community Plugins</a></li>
+     <li><a href="/snapshots.html">Snapshots</a></li>
+     
+   
+   </ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

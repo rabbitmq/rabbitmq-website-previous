@@ -1,0 +1,1667 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - .NET/C# Client API Guide</title>
+        
+    </head>
+    <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>.NET/C# Client API Guide</h1>
+        <p class="intro">
+            This page gives an overview of the RabbitMQ .NET/C# client API.
+        </p>
+        <p class="intro">
+            The code samples given here demonstrate connecting to RabbitMQ and
+            performing several common operations with the client.
+        </p>
+
+        <p class="intro">
+            The library is open-source, and is dual-licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">the Apache
+            License v2</a> and <a href="mpl.html">the Mozilla Public License
+            v1.1</a>.
+        </p>
+
+        <p class="intro">
+            The client is dual-licensed under
+
+            <ul>
+                <li><a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Public License 2.0</a></li>
+                <li><a href="https://www.mozilla.org/MPL/1.1/">Mozilla Public License</a></li>
+            </ul>
+        </p>
+
+        <p>
+            The client API is closely modelled on the AMQP 0-9-1 protocol specification,
+            with additional abstractions for ease of use.
+        </p>
+
+        <p>
+            This section gives an overview of the RabbitMQ .NET client API.
+
+            Only the basics of using the library are covered: for full detail,
+            please see the javadoc-like API documentation generated from the
+            source code.
+        </p>
+
+        <div class="docSection"><a name="classoverview" id="classoverview"></a>
+            <h2 class="docHeading">Major namespaces, interfaces and classes</h2>
+            <p>
+                The core API interfaces and classes are defined in the <span class="code ">RabbitMQ.Client</span> namespace:
+
+<pre class="sourcecode">
+using RabbitMQ.Client;
+</pre>
+
+    The core API interfaces and classes are
+
+    <ul>
+        <li><span class="code ">IModel</span>: represents an AMQP 0-9-1 channel, and provides most
+        of the operations (protocol methods).</li>
+
+        <li><span class="code ">IConnection</span>: represents an AMQP 0-9-1 connection</li>
+
+        <li><span class="code ">ConnectionFactory</span>: constructs <span class="code ">IConnection</span> instances</li>
+
+        <li><span class="code ">IBasicConsumer</span>: represents a message consumer</li>
+    </ul>
+
+    Other useful interfaces and classes include:
+
+    <ul>
+      <li><span class="code ">DefaultBasicConsumer</span>: commonly used base class for consumers</li>
+    </ul>
+
+    Public namespaces other than <span class="code ">RabbitMQ.Client</span> include:
+
+    <ul>
+        <li>
+            <span class="code ">RabbitMQ.Client.Events</span>: various events and event handlers
+            that are part of the client library, including <span class="code ">EventingBasicConsumer</span>,
+            a consumer implementation built around C# event handlers.
+        </li>
+        <li>
+            <span class="code ">RabbitMQ.Client.Exceptions</span>: exceptions visible to the user.
+        </li>
+    </ul>
+          </p>
+
+          <p>
+            All other namespaces are reserved for private implementation detail of
+            the library, although members of private namespaces are usually made
+            available to applications using the library in order to permit
+            developers to implement workarounds for faults or design mistakes they
+            discover in the library implementation. Applications cannot rely on
+            any classes, interfaces, member variables etc. that appear within
+            private namespaces remaining stable across releases of the library.
+          </p>
+        </div>
+
+
+        <div class="docSection"><a name="connecting" id="connecting"></a>
+          <h2 class="docHeading">Connecting to a Broker</h2>
+          <p>
+            To connect to a RabbitMQ, it is necessary to instantiate a <span class="code ">ConnectionFactory</span>
+            and configure it to use desired hostname, virtual host, and credentials. Then
+            use <span class="code ">ConnectionFactory.CreateConnection()</span> to open a connection.
+
+            The following two code snippets connect to a RabbitMQ node on <span class="code ">hostName</span>:
+
+<pre>
+ConnectionFactory factory = new ConnectionFactory();
+factory.UserName = user;
+// "gue
+factory.Password = pass;
+factory.VirtualHost = vhost;
+factory.HostName = hostName;
+
+IConnection conn = factory.CreateConnection();
+</pre>
+
+<pre class="sourcecode">
+ConnectionFactory factory = new ConnectionFactory();
+factory.Uri = "amqp://user:pass@hostName:port/vhost";
+
+IConnection conn = factory.CreateConnection();
+</pre>
+          </p>
+
+          <p>
+            Since the .NET client uses a stricter interpretation of the <a href="/v3_5_7/uri-spec.html">AMQP 0-9-1 URI
+            spec</a> than the other clients, care must be taken when using URIs.  In
+            particular, the host part must not be omitted and virtual hosts with
+            empty names are not addressable.
+
+            All factory properties have default values. The default value for a property will be used if the property remains unassigned prior to creating a connection:
+
+            <dl>
+              <dt>Username</dt>
+              <dd><span class="code ">"guest"</span></dd>
+
+              <dt>Password</dt>
+              <dd><span class="code ">"guest"</span></dd>
+
+              <dt>Virtual host</dt>
+              <dd><span class="code ">"/"</span></dd>
+
+              <dt>Hostname</dt>
+              <dd><span class="code ">"localhost"</span></dd>
+
+              <dt>port</dt>
+              <dd>
+                <span class="code ">5672</span> for regular connections,
+                <span class="code ">5671</span> for connections that use TLS
+              </dd>
+            </dl>
+          </p>
+
+          <p>
+            The <span class="code ">IConnection</span> interface can then be used to open a channel:
+
+<pre class="sourcecode">
+IModel channel = conn.CreateModel();
+</pre>
+
+            The channel can now be used to send and receive messages,
+            as described in subsequent sections.
+          </p>
+        </div>
+
+        <div class="docSection"><a name="using-exchanges-and-queues" id="using-exchanges-and-queues"></a>
+          <h2 class="docHeading">Using Exchanges and Queues</h2>
+
+          <p>
+            Client applications work with exchanges and queues, the high-level
+            building blocks of AMQP 0-9-1. These must be "declared" before they can be
+            used. Declaring either type of object simply ensures that one of that
+            name exists, creating it if necessary.
+
+            Continuing the previous example, the following code declares an
+            exchange and a queue, then binds them together.
+
+<pre class="sourcecode">
+model.ExchangeDeclare(exchangeName, ExchangeType.Direct);
+model.QueueDeclare(queueName, false, false, false, null);
+model.QueueBind(queueName, exchangeName, routingKey, null);
+</pre>
+
+            This will actively declare the following objects:
+
+            <ul>
+              <li>a non-durable, non-autodelete exchange of "direct" type</li>
+              <li>a non-durable, non-autodelete, non-exclusive queue</li>
+            </ul>
+
+            The exchange can be customised by using additional parameters.
+            The above code then binds the queue to the exchange with the given
+            routing key.
+
+            Note that many channel API (<span class="code ">IModel</span>) methods are overloaded. The convenient
+            short form of <span class="code ">ExchangeDeclare</span> uses sensible defaults. There are
+            also longer forms with more parameters, to let you override these
+            defaults as necessary, giving full control where needed.
+
+            This "short version, long version" pattern is used throughout the API.
+          </p>
+        </div>
+
+        <div class="docSection"><a name="publishing" id="publishing"></a>
+          <h2 class="docHeading">Publishing Messages</h2>
+
+          <p>
+            To publish a message to an exchange, use <span class="code ">IModel.BasicPublish</span> as
+            follows:
+
+<pre class="sourcecode">
+byte[] messageBodyBytes = System.Text.Encoding.UTF8.GetBytes("Hello, world!");
+model.BasicPublish(exchangeName, routingKey, null, messageBodyBytes);
+</pre>
+
+            For fine control, you can use overloaded variants to specify the
+            mandatory flag, or specify messages properties:
+
+<pre class="sourcecode">
+byte[] messageBodyBytes = System.Text.Encoding.UTF8.GetBytes("Hello, world!");
+IBasicProperties props = model.CreateBasicProperties();
+props.ContentType = "text/plain";
+props.DeliveryMode = 2;
+mode.BasicPublish(exchangeName,
+                  routingKey, props,
+                  messageBodyBytes);
+</pre>
+
+            This sends a message with delivery mode 2 (persistent) and
+            content-type "text/plain". See the definition of the <span class="code ">
+            IBasicProperties</span> interface for more information about the available
+            header properties.
+          </p>
+        </div>
+
+        <div class="docSection"><a name="basic-get" id="basic-get"></a>
+          <h2 class="docHeading">Fetching Individual Messages ("pull API")</h2>
+
+          <p>
+            To retrieve individual messages, use <span class="code ">IModel.BasicGet</span>. The
+            returned value is an instance of BasicGetResult, from which the header
+            information (properties) and message body can be extracted:
+
+<pre class="sourcecode">
+bool noAck = false;
+BasicGetResult result = channel.BasicGet(queueName, noAck);
+if (result == null) {
+    // No message available at this time.
+} else {
+    IBasicProperties props = result.BasicProperties;
+    byte[] body = result.Body;
+    ...
+</pre>
+
+            Since <span class="code ">noAck = false</span> above, you must also call <span class="code ">
+            IModel.BasicAck</span> to acknowledge that you have successfully received
+            and processed the message:
+
+<pre class="sourcecode">
+    ...
+    // acknowledge receipt of the message
+    channel.BasicAck(result.DeliveryTag, false);
+}
+</pre>
+
+            Note that fetching messages using this API is relatively inefficient. If you'd prefer
+            RabbitMQ to push messages to the client, see the next section.
+          </p>
+        </div>
+
+
+        <div class="docSection"><a name="basic-consume" id="basic-consume"></a>
+          <h2 class="docHeading">Retrieving Messages By Subscription ("push API")</h2>
+
+          <p>
+            Another way to receive messages is to set up a subscription using the
+            <span class="code ">IBasicConsumer</span> interface. The messages will then be delivered
+            automatically as they arrive, rather than having to be requested
+            proactively.
+
+            One way to implement a consumer is to use the
+            convenience class <span class="code ">EventingBasicConsumer</span>, which dispatches
+            deliveries and other consumer lifecycle events as C# events:
+
+<pre class="sourcecode">
+var consumer = new EventingBasicConsumer(channel);
+consumer.Received += (ch, ea) =&gt;
+                {
+                    var body = ea.Body;
+                    // ... process the message
+                    ch.BasicAck(ea.DeliveryTag, false);
+                };  
+String consumerTag = channel.BasicConsume(queueName, false, consumer);
+</pre>
+
+            Another option is to subclass <span class="code ">DefaultBasicConsumer</span>,
+            overriding methods as necessary, or implement <span class="code ">IBasicConsumer</span>
+            directly. You will generally want to implement the core method <span class="code ">IBasicConsumer.HandleBasicDeliver</span>.
+
+            More sophisticated consumers will need to implement further
+            methods. In particular, <span class="code ">HandleModelShutdown</span> traps
+            channel/connection closure. Consumers can also implement <span class="code ">
+            HandleBasicCancelOk</span> to be notified of cancellations.
+
+            The <span class="code ">ConsumerTag</span> property of <span class="code ">DefaultBasicConsumer</span> can be
+            used to retrieve the server-generated consumer tag, in cases where
+            none was supplied to the original <span class="code ">IModel.BasicConsume</span> call.
+
+            You can cancel an active consumer with <span class="code ">IModel.BasicCancel</span>:
+
+<pre class="sourcecode">
+channel.BasicCancel(consumerTag);
+</pre>
+
+When calling the API methods, you always refer to consumers by their
+consumer tags, which can be either client- or server-generated as
+explained in the <a href="/v3_5_7/specification.html">AMQP 0-9-1 specification</a> document.
+          </p>
+        </div>
+
+
+        <div class="docSection"><a name="concurrency" id="concurrency"></a>
+          <h2 class="docHeading">Concurrency Considerations for Consumers</h2>
+
+          <p>
+          Each <span class="code ">IConnection</span> instance is, in the current implementation,
+          backed by a single background thread that reads from the socket and
+          dispatches the resulting events to the application.
+          If heartbeats are enabled, as of version <span class="code ">3.5.0</span>
+          they are implemented in terms of .NET timers.
+
+          Usually, therefore, there will be at least two threads active in an application
+          using this library:
+          </p>
+
+          <dl>
+            <dt>the application thread</dt>
+            <dd>
+              contains the application logic, and makes
+              calls on <span class="code ">IModel</span> methods to perform protocol operations.
+            </dd>
+
+            <dt>the I/O activity thread</dt>
+            <dd>
+              hidden away and completely managed by the
+              <span class="code ">IConnection</span> instance.
+            </dd>
+          </dl>
+
+          <p>
+          The one place where the nature of the threading model is visible to
+          the application is in any callback the application registers with the
+          library. Such callbacks include:
+          </p>
+
+          <ul>
+            <li>any <span class="code ">IBasicConsumer</span> method</li>
+            <li>the <span class="code ">BasicReturn</span> event on <span class="code ">IModel</span></li>
+            <li>any of the various shutdown events on <span class="code ">IConnection</span>, <span class="code ">IModel</span> etc.</li>
+          </ul>
+
+          <div class="docSubsection"><a name="consumer-callbacks-and-ordering" id="consumer-callbacks-and-ordering"></a>
+            <h3 class="docHeading">Consumer Callbacks and Ordering</h3>
+            <p>
+              As of version <span class="code ">3.5.0</span> application callback handlers <strong>can</strong> invoke blocking
+              operations (such as <span class="code ">IModel.QueueDeclare</span> or <span class="code ">
+              IModel.BasicCancel</span>). <span class="code ">IBasicConsumer</span> callbacks are invoked concurrently.
+              However, per-channel operation order is preserved. In other word, if messages A and B were delivered
+              in this order on the same channel, they will be processed in this order. If messages A and B
+              were delivered on different channels, they can be processed in any order (or in parallel).
+              Consumer callbacks are invoked in tasks dispatched to the default <a href="https://msdn.microsoft.com/en-us/library/dd997402%28v=vs.110%29.aspx">TaskScheduler</a>
+              provided by the .NET runtime.
+            </p>
+          </div>
+
+          <div class="docSubsection"><a name="custom-task-scheduler" id="custom-task-scheduler"></a>
+            <h3 class="docHeading">Using a Custom Task Scheduler</h3>
+            <p>
+              It is possible to use a custom task scheduler by setting <span class="code ">ConnectionFactory.TaskScheduler</span>:
+
+<pre class="sourcecode">
+public class CustomTaskScheduler : TaskScheduler
+{
+  // ...
+}
+
+var cf = new ConnectionFactory();
+cf.TaskScheduler = new CustomTaskScheduler();
+</pre>
+
+              This, for example, can be used to <a href="https://msdn.microsoft.com/en-us/library/ee789351%28v=vs.110%29.aspx">limit concurrency degree with a custom TaskScheduler</a>.
+            </p>
+          </div>
+
+          <div class="docSubsection"><a name="model-sharing" id="model-sharing"></a>
+            <h3 class="docHeading">Sharing Channels Between Threads</h3>
+
+            <p>
+              As a rule of thumb, <span class="code ">IModel</span> instances should not be used by more than
+              one thread simultaneously: application code should maintain a clear
+              notion of thread ownership for <span class="code ">IModel</span> instances.
+
+              If more than one thread needs to access a particular <span class="code ">IModel</span>
+              instances, the application should enforce mutual exclusion itself. One
+              way of achieving this is for all users of an <span class="code ">IModel</span> to <span class="code ">
+              lock</span> the instance itself:
+
+<pre class="sourcecode">
+IModel ch = RetrieveSomeSharedIModelInstance();
+lock (ch) {
+  ch.BasicPublish(...);
+}
+</pre>
+
+              Symptoms of incorrect serialisation of <span class="code ">IModel</span> operations
+              include, but are not limited to,
+
+              <ul>
+                <li>invalid frame sequences being sent on the wire (which occurs, for
+                example, if more than one <span class="code ">BasicPublish</span> operation is run
+                simultaneously), and/or
+                </li>
+
+                <li>
+                  <span class="code ">NotSupportedException</span>s being thrown from a method in class
+                  <span class="code ">RpcContinuationQueue</span> complaining about <span class="code ">"Pipelining of
+                  requests forbidden"</span> (which occurs in situations where more than
+                  one AMQP 0-9-1 synchronous operation, such as <span class="code ">ExchangeDeclare</span>, is run
+                  simultaneously).
+                </li>
+              </ul>
+            </p>
+          </div>
+        </div>
+
+
+        <div class="docSection"><a name="basic-return" id="basic-return"></a>
+          <h2 class="docHeading">Handling Unroutable Messages</h2>
+          <p>
+            If a message is published with the "mandatory" flag
+            set, but cannot be delivered, the broker will return it to the sending
+            client (via a <span class="code ">basic.return</span> AMQP 0-9-1 command).
+
+            To be notified of such returns, clients can subscribe to the <span class="code ">
+            IModel.BasicReturn</span> event. If there are no listeners attached to the
+            event, then returned messages will be silently dropped.
+
+<pre class="sourcecode">
+model.BasicReturn +=
+  new RabbitMQ.Client.Events.BasicReturnEventHandler(...);
+</pre>
+
+            The <span class="code ">BasicReturn</span> event will fire, for example, if the client
+            publishes a message with the "mandatory" flag set to an exchange of
+            "direct" type which is not bound to a queue.
+          </p>
+        </div>
+
+        <div class="docSection"><a name="disconnecting" id="disconnecting"></a>
+          <h2 class="docHeading">Disconnecting from RabbitMQ</h2>
+          <p>
+            To disconnect, simply close the channel and the connection:
+
+<pre class="sourcecode">
+channel.Close(200, "Goodbye");
+conn.Close();
+</pre>
+
+            Note that closing the channel is considered good practice, but isn't
+            strictly necessary - it will be done automatically anyway when the
+            underlying connection is closed.
+
+            In some situations, you may want the connection to close automatically
+            once the last open channel on the connection closes. To achieve this,
+            set the <span class="code ">IConnection.AutoClose</span> property to true, but only
+            <strong>after</strong> creating the first channel:
+
+<pre class="sourcecode">
+IConnection conn = factory.CreateConnection(...);
+IModel channel = conn.CreateModel();
+conn.AutoClose = true;
+</pre>
+
+            When <span class="code ">AutoClose</span> is true, the last channel to close will also
+            cause the connection to close. If it is set to true before any
+            channel is created, the connection will close then and there.
+          </p>
+        </div>
+
+
+        <div class="docSection"><a name="connection-recovery" id="connection-recovery"></a>
+          <h2 class="docHeading">Automatic Recovery From Network Failures</h2>
+
+          <div class="docSubsection"><a name="connection-recovery" id="connection-recovery"></a>
+            <h3 class="docHeading">Connection Recovery</h3>
+
+            <p>
+              Network connection between clients and RabbitMQ nodes can fail.
+              RabbitMQ .NET/C# client supports automatic recovery of connections
+              and topology (queues, exchanges, bindings, and consumers).
+
+              The automatic recovery process for many applications follows the following steps:
+
+              <ol>
+                <li>Reconnect</li>
+                <li>Restore connection listeners</li>
+                <li>Re-open channels</li>
+                <li>Restore channel listeners</li>
+                <li>Restore channel <span class="code ">basic.qos</span> setting, publisher confirms and transaction settings</li>
+              </ol>
+
+              Topology recovery includes the following actions, performed for every channel
+
+              <ol>
+                <li>Re-declare exchanges (except for predefined ones)</li>
+                <li>Re-declare queues</li>
+                <li>Recover all bindings</li>
+                <li>Recover all consumers</li>
+              </ol>
+
+              To enable automatic connection recovery, set
+              <span class="code ">ConnectionFactory.AutomaticRecoveryEnabled</span> to true:
+
+<pre class="sourcecode">
+ConnectionFactory factory = new ConnectionFactory();
+factory.AutomaticRecoveryEnabled = true;
+// connection that will recover automatically
+IConnection conn = factory.CreateConnection();
+</pre>
+
+              If recovery fails due to an exception (e.g. RabbitMQ node is
+              still not reachable), it will be retried after a fixed time interval (default
+              is 5 seconds). The interval can be configured:
+
+<pre class="sourcecode">
+ConnectionFactory factory = new ConnectionFactory();
+// attempt recovery every 10 seconds
+factory.NetworkRecoveryInterval = TimeSpan.FromSeconds(10);
+</pre>
+            </p>
+          </div>
+
+          <div class="docSubsection"><a name="topology-recovery" id="topology-recovery"></a>
+            <h3 class="docHeading">Topology Recovery</h3>
+
+            <p>
+              Topology recovery involves recovery of exchanges, queues, bindings
+              and consumers. It is enabled by default but can be disabled:
+
+<pre class="sourcecode">
+ConnectionFactory factory = new ConnectionFactory();
+
+Connection conn = factory.CreateConnection();
+factory.AutomaticRecoveryEnabled = true;
+factory.TopologyRecoveryEnabled  = false;
+</pre>
+            </p>
+          </div>
+
+          <div class="docSubsection"><a name="basic-ack-and-recovery" id="basic-ack-and-recovery"></a>
+            <h3 class="docHeading">Manual Acknowledgements and Automatic Recovery</h3>
+
+            <p>
+              When manual acknowledgements are used, it is possible that
+              network connection to RabbitMQ node fails between message
+              delivery and acknowledgement. After connection recovery,
+              RabbitMQ will reset delivery tags on all channels.
+
+              This means that <span class="code ">basic.ack</span>, <span class="code ">basic.nack</span>, and <span class="code ">basic.reject</span>
+              with old delivery tags will cause a channel exception. To avoid this,
+              RabbitMQ .NET client keeps track of and updates delivery tags to make them monotonically
+              growing between recoveries.
+
+              <span class="code ">IModel.BasicAck</span>,
+              <span class="code ">IModel.BasicNack</span>, and
+              <span class="code ">IModel.BasicReject</span> then translate adjusted
+              delivery tags into those used by RabbitMQ.
+
+              Acknowledgements with stale delivery tags will not be
+              sent. Applications that use manual acknowledgements and automatic
+              recovery must be capable of handling redeliveries.
+
+            </p>
+          </div>
+        </div>
+
+        <div class="docSection"><a name="common-patterns" id="common-patterns"></a>
+          <h2 class="docHeading">Common ways of working with AMQP 0-9-1</h2>
+
+          <p>
+            When building distributed systems with RabbitMQ, there are a number of
+            different messaging patterns that crop up over and over again. In this
+            section, we cover some of the most common coding patterns and
+            interaction styles:
+
+            <ul>
+              <li>Point-to-point messaging: both remote procedure call (RPC), and
+              asynchronous messages directed toward a particular receiver.
+              </li>
+
+              <li>
+                Event broadcasting: one-to-many interactions; transmission of
+                messages directed implicitly to a set of interested receivers, with
+                collection of zero or more possible responses.
+              </li>
+
+              <li>
+                Responsibility transfer: choosing which piece of the network is
+                responsible for any given message.
+              </li>
+
+              <li>
+                Message transfer: at-least-once and at-most-once message delivery.
+              </li>
+
+              <li>
+                Preserving atomicity and idempotence when interacting with external resources.
+              </li>
+            </ul>
+
+            Limited library support is also available for working with these
+            patterns, in the <span class="code ">RabbitMQ.Client.MessagePatterns</span> namespace:
+
+            <ul>
+              <li>
+                <span class="code ">Subscription</span> provides a high-level interface to receiving
+                messages from the server.
+              </li>
+
+              <li>
+                <span class="code ">SimpleRpcServer</span> builds on <span class="code ">Subscription</span> to implement
+                an RPC or one-way service.
+              </li>
+
+              <li>
+                <span class="code ">SimpleRpcClient</span> builds on <span class="code ">Subscription</span> to interact
+                with remote services.
+              </li>
+            </ul>
+
+            Future releases of the RabbitMQ .NET client library will include
+            improved high-level support for the most common messaging patterns and
+            their variations.
+          </p>
+
+
+        <div class="docSubsection"><a name="point-to-point-messaging" id="point-to-point-messaging"></a>
+          <h3 class="docHeading">Point-to-point Messaging</h3>
+
+          <p>
+            The point-to-point messaging pattern occurs when the publisher of a
+            message has a particular receiving application in mind - for instance,
+            when a RPC-style service is made available via the AMQP server, or
+            when an application in a workflow chain receives a work item from its
+            predecessor and sends the transformed work item to its successor.
+          </p>
+
+          <h3>Synchronous, Client-Server Remote Procedure Call (RPC)</h3>
+
+          In order to perform request/response RPC,
+          <ul>
+            <li>some means of addressing the service must be available</li>
+            <li>some means of receiving a reply must be available</li>
+            <li>some means of correlating the request message to the reply message
+            must be available</li>
+          </ul>
+
+          <h4>Addressing the service</h4>
+
+          Since AMQP messages are published using a pair of an exchange name and
+          a routing key, this is sufficient for addressing a service. Using a
+          simple exchange-name/routing-key combination permits a number of
+          different ways to implement the service while presenting the same
+          interface to clients. For instance, the service could be implemented
+          as a single process consuming from a queue, and load-balancing
+          internally, or it could be multiple processes consuming from a single
+          queue, being handed requests round-robin style, thereby load balancing
+          without special coding in the service logic.
+
+          Messages can be addressed to the service request queue either
+
+          <ul>
+            <li>directly, using the AMQP default exchange (""); or</li>
+
+            <li>
+              indirectly, by using a service-specific exchange, which leaves the
+              routing-key free for such purposes as method selection or
+              additional service-specific addressing information; or
+            </li>
+
+            <li>
+              indirectly, by using an exchange shared by multiple services, with
+              the service name encoded in the routing key.
+            </li>
+          </ul>
+
+            Using an exchange other than the default exchange permits other
+            applications to receive copies of each request message, which can be
+            useful for monitoring, auditing, logging and debugging.
+
+            <h4>Ensuring a service instance is listening</h4>
+
+            <p>
+            AMQP 0-9-1 publish operation (<span class="code ">IModel.BasicPublish</span>)
+            provides a delivery flag, "mandatory", which can be
+            used to ensure service availability at the time a
+            request is sent by a client.
+
+            Setting the "mandatory" flag causes a request to be returned if it
+            cannot be routed to a queue. Returned messages appear as <span class="code ">basic.return</span>
+            commands, which are made visible to the application via the <span class="code ">IModel.BasicReturn</span>
+            event on the <span class="code ">IModel</span> that was used to publish the message.
+            </p>
+
+            <p>
+            Since published messages are returned to clients via <span class="code ">
+            basic.return</span> method, and <span class="code ">basic.return</span> is an asynchronous
+            negative-acknowledgement event, the <em>absence</em> of a <span class="code ">basic.return</span>
+            for a particular message cannot be taken as a
+            confirmation of delivery: the use of delivery flags only provides a
+            way of raising the bar, rather than eliminating failure entirely.
+            </p>
+
+            <p>
+            Additionally, the fact that a message was flagged "mandatory", and
+            successfully enqueued on one or more queues, is no guarantee of its
+            eventual receipt: most trivially, the queue could be deleted before
+            the message is processed, but other situations, like the use of the
+            <span class="code ">noAck</span> flag by a message consumer, can also make the guarantee
+            provided by "mandatory" conditional.
+            </p>
+
+            <p>
+            Alternatively, one could use <a href="/v3_5_7/confirms.html">Publisher Confirms</a>. Setting a channel
+            into <em>confirm mode</em> by calling <span class="code ">IModel.ConfirmSelect</span> causes
+            the broker to send a <span class="code ">Basic.Ack</span> after each message is processed
+            by delivering to a ready consumer or by persisting to disk.
+
+            Once a successfully processed message has been confirmed via the <span class="code ">IModel.BasicAcks</span>
+            event handler, the broker has assumed responsibility
+            for the message and the client may consider the message <em>handled</em>.
+
+            Note that the broker may also <em>negatively acknowledge</em> a message by
+            sending back a <span class="code ">Basic.Nack</span>. In this case, if a message is
+            rejected via the <span class="code ">IModel.BasicNacks</span> event handler, the client
+            should assume that the message was lost or otherwise
+            undeliverable. Also, note that unroutable messages - messages published as mandatory to non-existing queues -
+            are both <span class="code ">Basic.Return'ed</span> and <span class="code ">Basic.Ack'ed</span>.
+            </p>
+
+            <h4>Receiving Replies</h4>
+
+            AMQP 0-9-1 content header (<span class="code ">IBasicProperties</span>) contains a
+            field called <span class="code ">ReplyTo</span>, which can be used to tell the service where to post
+            a reply to a received RPC request. Across current RabbitMQ client
+            libraries, the most widely-used formats for the string in the
+            <span class="code ">ReplyTo</span> header is a simple queue name, although passing an exchange
+            name and routing key joined by application-specific rules is also an option.
+
+            The service instance will post its reply to the named destination, and
+            the requesting client should arrange to receive messages so addressed,
+            using either <span class="code ">BasicGet</span> or <span class="code ">BasicConsume</span> on an
+            appropriately-bound queue.
+
+            <h4>Correlating a received reply to a transmitted request</h4>
+
+            <span class="code ">IBasicProperties</span> contain a
+            field called <span class="code ">CorrelationId</span>, which in AMQP 0-9-1 is an
+            unstructured string that can be used to match a request to a reply. A
+            reply message should have the same <span class="code ">CorrelationId</span> as the one
+            that was attached to the request message.
+
+            <h2>Asynchronous, one-way messaging</h2>
+
+            In some situations, a simple request-reply interaction pattern is
+            inappropriate for your application. In these cases, the interaction
+            pattern of interest can be constructed from asynchronous, one-way,
+            point-to-point messages.
+
+            If an application is to respond to both synchronous, RPC-style
+            requests, and asynchronous one-way requests, it should use the value
+            of <span class="code ">ReplyTo</span> to decide which interaction style is being requested
+            of it: if <span class="code ">ReplyTo</span> is present and non-empty, the request can be
+            assumed to be an RPC-style call; otherwise, it should be assumed to be
+            a one-way message.
+
+            The <span class="code ">CorrelationId</span> field can be used to group together a number
+            of related messages, just as for the RPC-style case, but more
+            generally tying together an arbitrary number of messages.
+
+            <h3>Acknowledgment modes for point-to-point</h3>
+
+            AMQP can operate in one of two modes, when receiving messages from the
+            server: auto-acknowledgement mode (when the <span class="code ">noAck</span> flag has been
+            set on <span class="code ">BasicGet</span>, <span class="code ">BasicConsume</span>, or the <span class="code ">
+            Subscription</span> constructor), or manual-acknowledgement mode. Choosing
+            the right acknowledgement mode is important for your application:
+
+            <ul>
+              <li>
+                auto-acknowledgement mode means that the server will internally
+                mark a message as successfully delivered as it transmits it across
+                the network. Messages delivered in auto-acknowledgement mode will
+                not generally be redelivered to any other receiver.
+              </li>
+
+              <li>
+                manual-acknowledgement mode means that the server will wait for
+                positive confirmation of receipt before marking a message as
+                successfully delivered. Messages delivered in
+                manual-acknowledgement mode will be re-queued if the channel
+                (<span class="code ">IModel</span>) they were delivered on is closed before
+                an acknowledgement is received by the server.
+              </li>
+            </ul>
+
+            In general,
+
+            <ul>
+              <li>
+                if a service is in manual-acknowledgement mode, it should not
+                acknowledge the request message until it has replied to it; see the
+                section below on interaction with external resources.
+              </li>
+              <li>
+                a client may use auto-acknowledgement mode, depending on the
+                consequences of a retransmission of the request message.
+              </li>
+            </ul>
+
+            <h3>Library support for point-to-point messaging</h3>
+
+            The RabbitMQ .NET client library includes basic support for common
+            tasks involving point-to-point messaging.
+
+            <h4>SimpleRpcServer</h4>
+
+            The class <span class="code ">RabbitMQ.Client.MessagePatterns.SimpleRpcServer</span>
+            implements synchronous RPC-style request handling as well as
+            asynchronous message handling. Users should subclass <span class="code ">
+            SimpleRpcServer</span>, overriding one or more of the methods with names
+            beginning with "<span class="code ">Handle</span>".
+
+            <span class="code ">SimpleRpcServer</span> instances have a request-dispatching loop,
+            <span class="code ">MainLoop</span>, which interprets a request as an RPC-style request
+            needing a reply if the <span class="code ">ReplyTo</span> field of the request's <span class="code ">
+            IBasicProperties</span> is non-null and non-empty. Requests with absent or
+            empty <span class="code ">ReplyTo</span> fields are treated as one-way.
+
+            When an RPC-style request has been processed, the reply is sent to the
+            <span class="code ">ReplyTo</span> address. The reply address is first matched against a
+            regular-expression describing the URI-like syntax given above; if it
+            matches, the components of the URI-like syntax are used as the reply
+            address, and if it does not, the whole string is used as a simple
+            queue name, and the reply is sent to the default exchange ("") with a
+            routing-key equal to the <span class="code ">ReplyTo</span> string.
+
+            <h4>SimpleRpcClient</h4>
+
+            The class <span class="code ">RabbitMQ.Client.MessagePatterns.SimpleRpcClient</span>
+            implements code for interacting with <span class="code ">SimpleRpcServer</span>s or
+            similar.
+
+            RPC-style interactions are performed with the <span class="code ">Call</span> methods. A
+            (private) <span class="code ">Subscription</span> is set up to receive replies from the
+            service, and the <span class="code ">ReplyTo</span> field is set to point to the
+            subscription. The <span class="code ">CorrelationId</span> field of the request is
+            initialised to a fresh GUID. Asynchronous/one-way interactions are
+            simply passed on to <span class="code ">IModel.BasicPublish</span> without modification:
+            it is up to the caller to set <span class="code ">CorrelationId</span> in the asynchronous
+            case.
+
+            The class currently has no support for setting the "mandatory" flag
+            on a published request message, nor for handling any
+            <span class="code ">BasicReturn</span> events that might arise from setting that flag.
+
+            The code that retrieves replies from the internal <span class="code ">Subscription</span>
+            currently cannot deal with multiple simultaneously outstanding RPC
+            requests, because it requires that replies arrive in the same order as
+            the requests were sent out. Do not attempt to pipeline requests sent
+            through a single instance of <span class="code ">SimpleRpcClient</span> until this
+            restriction has been lifted. See also the overridable protected method
+            <span class="code ">SimpleRpcClient.RetrieveReply</span>.
+
+            The basic pattern for using <span class="code ">SimpleRpcClient</span> is as follows:
+
+<pre class="sourcecode">
+using (IConnection conn = new ConnectionFactory()
+                                .CreateConnection(args[0])) {
+    using (IModel ch = conn.CreateModel()) {
+
+        SimpleRpcClient client = new SimpleRpcClient(ch, /* ... */);
+        // in the line above, the "..." indicates the parameters
+        // used to specify the address to use to route messages
+        // to the service.
+
+        // The next three lines are optional:
+        client.TimeoutMilliseconds = 5000; // defaults to infinity
+        client.TimedOut += new EventHandler(TimedOutHandler);
+        client.Disconnected += new EventHandler(DisconnectedHandler);
+
+        byte[] replyMessageBytes = client.Call(requestMessageBytes);
+        // other useful overloads of Call() and Cast() are
+        // available. See the code documentation of SimpleRpcClient
+        // for full details.
+    }
+}
+</pre>
+
+            Note that a single <span class="code ">SimpleRpcClient</span> instance can perform many
+            (sequential) <span class="code ">Call()</span> and <span class="code ">Cast()</span> requests! It is
+            recommended that a single <span class="code ">SimpleRpcClient</span> be reused for
+            multiple service requests, so long as the requests are strictly
+            sequential.
+        </div>
+
+        <div class="docSubsection"><a name="" id=""></a>
+          <h3 class="docHeading">Event Broadcasting</h3>
+          <p>
+          The event broadcasting pattern occurs when an application wishes to
+          indicate a state change or other notification to a pool of
+          applications without knowing precisely the addresses of each
+          interested party. Applications interested in a certain subset of
+          events use exchanges and queue-bindings to configure which
+          events are routed to their own private queues.
+          </p>
+
+          <p>
+          Generally, events will be broadcast through <span class="code ">topic</span> exchanges,
+          although <span class="code ">direct</span> exchanges, while less flexible, can sometimes
+          perform better for applications where their limited pattern-matching
+          capability is sufficient.
+          </p>
+
+          <h3>Publishing events</h3>
+
+          To publish an event, first ensure the exchange exists, then  determine an appropriate routing key.
+          For example, for stocks, a key such as `stock.ibm.nyse` might be appropriate; for other
+          applications, other topic hierarchies will naturally arise. <span class="code ">topic</span> exchanges
+          are commonly used. Then publish the message. For example:
+
+<pre class="sourcecode">
+using (IConnection conn = new ConnectionFactory()
+                                .CreateConnection(args[0])) {
+    using (IModel ch = conn.CreateModel()) {
+
+        IBasicProperties props = ch.CreateBasicProperties();
+        FillInHeaders(props); // or similar
+        byte[] body = ComputeBody(props); // or similar
+
+        ch.BasicPublish("exchangeName",
+                        "chosen.routing.key",
+                        props,
+                        body);
+    }
+}
+</pre>
+          See the documentation for the various overloads of <span class="code ">BasicPublish</span>
+          on class <span class="code ">RabbitMQ.Client.IModel</span>.
+
+          <h3>Subscription</h3>
+
+          The class <span class="code ">RabbitMQ.Client.MessagePatterns.Subscription</span>
+          implements most of the boilerplate of receiving messages (including,
+          in particular, broadcast events) for you, including consumer
+          declaration and management, but excluding queue and exchange
+          declaration and queue binding. For example,
+
+<pre class="sourcecode">
+// "IModel ch" in scope.
+Subscription sub = new Subscription(ch, "STOCK.IBM.#");
+foreach (BasicDeliverEventArgs e in sub) {
+  // handle the message contained in e ...
+  // ... and finally acknowledge it
+  sub.Ack(e);
+}
+</pre>
+
+          will start a consumer on the queue using <span class="code ">IModel.BasicConsume</span>.
+          It is assumed that the queue and any bindings have been previously
+          declared.
+
+          <span class="code ">Subscription.Ack()</span> should be called for each received event,
+          whether or not auto-acknowledgement mode is used, because <span class="code ">
+          Subscription</span> internally knows whether an actual network message for
+          acknowledgement is required, and will take care of it for you in an
+          efficient way so long as <span class="code ">Ack()</span> is always called in your code.
+
+          For full details, please see the code documentation for the <span class="code ">
+          Subscription</span> class.
+
+          <h3>Retrieving events with a custom consumer</h3>
+
+          Sometimes the high-level approach using <span class="code ">Subscription</span> is
+          sufficient. Other times, however, there is a need to use a custom consumer.
+          This approach to retrieving events
+          is to bind a queue to the exchange concerned with an appropriate
+          routing-key pattern specification. For instance, assuming that our
+          application wanted to retrieve all prices regarding IBM on queue
+          "MyApplicationQueue":
+
+<pre class="sourcecode">
+// "IModel ch" in scope.
+ch.ExchangeDeclare("prices", "topic");
+ch.QueueDeclare("MyApplicationQueue", false, true, true, null);
+ch.QueueBind("MyApplicationQueue", "prices",
+             "STOCK.IBM.#", false, null);
+</pre>
+
+          ... followed by consumption of messages from "MyApplicationQueue"
+          using <span class="code ">BasicGet</span> or <span class="code ">BasicConsume</span>. A more full example is
+          given in the ApiOverview chapter.
+
+          <h3>Acknowledgment modes for event broadcasting</h3>
+
+          <p>
+          The same auto-acknowledgement/manual-acknowledgement decision as for
+          point-to-point messaging is available for consumers of broadcast
+          events, but the pattern of interaction introduces different tradeoffs:
+          </p>
+
+          <ul>
+            <li>
+              for high-volume messaging where it is occasionally acceptable to
+              not receive one of the messages one is interested in,
+              auto-acknowledgement mode makes sense
+            </li>
+
+            <li>
+              for scenarios where every message matching our subscription needs
+              to be delivered, manual-acknowledgement is appropriate
+            </li>
+          </ul>
+
+            <p>
+            For more information, see the section on reliable message transfer
+            below.
+            Note also that class <span class="code ">Subscription</span> takes care of acknowledgement
+            and the various acknowledgement modes for you, so long as <span class="code ">
+            Subscription.Ack()</span> is called for each received message.
+            </p>
+        </div>
+
+        <div class="docSubsection"><a name="reliable-message-transfer" id="reliable-message-transfer"></a>
+          <h3 class="docHeading">Reliable message transfer</h3>
+
+          <p>
+            Messages can be transported between endpoints with different
+            quality-of-service (QoS) levels. In general, failure cannot be
+            completely ruled out, but it is important to understand the various
+            delivery failure modes to understand the kinds of recovery from
+            failure that are required, and the kinds of situation for which
+            recovery is possible.
+
+            To reiterate: it is not possible to completely rule out failure. The
+            best that can be done is to narrow the conditions in which failure can
+            occur, and to notify a system operator when failure is detected.
+          </p>
+
+          <h3>At-least-once delivery</h3>
+
+          <p>
+            This QoS level assures that a message is delivered to its ultimate
+            destination at least once. That is, a receiver may receive multiple
+            copies of the message. If it is important that a side-effect only
+            occur once for a given message, at-most-once delivery should be used instead.
+          </p>
+
+          To implement at-least-once delivery:
+
+          <ul>
+            <li>
+              publish the message as usual, with some correlation identifier and
+              reply-to address on it so that the receiver can acknowledge receipt
+              to the sender.
+
+              when receiving a message, send an acknowledgement message back to
+              the sender. If the message is an RPC request, then the RPC reply
+              message is implicitly an acknowledgement of receipt of the request.
+            </li>
+
+            <li>
+              Alternatively, rather than implement the round-trip logic manually, a
+              client may use Publisher Confirms. By enabling Confirm mode on a
+              channel, a client is requesting that the broker acknowledge or
+              negatively acknowledge all messages sent on the channel from that
+              point on.  See the instructions from Responsibility Transfer on how to
+              use confirms.
+            </li>
+          </ul>
+
+          Deciding on a message-resend policy can be difficult. Some simple
+          resend strategies are:
+
+            <ul>
+              <li>
+                resend if your connection is lost or some other crash occurs before
+                you receive confirmation of receipt
+              </li>
+
+              <li>
+                timeout and resend if you do not receive a confirmation within a
+                few seconds. Make sure to double the timeout for each resend, to
+                help avoid retry-related denial-of-service and network congestion.
+              </li>
+            </ul>
+
+            <h3> At-most-once delivery</h3>
+
+            For at-most-once delivery, simply publish the message,
+            once, as usual. No correlation identifier is required.
+            Receive the message in the consuming application, paying
+            attention to the <span class="code ">Redelivered</span> flag on the
+            delivery. The <span class="code "> Redelivered</span> flag will only be
+            clear when the server believes that it is offering a
+            message for consumption for the very first time. If any
+            attempt at delivery has been made before, the
+            <span class="code ">Redelivered</span> flag will be set.
+
+            The <span class="code ">Redelivered</span> flag is a very limited piece of information,
+            giving only at-most-once semantics.
+        </div>
+        </div>
+
+
+
+        <div class="docSection"><a name="working-with-clusters" id="working-with-clusters"></a>
+          <h2 class="docHeading">Coding with multi-node RabbitMQ clusters</h2>
+          <p>
+            In situations where continuous service is desired, the
+            possibility of a server failure can be hedged against with some
+            careful programming and the availability of a warm-standby cluster
+            for failover.
+          </p>
+
+          The main concerns when failing over are
+
+          <ul>
+            <li>atomicity of published/acknowledged work units, and</li>
+            <li>availability of configured resources on the backup server</li>
+          </ul>
+
+          <p>
+            Message producers should take care to use transactions in order to
+            receive positive confirmation of receipt of a group of messages from a
+            server, and should keep a record of the exchanges, queues and bindings
+            they need to have available in order to perform their work, so that on
+            failover, the appropriate resources can be declared before replaying
+            the most recent transactions to recover.
+          </p>
+
+          <p>
+            Message consumers should be aware of the possibility of missing or
+            duplicate messages when failing over: a publisher may decide to resend
+            a transaction whose outcome is in doubt, or a transaction the
+            publisher considered complete could disappear entirely due to failure
+            of a cluster node.
+          </p>
+
+        <div class="docSubsection"><a name="external-resources" id="external-resources"></a>
+          <h3 class="docHeading">Interacting with external resources</h3>
+          A common pattern for a service is to
+
+          <ul>
+            <li>receive a service request via a queue</li>
+            <li>update some external resource, such as a file or database</li>
+
+            <li>reply over RabbitMQ, or at a minimum, acknowledge to the server
+            that the message triggering the action has been completed</li>
+          </ul>
+
+          <p>
+            Often elements of the at-least-once pattern appear in
+            conjunction with the external-resource pattern - specifically, the
+            side-effects discussed in the section on reliable message transfer
+            above are often effects on an external resource.
+          </p>
+
+          <p>
+            In cases where a delivery must be processed no more than once and used in conjunction with an
+            external resource, it's important to write code that is able at each
+            step to determine whether the step has already been taken in some
+            previous attempt at completing the whole transaction, and if it has,
+            to be able to omit it in this attempt and proceed to the next
+            step. For example:
+          </p>
+
+          <ul>
+            <li>
+              If a work-triggering request went missing, another copy will
+              (eventually) arrive from the ultimate requestor.
+            </li>
+
+            <li>
+              If the work was already performed, for instance a database table
+              was updated, in a previous receipt of the work item in question,
+              the service needs to keep a record of completion of the external
+              work that is atomic with respect to the atomic work itself: for
+              instance, within the same database transaction, some log of
+              honoured requests could be updated, or the row being modified could
+              be updated to include the ID of the request that caused the
+              modification, as well as previous request-IDs that modified the row
+              in question.
+            </li>
+          </ul>
+
+          <p>
+            This makes it important to be able to compress request IDs so that
+            they do not take unbounded space in the log of performed work, and
+            so that we do not need to introduce a full distributed
+            garbage-collection protocol with the ultimate requestor. One way of
+            doing this is to choose to use request IDs that are strictly
+            increasing, so that a "high water mark" can be used.
+
+            Once the work is known to have been performed, and a reply has been
+            produced (if there is one), the reply can be sent back to the
+            requestor as many times as necessary. The requestor knows which
+            replies it is expecting, and can discard unwanted duplicates. So
+            long as duplicates of the same request always receive identical
+            reply messages, the replier need not be careful about sending too
+            many copies of the reply.
+
+            Once the reply has been sent to the server, the request
+            message can be acknowledged as received and processed with the server
+            server. In cases where there is no reply to a request, the
+            acknowledgement is still useful to ensure that requests are not lost.
+          </p>
+        </div>
+        </div>
+
+
+        <div class="docSection"><a name="rabbitmq-binding-for-wcf" id="rabbitmq-binding-for-wcf"></a>
+          <h2 class="docHeading">A RabbitMQ Binding for WCF</h2>
+          <p>
+            The <a href="http://msdn.microsoft.com/en-us/library/ms731082(v=vs.100).aspx">Windows Communication Foundation (WCF)</a> enabled
+            protocol independent service oriented applications to be
+            built; RabbitMQ .NET client extends the framework by providing a
+            <span class="code ">Binding</span> and <span class="code ">Transport Binding Element</span> over RabbitMQ. In the
+            language of WCF, a <span class="code ">Binding</span> is a stack of <span class="code ">Binding Elements</span>
+            which control all aspects of the service’s communication
+            (for example, Security, Message Format and
+            Transactions). A specialized kind of Binding Element, the
+            <span class="code ">Transport Binding Element</span> specifies the protocol to be
+            used for communication between a service and its clients
+            (for example WS-HTTP, MSMQ or .Net Remoting over TCP).
+          </p>
+          <p>
+            The RabbitMQ Binding provides <em>OneWay</em> ("Fire and Forget"),
+            <em>TwoWay</em> (Request/Reply) and <em>Duplex</em> (Asynchronous Callback)
+            communication over RabbitMQ with <span class="code ">WS-ReliableSessions</span>,
+            <span class="code ">WS-AtomicTransactions</span> and <span class="code ">Text</span> message
+            encoding. The binding can be configured from imperative
+            code or using the standard WCF Configuration model.
+          </p>
+          <p>
+            A <span class="code ">Transport Binding Element</span> is also supplied and can be
+            used in the construction of custom bindings if the channel
+            stack provided by the <span class="code ">RabbitMQ Binding</span> is
+            insufficient. The transport binding must be configured
+            with a broker hostname and broker port prior to use.
+          </p>
+
+          <div class="docSubsection"><a name="status-and-limitations" id="status-and-limitations"></a>
+            <h3 class="docHeading">Status and Known Limitations</h3>
+
+            <ol>
+              <li>A <span class="code ">TwoWay</span> or <span class="code ">Duplex</span> service cannot have <span class="code ">SessionMode</span> = <span class="code ">SessionMode.NotAllowed</span> since a Reliable Session is required to maintain the reply channel.</li>
+              <li>Only SOAP Formatting is available, other formatters can be specified by building a <span class="code ">CustomBinding</span> on top of the <span class="code ">RabbitMQTransportBindingElement</span></li>
+              <li>Service queue parameters (e.g. durability) are not configurable</li>
+              <li>Network faults are not reported to the binding</li>
+            </ol>
+
+            <p>
+              The RabbitMQ WCF binding has limited flexibility
+              compared to the RabbitMQ .NET RabbitMQ client
+              library. You are advised to use the .NET RabbitMQ client
+              library if you require greater flexibility (e.g. control
+              over durability of service queue) or if you require
+              long-term support. The WCF binding is <strong>not under active development</strong>.
+            </p>
+          </div>
+
+          <div class="docSubsection"><a name="building-samples" id="building-samples"></a>
+            <h3 class="docHeading">Building the Binding and Samples</h3>
+
+            <p>
+              The RabbitMQ binding to WCF and associated samples can be built automatically using Nant. For more information about Nant, visit http://nant.sourceforge.net/. To build the library and Sample Applications from a console window, change to the RabbitMQ.net drop location and execute:
+
+<pre class="sourcecode">
+nant build-wcf
+nant wcf-examples
+</pre>
+            </p>
+
+            <p>
+              <ul>
+                <li>src\wcf\RabbitMQ.ServiceModel\RabbitMQ.ServiceModel.csproj</li>
+                <li>src\wcf\Test\RabbitMQ.ServiceModel.Test.csproj</li>
+              </ul>
+
+              The WCF Binding is built into the RabbitMQ.ServiceModel.dll assembly
+              and copied to the bin directory of the RabbitMQ.ServiceModel project
+              and the sample applications are built into the bin directory of the
+              Test project. To run the sample applications (verifying the build and
+              your environment configuration) execute the
+              RabbitMQ.ServiceModel.Test.exe application.  By default, the sample
+              applications use a test broker which must be running at localhost. You
+              can modify the broker hostname and port by opening and editing the
+              <span class="code ">appSettings</span> section of the Application Configuration file (<span class="code ">App.Config</span>)
+              for the Test Project.
+            </p>
+          </div>
+
+          <div class="docSubsection"><a name="abcs-of-wcf" id="abcs-of-wcf"></a>
+            <h3 class="docHeading">The ABCs of WCF</h3>
+
+            <p>
+              Each Windows Communication Foundation service is built from three components, an Address, Behaviours and a Contract. For more information, see <a href="http://msdn.microsoft.com/en-us/library/ee354181.aspx">Windows Communication Foundation Essentials</a>.
+            </p>
+
+            <h4>Contract</h4>
+            <p>
+              A service contract is an interface decorated with the
+              ServiceContractAttribute and has one or more methods (or
+              property accessors) decorated with the
+              <span class="code ">OperationContract</span> attribute. Typically the contract
+              exists in an assembly that can be shared between client
+              and server applications.
+
+<pre class="sourcecode">
+[ServiceContract]
+public interface ICalculator
+{
+  [OperationContract]
+  int Add(int x, int y);
+
+  [OperationContract]
+  int Subtract(int x, int y);
+}
+</pre>
+            </p>
+
+            <h4>Behaviour</h4>
+            <p>
+              The contract for a service specifies what the operations
+              the service agrees to provide, the behaviour specifies
+              the implementation for that service. A behaviour is a
+              class implementing the contract and optionally decorated
+              with the <span class="code ">ServiceBehavior</span> attribute.
+
+<pre class="sourcecode">
+[ServiceBehavior(InstanceContextMode=InstanceContextMode.PerCall)]
+public sealed class Calculator : ICalculator
+{
+  public int Add(int x, int y)
+  {
+    return x + y;
+  }
+
+  public int Subtract(int x, int y)
+  {
+    return x - y;
+  }
+}
+</pre>
+            </p>
+
+            <h4>Address</h4>
+            <p>
+              For a service to be useful, it must be reachable and
+              therefore hosted. The two common hosting scenarios for
+              WCF services are IIS and ServiceHost. IIS Hosting is
+              untested and unsupported by the RabbitMQ binding and
+              using <span class="code ">System.ServiceModel.ServiceHost</span> is the recommended
+              hosting path. A service host instance is constructed
+              with the type of service behaviour being hosted and a
+              description of the endpoint(s) it will be published
+              on. The endpoints consist of Addresses
+              (e.g. <span class="code ">soap.amp:///MyService</span>) and Bindings; they may be
+              specified directly as constructor arguments in
+              imperative code or declaratively through WCF
+              configuration files, both are supported by the RabbitMQ
+              binding.
+            </p>
+
+            <h4>Service Addressing</h4>
+            <p>
+              Services hosted using the RabbitMQ binding must be
+              hosted at addresses under the <span class="code ">soap.amqp</span> scheme. The
+              <span class="code ">amq.direct</span> exchange is used. The service name must not
+              be omitted.
+
+<pre class="sourcecode">
+serviceAddress = “soap.amqp:///” serviceName
+</pre>
+            </p>
+          </div>
+
+          <div class="docSubsection"><a name="sample-services" id="sample-services"></a>
+            <h3 class="docHeading">Sample Services</h3>
+
+            <p>The sample services referred to in this section are located in the <span class="code ">src\wcf\Test project</span>.</p>
+
+            <h4>One Way Services</h4>
+            <p>
+              Operations on a service can be marked as <span class="code ">One Way</span>; this
+              means there will be no response from the service when
+              the operation completes. <span class="code ">One Way</span> operations always have
+              return type void and have an <span class="code ">OperationContract</span> attribute
+              with <span class="code ">IsOneWay</span> set equal to true decorating them.
+            </p>
+
+<pre class="sourcecode">
+[OperationContract(IsOneWay=true)]
+void Log(LogData entry);
+</pre>
+
+            <p>
+              If a service only contains one way operations the
+              RabbitMQ binding can be used in an optimized <span class="code ">OneWayOnly</span>
+              mode. In this mode, no reply queue is created for
+              responses to be sent back to the client and the client
+              does not listen for responses from the service. To
+              enable <span class="code ">OneWayOnly</span> mode set the binding property or use
+              the <span class="code ">oneWay</span> configuration attribute.
+            </p>
+
+<pre class="sourcecode">
+&lt;rabbitMQBinding&gt;
+  &lt;binding name="rabbitMQConfig"
+           hostame="localhost"
+           port="5672"
+           username="guest"
+           password="guest"
+           virtualHost="/"
+           oneWay="true"
+           maxmessagesize="8192" /&gt;
+&lt;/rabbitMQBinding&gt;
+</pre>
+
+            <p>
+              The <span class="code ">OneWayTest</span> sample application is a simple logging
+              service. Clients submit log entries to a server which
+              displays them on the console. It demonstrates one way
+              RPC over RabbitMQ, SOAP encoding to transmit complex data
+              types over the wire and singleton instance context mode.
+            </p>
+
+            <h4>Two Way Services</h4>
+            <p>
+              Typically a service operates in a bi-directional, two
+              way fashion where requests from the client are
+              synchronously executed and a response returned to the
+              caller. To support these services, the RabbitMQ binding
+              uses the <span class="code ">CompositeDuplexBindingElement</span> , which
+              constructs a uniquely named reply queue on the
+              broker. Two Way services are not supported by the
+              binding when it is in <span class="code ">OneWayOnly</span> mode.  The <span class="code ">TwoWayTest</span>
+              sample application is a calculator service, whose
+              operations take a pair of integers and return a third.
+            </p>
+
+            <h4>Sessionful Services</h4>
+            <p>
+              Each call to a service can be considered independent of all others
+              with the service maintaining no state, often a more useful service
+              maintains some state between calls. The RabbitMQ binding supports
+              <span class="code ">WS-ReliableSessions</span> enable the object instances used to service
+              requests to have a session-long lifetime and be associated with a
+              single client session. <span class="code ">The SessionTest</span> sample application is a cart
+              service, allowing items to be added to a cart and a total calculated.
+            </p>
+
+            <h4>Duplex Services</h4>
+            <p>
+              A call to a two way service might start a long running process (for
+              example, aggregating prices from a list of suppliers) and whilst the
+              client requires a response, it is desirable that the client is not
+              blocked for the duration of the call; instead, an asynchronous call is
+              desired. Duplex services allow the service to make calls to the
+              client, and have a contract whose <span class="code ">ServiceContract</span> specifies a
+              <span class="code ">CallbackContract</span> type.
+            </p>
+
+<pre class="sourcecode">
+[ServiceContract(CallbackContract=typeof(IOrderCallback))]
+public interface IOrderService
+</pre>
+
+            <p>
+              Duplex services are supported by the RabbitMQ binding because its
+              channel stack includes the composite duplex binding element, they
+              are not supported in <span class="code ">OneWayOne</span> mode. The <span class="code ">DuplexTest</span> sample
+              application is an ordering service, which makes a callback to the
+              client when an order is fulfilled.
+            </p>
+          </div>
+
+          <div class="docSubsection"><a name="using-wcf-binding" id="using-wcf-binding"></a>
+            <h3 class="docHeading">Using the RabbitMQ Binding</h3>
+
+            <h4>Services</h4>
+            <p>
+              The recommended hosting scenario for services over RabbitMQ is self
+              hosting using <span class="code ">System.ServiceModel.ServiceHost</span>. The
+              ServiceHost must specify a base or absolute endpoint address under the
+              soap.amqp scheme. An endpoint should then be added to the service
+              using the <span class="code ">RabbitMQBinding</span>.
+            </p>
+
+<pre class="sourcecode">
+var service = new ServiceHost(typeof(Calculator), new Uri("soap.amqp:///"));
+var binding = new RabbitMQBinding("localhost", 5672, "guest", "guest", "/",
+                                  8192, Protocols.AMQP_0_9_1);
+
+service.AddServiceEndpoint(typeof(ICalculator), binding, "Calculator");
+</pre>
+
+            <h4>Clients</h4>
+            <p>
+              The recommended pattern for connecting to a service is
+              by deriving from either <span class="code ">ClientBase&lt;T&gt;</span> or
+              <span class="code ">DuplexClientBase&lt;T&gt;</span>. For duplex clients, the
+              <span class="code ">InstanceContext</span> must be specified.
+            </p>
+
+            <h4>Configuration Files</h4>
+            <p>
+              Specifying details like the protocol version and broker
+              address in source code tends to result in services which
+              are very hard to manage and deploy. To avoid this, WCF
+              provides a configuration mechanism using application
+              configuration files (App.Config). The configuration file
+              must be applied to the host or client assembly
+              (typically an executable) and not to a library which
+              contains the service contract or behaviours. To
+              declaratively configure a service, the
+              RabbitMQBindingSection must be imported into the
+              system.serviceModel section of the configuration file.
+            </p>
+
+<pre class="sourcecode">
+&lt;extensions&gt;
+  &lt;bindingExtensions&gt;
+    &lt;add
+      name="rabbitMQBinding"
+      type="RabbitMQ.ServiceModel.RabbitMQBindingSection, RabbitMQ.ServiceModel, Version=1.0.110.0, Culture=neutral, PublicKeyToken=null"/&gt;
+  &lt;/bindingExtensions&gt;
+&lt;/extensions&gt;
+</pre>
+
+            <p>
+              With the extension imported, the <span class="code ">rabbitMQBinding</span> can be declared and configured:
+            </p>
+
+<pre class="sourcecode">
+&lt;bindings&gt;
+  &lt;rabbitMQBinding&gt;
+    &lt;binding
+      name="rabbitMQConfig"
+      hostname="localhost"
+      port="5672"
+      maxmessagesize="8192"
+      version="AMQP_0_9_1" /&gt;
+  &lt;/rabbitMQBinding&gt;
+&lt;/bindings&gt;
+</pre>
+
+            <h4>Service Configuration</h4>
+            <p>
+              A service is configured by declaring the contract,
+              endpoint and binding. Multiple services and bindings can
+              be specified in a single configuration file.
+            </p>
+
+<pre class="sourcecode">
+&lt;services&gt;
+  &lt;service name="Calculator"&gt;
+    &lt;host&gt;
+      &lt;baseAddresses&gt;
+        &lt;add baseAddress="soap.amq:///" /&gt;
+      &lt;/baseAddresses&gt;
+    &lt;/host&gt;
+    &lt;endpoint
+      address="Calculator"
+      binding="rabbitMQBinding"
+      bindingConfiguration="rabbitMQConfig"
+      contract="ICalculator"/&gt;
+  &lt;/service&gt;
+&lt;/services&gt;
+</pre>
+
+            <p>
+              To run the service, simply create a new ServiceHost
+              instance passing in the service behaviour (as specified
+              in config).
+            </p>
+
+<pre class="sourcecode">
+host = new ServiceHost(typeof(Calculator));
+host.Open();
+</pre>
+
+            <h4>Client Configuration</h4>
+            <p>
+              To build a client whose settings are derived from
+              configuration, expose a constructor for your
+              <span class="code ">ClientBase&lt;T&gt;</span> derived class calling the
+              <span class="code ">ClientBase(string)</span>.
+            </p>
+<pre class="sourcecode">
+public class CalculatorClient : ClientBase&lt;ICalculator&gt;, ICalculator
+{
+
+    public CalculatorClient(string configurationName)
+        : base(configurationName) { }
+
+</pre>
+
+            <p>Construct the class passing the client endpoint name as specified in configuration.</p>
+<pre class="sourcecode">
+&lt;client&gt;
+  &lt;endpoint address="soap.amq:///Calculator"
+            binding="rabbitMQBinding"
+            bindingConfiguration="rabbitMQConfig"
+            contract=" ICalculator"
+            name="AMQPCalculatorService" /&gt;
+&lt;/client&gt;
+</pre>
+
+            <p>
+              The RabbitMQ WCF libraries also have full support for the WCF Configuration Editor Tool.
+            </p>
+          </div>
+        </div>
+    </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html" class="selected">Client Documentation</a><ul>
+       <li><a href="/v3_5_7/api-guide.html">Java Client Guide</a></li>
+       <li><a href="/v3_5_7/dotnet-api-guide.html" class="selected">.NET Client Guide</a></li>
+       <li><a href="/v3_5_7/heartbeats.html">Heartbeats</a></li>
+       <li><a href="/v3_5_7/erlang-client-user-guide.html">Erlang Client Guide</a></li>
+       <li><a href="/v3_5_7/uri-spec.html">AMQP URI Spec</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#classoverview">Major namespaces, interfaces and classes</a></li><li><a href="#connecting">Connecting to a Broker</a></li><li><a href="#using-exchanges-and-queues">Using Exchanges and Queues</a></li><li><a href="#publishing">Publishing Messages</a></li><li><a href="#basic-get">Fetching Individual Messages ("pull API")</a></li><li><a href="#basic-consume">Retrieving Messages By Subscription ("push API")</a></li><li><a href="#concurrency">Concurrency Considerations for Consumers</a></li><li><a href="#basic-return">Handling Unroutable Messages</a></li><li><a href="#disconnecting">Disconnecting from RabbitMQ</a></li><li><a href="#connection-recovery">Automatic Recovery From Network Failures</a></li><li><a href="#common-patterns">Common ways of working with AMQP 0-9-1</a></li><li><a href="#working-with-clusters">Coding with multi-node RabbitMQ clusters</a></li><li><a href="#rabbitmq-binding-for-wcf">A RabbitMQ Binding for WCF</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

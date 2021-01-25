@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Installing Additional Plugins</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Installing Additional Plugins</h1>
+      <div class="docSection"><a name="installing-plugins" id="installing-plugins"></a>
+      <p>
+        Any plugins that do not ship with the server will need to be
+        installed as .ez archives by copying them to the plugins
+        directory. Once they have been copied to the correct
+        directory, they will show up in <span class="code ">rabbitmq-plugins
+        list</span> and can be enabled with <span class="code ">rabbitmq-plugins
+        enable <i>plugin-name</i></span>.
+      </p>
+      <p>
+        The plugins directory location is determined by the
+        <b>RABBITMQ_PLUGINS_DIR</b> variable.  Its default value
+        depends on how you installed RabbitMQ. Some common values are:
+      </p>
+      <table>
+        <tr><th>Installation method</th><th>Plugins directory</th></tr>
+        <tr>
+          <th>Debian/RPM packages</th>
+          <td>
+            <span class="code ">/usr/lib/rabbitmq/lib/rabbitmq_server-</span><i>version</i><span class="code ">/plugins</span>
+          </td>
+        </tr>
+        <tr>
+          <th>Windows</th>
+          <td>
+            Typically <span class="code ">C:\Program
+              Files\RabbitMQ\rabbitmq_server-</span><i>version</i><span class="code ">\plugins</span>
+            (depending on where it was installed)
+          </td>
+        </tr>
+        <tr>
+          <th>Homebrew</th>
+          <td>
+            <span class="code ">/usr/local/Cellar/rabbitmq/</span><i>version</i><span class="code ">/lib/rabbitmq/erlang/lib/rabbitmq-</span><i>version</i><span class="code ">/plugins</span>
+          </td>
+        </tr>
+        <tr>
+          <th>Generic Unix</th>
+          <td>
+            <span class="code ">rabbitmq_server-</span><i>version</i><span class="code ">/plugins</span>
+            (depending on where it was installed)
+          </td>
+        </tr>
+      </table>
+      </div>
+      <div class="docSection"><a name="upgrades" id="upgrades"></a>
+        <h2 class="docHeading">Plugins and Upgrades</h2>
+        <p>
+          The enabled plugins configuration is preserved between
+          upgrades, so there is no need to re-enable plugins after an
+          upgrade, but because the plugins directory changes between
+          versions, any third party plugins will need to be copied to
+          the new directory. It's very possible that due to API
+          changes you may need to check for updates to third party
+          plugins at this point.
+        </p>
+      </div>
+      <div class="docSection"><a name="building" id="building"></a>
+        <h2 class="docHeading">Building Plugins</h2>
+        <p>
+          You can also build RabbitMQ plugins from source.  The sources for a
+          particular version of the plugins is distributed in the same
+          archive as the broker with that version.  The source code
+          repositories can all be found on <a href="https://github.com/rabbitmq">GitHub</a>. See the
+          <a href="plugin-development.html">plugin development</a>
+          guide for more information on building plugins from source.
+        </p>
+        <p>
+          Note that plugins tend to be strongly bound to a particular
+          version of <span class="code ">rabbitmq-server</span>. For example, if you are
+          running RabbitMQ 3.5.7, you should check out all plugins
+          with the Git tag <span class="code ">rabbitmq_v3_5_7</span>.
+        </p>
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_5_7/management.html">Management plugin</a></li>
+       <li><a href="/v3_5_7/federation.html">Federation plugin</a></li>
+       <li><a href="/v3_5_7/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v3_5_7/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_5_7/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_5_7/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_5_7/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_5_7/installing-plugins.html" class="selected">Installing plugins</a></li>
+       <li><a href="/v3_5_7/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#installing-plugins"></a></li><li><a href="#upgrades">Plugins and Upgrades</a></li><li><a href="#building">Building Plugins</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

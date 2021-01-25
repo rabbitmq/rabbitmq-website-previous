@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Production Checklist</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Production Checklist</h1>
+    <div class="docSection"><a name="intro" id="intro"></a>
+      <h2 class="docHeading">Introduction</h2>
+
+      <p>
+        Data services such as RabbitMQ often have many tunable
+        parameters. Some configurations make a lot of sense for
+        development but are not really suitable for production.  No
+        single configuration fits every use case.  It is, therefore,
+        important to assess your configuration before going into
+        production. This guide aims to help with that.
+      </p>
+    </div>
+
+
+    <div class="docSection"><a name="users-and-permissions" id="users-and-permissions"></a>
+      <h2 class="docHeading">Virtual Hosts, Users, Permissions</h2>
+
+      <div class="docSubsection"><a name="virtual-hosts" id="virtual-hosts"></a>
+        <h3 class="docHeading">Virtual Hosts</h3>
+        <p>
+          In a single-tenant environment, for example, when your RabbitMQ
+          cluster is dedicated to power a single system in production,
+          using default virtual host (<span class="code ">/</span>) is perfectly fine.
+        </p>
+
+        <p>
+          In multi-tenant environments, use a separate vhost for
+          each tenant/environment, e.g. <span class="code ">project1_development</span>,
+          <span class="code ">project1_production</span>, <span class="code ">project2_development</span>,
+          <span class="code ">project2_production</span>, and so on.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="users" id="users"></a>
+        <h3 class="docHeading">Users</h3>
+        <p>
+          For production environments, delete the default user (<span class="code ">guest</span>).
+          Default user only can connect from localhost by default, because it has well-known
+          credentials. Instead of enabling remote connections, consider using a separate user
+          with administrative permissions and a generated password.
+        </p>
+        <p>
+          It is recommended to use a separate user per application. For example, if you
+          have a mobile app, a Web app, and a data aggregation system, you'd have 3
+          separate users. This makes a number of things easier:
+
+          <ul>
+            <li>Correlating client connections with applications</li>
+            <li>Using <a href="/v3_5_7/access-control.html">fine-grained permissions</a></li>
+            <li>Credentials roll-over (e.g. periodically or in case of a breach)</li>
+          </ul>
+
+          In case there are many instances of the same application, there's a trade-off
+          between better security (having a set of credentials per instance) and convenience
+          of provisioning (sharing a set of credentials between some or all instances).
+
+          For IoT applications that involve many clients performing the same or similar
+          function and having fixed IP addresses, it may make sense to <a href="/v3_5_7/ssl.html">authenticate
+          using x509 certificates</a> or <a href="https://github.com/gotthardp/rabbitmq-auth-backend-ip-range">source IP addresse ranges</a>.
+        </p>
+      </div>
+    </div>
+
+
+    <div class="docSection"><a name="resource-limits" id="resource-limits"></a>
+      <h2 class="docHeading">Resource Limits</h2>
+
+      <p>
+        RabbitMQ uses <a href="/v3_5_7/alarms.html">Resource-driven alarms</a>
+        to throttle publishers when consumers do not keep up.
+        It is important to evaluate resource limit configurations before
+        going into production.
+      </p>
+
+      <div class="docSubsection"><a name="resource-limits-ram" id="resource-limits-ram"></a>
+        <h3 class="docHeading">Memory</h3>
+        <p>
+          By default, RabbitMQ will use up to 40% of available RAM. For nodes
+          that are dedicated to run RabbitMQ, it is often reasonable to raise
+          the limit. However, care should be taken as the OS and file system caches
+          need RAM to operate as well. Failing to do so will have a severe throughput drop due
+          to OS swapping, or even result in the RabbitMQ process terminated by the OS.
+        </p>
+        <p>
+          Below are some basic guidelines for determining what <a href="/v3_5_7/memory.html">RAM limit</a>
+          is recommended:
+
+          <ul>
+            <li>At least 128 MB</li>
+            <li>
+              75% of the configured RAM limit when
+              the limit is up to 4 GB of RAM
+            </li>
+            <li>
+              80% of the configured RAM limit when
+              the limit is between 4 and 8 GB of RAM
+            </li>
+            <li>
+              85% of the configured RAM limit when
+              the limit is between 8 and 16 GB of RAM
+            </li>
+            <li>
+              90% of the configured RAM limit when
+              the limit is above 16 GB of RAM
+            </li>
+          </ul>
+
+          Values higher than 0.9 can be dangerous
+          and are not recommended.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="resource-limits-disk-space" id="resource-limits-disk-space"></a>
+        <h3 class="docHeading">Free Disk Space</h3>
+        <p>
+          Some free disk space should be available to avoid <a href="/v3_5_7/disk-alarms.html">disk space alarms</a>.
+          By default RabbitMQ requires 50 MiB of free disk space at all times. This improves developer
+          experience on many popular Linux distributions which may place the <span class="code ">/var</span> directory
+          on a small partition. However, this is not a value recommended for production environments,
+          since they may have significantly higher RAM limits.
+
+          Below are some basic guidelines for determining how much free disk space
+          is recommended:
+
+          <ul>
+            <li>At least 2 GB</li>
+            <li>
+              50% of the configured RAM limit when
+              the limit is between 1 and 8 GB of RAM
+            </li>
+            <li>
+              40% of the configured RAM limit when
+              the limit is between 8 and 32 GB of RAM
+            </li>
+            <li>
+              30% of the configured RAM limit when
+              the limit is above 32 GB of RAM
+            </li>
+          </ul>
+
+          The <span class="code ">rabbit.disk_free_limit</span> configuration setting
+          can be set to <span class="code ">{mem_relative, N}</span> to make it calculated
+          as a percentage of the RAM limit. For example, use <span class="code ">{mem_relative, 0.5}</span>
+          for 50%, <span class="code ">{mem_relative, 0.25}</span> for 25%, and so on.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="resource-limits-file-handle-limit" id="resource-limits-file-handle-limit"></a>
+        <h3 class="docHeading">Open File Handles Limit</h3>
+        <p>
+          Operating systems limit maximum number of concurrently open file handles, which
+          includes network sockets. Make sure that you have limits set high enough to allow
+          for expected number of concurrent connections and queues.
+        </p>
+        <p>
+          Make sure your environment allows for at least 50K open file descriptors for effective RabbitMQ
+          user, including in development environments.
+        </p>        
+        <p>
+          As a rule of thumb, multiple the 95th percentile number of concurrent connections
+          by 2 and add total number of queues to calculate recommended open file handle limit.
+          Values as high as 500K are not inadequate and
+          won't consume a lot of hardware resources, and therefore are recommended for production
+          setups.
+
+          See <a href="/v3_5_7/networking.html">Networking guide</a>
+          for more information.          
+        </p>
+      </div>
+    </div>
+
+
+    <div class="docSection"><a name="security-considerations" id="security-considerations"></a>
+      <h2 class="docHeading">Security Considerations</h2>
+
+      <div class="docSubsection"><a name="security-considerations-users-and-permissions" id="security-considerations-users-and-permissions"></a>
+        <h3 class="docHeading">Users and Permissions</h3>
+        <p>
+          See the section on vhosts, users, and credentials above.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="security-considerations-erlang-cookie" id="security-considerations-erlang-cookie"></a>
+        <h3 class="docHeading">Erlang Cookie</h3>
+        <p>
+          On Linux and BSD systems, it is necessary to restrict <a href="/v3_5_7/clustering.html">Erlang cookie</a>
+          access only to the users that will run RabbitMQ and tools such as <span class="code ">rabbitmqctl</span>.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="security-considerations-tls" id="security-considerations-tls"></a>
+        <h3 class="docHeading">TLS</h3>
+        <p>
+          We recommend using <a href="/v3_5_7/ssl.html">TLS connections</a> when possible,
+          at least to encrypt traffic. Peer verification (authentication) is also recommended.
+          Development and QA environments can use <a href="https://github.com/michaelklishin/tls-gen/">self-signed TLS certificates</a>.
+          Self-signed certificates can be appropriate in production environments when
+          RabbitMQ and all applications run on a trusted network or isolated using technologies
+          such as VMware NSX.
+        </p>
+        <p>
+          While RabbitMQ tries to offer a secure TLS configuration by
+          default (e.g. SSLv3 is disabled), we recommend evaluating
+          what TLS versions and cipher suites are enabled.  Please see
+          our <a href="/v3_5_7/ssl.html">TLS guide</a> for more information.
+        </p>
+      </div>
+    </div>
+
+
+    <div class="docSection"><a name="Networking Configuration" id="Networking Configuration"></a>
+      <h2 class="docHeading">Networking Configuration</h2>
+
+      <div class="docSubsection"><a name="networking-configuration-intro" id="networking-configuration-intro"></a>
+        <p>
+          Production environments may require network configuration
+          tuning. Please refer to the <a href="/v3_5_7/networking.html">Networking Guide</a> for details.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="networking-configuration-automatic-recovery" id="networking-configuration-automatic-recovery"></a>
+        <h3 class="docHeading">Automatic Connection Recovery</h3>
+        <p>
+          Some client libraries, for example, <a href="/v3_5_7/api-guide.html">Java</a>, <a href="/v3_5_7/dotnet-api-guide.html">.NET</a>, and <a href="http://rubybunny.info">Ruby</a> ones, support
+          automatic connection recovery after network failures. If the
+          client used provides this feature, it is recommended to use
+          it instead of developing your own recovery mechanism.
+        </p>
+      </div>
+    </div>
+
+
+    <div class="docSection"><a name="distribution-considerations" id="distribution-considerations"></a>
+      <h2 class="docHeading">Clustering Considerations</h2>
+
+      <div class="docSubsection"><a name="distribution-considerations-cluster-size" id="distribution-considerations-cluster-size"></a>
+        <h3 class="docHeading">Cluster Size</h3>
+        <p>
+          When determining cluster size, it is important to take several factors into
+          consideration:
+
+          <ul>
+            <li>Expected throughput</li>
+            <li>Expected replication (number of mirrors)</li>
+            <li>Data locality</li>
+          </ul>
+        </p>
+        <p>
+          Since clients can connect to any node, RabbitMQ may need to perform inter-cluster
+          routing of messages and internal operations. Try making consumers and producers
+          connect to the same node, if possible: this will reduce inter-node traffic.
+          Equally helpful would be making consumers connect to the node that currently hosts
+          queue master (can be inferred using <a href="/v3_5_7/management.html">HTTP API</a>).
+          When data locality is taken into consideration, total cluster throughput
+          can reach <a href="http://blog.pivotal.io/pivotal/products/rabbitmq-hits-one-million-messages-per-second-on-google-compute-engine">non-trivial</a> volumes.
+        </p>
+        <p>
+          For most environments, mirroring to more than half of cluster nodes is sufficient.
+          It is recommended to use clusters with an odd number of nodes (3, 5, and so on).
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="distribution-considerations-partition-handling-strategy" id="distribution-considerations-partition-handling-strategy"></a>
+        <h3 class="docHeading">Partition Handling Strategy</h3>
+        <p>
+          It is important to pick a <a href="/v3_5_7/partitions.html">partition handling strategy</a>
+          before going into production. When in doubt, use the <span class="code ">autoheal</span> strategy.
+        </p>
+      </div>
+    </div>
+
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_5_7/configure.html">Configuration</a></li>
+       <li><a href="/v3_5_7/ssl.html">TLS/SSL Support</a></li>
+       <li><a href="/v3_5_7/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_5_7/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_5_7/clustering.html">Clustering</a></li>
+       <li><a href="/v3_5_7/ha.html">High Availability</a></li>
+       <li><a href="/v3_5_7/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_5_7/access-control.html">Access Control (Authorisation)</a></li>
+       <li><a href="/v3_5_7/production-checklist.html" class="selected">Production Checklist</a></li>
+       <li><a href="/v3_5_7/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_5_7/alarms.html">Alarms</a></li>
+       <li><a href="/v3_5_7/networking.html">Networking</a></li>
+       <li><a href="/v3_5_7/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_5_7/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_5_7/manpages.html">Manual Pages</a></li>
+       <li><a href="/v3_5_7/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

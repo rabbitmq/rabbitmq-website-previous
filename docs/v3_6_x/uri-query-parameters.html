@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - URI query parameters</title>
+    
+  </head>
+  <body id="uri-query-parameters"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>URI query parameters</h1>
+    <p class="intro">
+      This page is a less-formal companion to the <a href="uri-spec.html">URI specification</a>, documenting how the
+      officially-supported clients interpret URI parameters. Currently
+      only the Erlang client does so.
+    </p>
+
+    <p>
+      The <a href="federation-reference.html#upstreams">federation</a>
+      and <a href="shovel.html#uris">shovel</a> plugins specify
+      connections to other brokers using URIs, and are implemented
+      using the Erlang client, so they take all the parameters
+      described here for it.
+    </p>
+
+    <p>
+      Query parameters are added to the URI in the usual way. Any
+      parameter can be omitted. The client will pick sensible defaults
+      when they are.
+    </p>
+
+    <p>
+      Example:
+    </p>
+
+    <pre>amqp://myhost?heartbeat=10&amp;connection_timeout=10000</pre>
+
+    <p>
+      This specifies a (non-encrypted) network connection to the host
+      <span class="code ">myhost</span>. The heartbeat interval is set to 5 seconds,
+      and connection timeout is set to 10 seconds (10,000 milliseconds). Other parameters are
+      set to their default values.
+    </p>
+
+    
+
+    <table>
+      <tr>
+        <th>Parameter name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>
+          <span class="code ">cacertfile</span><br />
+          <span class="code ">certfile</span><br />
+          <span class="code ">keyfile</span>
+        </td>
+        <td>
+          Paths to files to use in order to present a client-side SSL
+          certificate to the server. Only of use for the
+          <span class="code ">amqps</span> scheme.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="code ">verify</span><br />
+          <span class="code ">fail_if_no_peer_cert</span>
+        </td>
+        <td>
+          Use to configure verification of the server's SSL
+          certificate. See the <a href="ssl.html">SSL guide</a> for
+          details of SSL in RabbitMQ in general and specifically the
+          <a href="ssl.html#configure-erlang">Erlang client</a>
+          section. Only of use for the <span class="code ">amqps</span> scheme.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">auth_mechanism</span></td>
+        <td>
+          SASL authentication mechanisms to consider when negotiating
+          a mechanism with the server. This parameter can be specified
+          multiple times,
+          e.g. <span class="code ">?auth_mechanism=plain&amp;auth_mechanism=amqplain</span>,
+          to specify multiple mechanisms.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">heartbeat</span></td>
+        <td>
+          <a href="/heartbeats.html">Heartbeat</a> timeout value in seconds (an integer)
+          to negotiate with the server.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">connection_timeout</span></td>
+        <td>
+          Time in milliseconds (an integer) to wait while establishing a TCP connection
+          to the server before giving up.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">channel_max</span></td>
+        <td>
+          Maximum number of channels to permit on this connection.
+        </td>
+      </tr>
+    </table>
+
+    <p>
+      <a href="/ssl.html">TLS options</a> can also be specified globally using the
+      <span class="code ">amqp_client.ssl_options</span> configuration key. They will be merged with
+      the TLS parameters from the URI (the latter will take
+      precedence) and affect all outgoing RabbitMQ Erlang client connections
+      on the node, including plugins that use the client internally (Federation, Shovel, etc).
+      Please see the <a href="/ssl.html">TLS guide</a> for details.
+    </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/clients.html" class="selected">Client Documentation</a><ul>
+       <li><a href="/api-guide.html">Java Client Guide</a></li>
+       <li><a href="/jms-client.html">JMS Client</a></li>
+       <li><a href="/dotnet-api-guide.html">.NET Client Guide</a></li>
+       <li><a href="/erlang-client-user-guide.html">Erlang Client Guide</a></li>
+       <li><a href="/heartbeats.html">Heartbeats</a></li>
+       <li><a href="/amqp-0-9-1-reference.html">AMQP 0-9-1 Reference</a></li>
+       <li><a href="/uri-spec.html" class="selected">AMQP 0-9-1 URI Spec</a><ul>
+         <li><a href="/uri-query-parameters.html" class="selected">AMQP 0-9-1 URI Params</a></li>
+       </ul></li>
+       
+       
+       
+     </ul></li>
+     <li><a href="/plugins.html">Plugins</a></li>
+     <li><a href="/news.html">News</a></li>
+     <li><a href="/protocol.html">Protocol</a></li>
+     <li><a href="/extensions.html">Our Extensions</a></li>
+     <li><a href="/build.html">Building</a></li>
+     
+       <li><a href="/previous.html">Previous Releases</a></li>
+     
+     <li><a href="/mpl.html">License</a></li>
+   </ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

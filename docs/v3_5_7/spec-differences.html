@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Spec Differences</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Spec Differences</h1>
+    <h2>Undeprecated Features</h2>
+      <p>
+        In addition to extensions beyond the specification, RabbitMQ
+        also undeprecates some features that were removed from AMQP
+         0-9-1.
+      </p>
+      <ul>
+        <li><a href="amqp-0-9-1-reference.html#exchange.declare.auto-delete">Auto-delete exchanges</a></li>
+        <li><a href="amqp-0-9-1-reference.html#exchange.declare.internal">Internal exchanges</a></li>
+      </ul>
+      <p>
+        The access class was deprecated from AMQP 0-9-1. RabbitMQ
+        implements the
+        <span class="code ">access.request</span> method from this class as a no-op
+        in order to maintain compatibility with older clients. This
+        method will be removed in the future and should not be relied
+        upon.
+      </p>
+
+    <h2>amq.* Exchange Immutability</h2>
+      <p>
+        AMQP 0-9-1 spec dictates that it must not be possible to declare an exchange
+        with the <span class="code ">amq.</span> prefix. RabbitMQ also prohibits deletion of such exchanges.
+      </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_5_7/confirms.html">Confirms</a></li>
+       <li><a href="/v3_5_7/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_5_7/consumer-prefetch.html">Consumer Prefetch</a></li>
+       <li><a href="/v3_5_7/consumer-priority.html">Consumer Priorities</a></li>
+       <li><a href="/v3_5_7/direct-reply-to.html">Direct reply-to</a></li>
+       <li><a href="/v3_5_7/connection-blocked.html">Blocked Connections</a></li>
+       <li><a href="/v3_5_7/nack.html">basic.nack</a></li>
+       <li><a href="/v3_5_7/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_5_7/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_5_7/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_5_7/ttl.html">TTL</a></li>
+       <li><a href="/v3_5_7/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_5_7/maxlength.html">Length Limit</a></li>
+       <li><a href="/v3_5_7/priority.html">Priority Queues</a></li>
+       <li><a href="/v3_5_7/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_5_7/auth-notification.html">Auth Failure</a></li>
+       <li><a href="/v3_5_7/spec-differences.html" class="selected">Spec Differences</a></li>
+     </ul></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

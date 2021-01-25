@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Federation Plugin</title>
+    
+  </head>
+  <body id="federation"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Federation Plugin</h1>
+
+    <div class="docSection"><a name="introduction" id="introduction"></a>
+      <h2 class="docHeading">Introduction</h2>
+
+      <p>
+        The high-level goal of the federation plugin is to transmit messages
+        between brokers without requiring clustering. This is useful for various
+        reasons:
+      </p>
+
+      <dl class="plain">
+        <dt><b>Loose coupling</b></dt>
+        <dd>
+          The federation plugin can transmit messages between brokers
+          (or clusters) in different administrative domains:
+          <ul class="plain">
+            <li>
+              they may have different users and virtual hosts;
+            </li>
+            <li>
+              they may run on different versions of RabbitMQ and Erlang.
+            </li>
+          </ul>
+        </dd>
+        <dt><b>WAN-friendly</b></dt>
+        <dd>
+          The federation plugin uses AMQP 0-9-1 to communicate between brokers, and is
+          designed to tolerate intermittent connectivity.
+        </dd>
+        <dt><b>Specificity</b></dt>
+        <dd>
+          A broker can contain federated <i>and</i> local-only components - you
+          don't need to federate everything if you don't want to.
+        </dd>
+        <dt><b>Scalability</b></dt>
+        <dd>
+          Federation does not require O(n<sup>2</sup>) connections between
+          <i>n</i> brokers (although this is the easiest way to set
+          things up), which should mean it scales better.
+        </dd>
+      </dl>
+    </div>
+
+    <div class="docSection"><a name="what-does-it-do" id="what-does-it-do"></a>
+      <h2 class="docHeading">What Does It Do?</h2>
+      <p>
+        The federation plugin allows you to make exchanges and queues
+        <i>federated</i>. A federated exchange or queue can receive
+        messages from one or more <i>upstreams</i> (remote exchanges
+        and queues on other brokers). A federated exchange can route
+        messages published upstream to a local queue. A federated
+        queue lets a local consumer receive messages from an upstream
+        queue.
+      </p>
+
+      <p>
+        Federation links connect to upstreams using RabbitMQ Erlang client. Therefore
+        they can connect to a specific vhost, use TLS, use multiple
+        <a href="http://www.rabbitmq.com/authentication.html">authentication mechanisms</a>.
+      </p>
+
+      <p>
+        For more details, see the
+        documentation on <a href="federated-exchanges.html">federated
+        exchanges</a> and <a href="federated-queues.html">federated
+        queues</a>.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="how-is-it-configured" id="how-is-it-configured"></a>
+      <h2 class="docHeading">How is Federation Set Up?</h2>
+
+      <p>
+        To use federation, one needs to configure two things
+
+        <ul>
+          <li>
+            One or more upstreams that define federation connections
+            to other nodes. This can be done via <a href="/parameters.html">runtime parameters</a>
+            or the <a href="https://github.com/rabbitmq/rabbitmq-federation-management">federation management plugin</a> which
+            adds a federation management tab to the <a href="/management.html">management UI</a>.
+          </li>
+          <li>
+            One or more policies that match exchanges/queues and makes them
+            federated.
+          </li>
+        </ul>
+      </p>
+    </div>
+
+    <div class="docSection"><a name="getting-started" id="getting-started"></a>
+      <h2 class="docHeading">Getting Started</h2>
+
+      <p>
+        The federation plugin is included in the RabbitMQ distribution. To
+        enable it, use
+        <a href="man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a>:
+      </p>
+      <pre class="sourcecode bash">rabbitmq-plugins enable rabbitmq_federation</pre>
+
+      <p>
+        When using the management plugin, you will also want to
+        enable <span class="code ">rabbitmq_federation_management</span>:
+      </p>
+      <pre class="sourcecode bash">rabbitmq-plugins enable rabbitmq_federation_management</pre>
+
+      <p>
+        When using a federation in a cluster, all the nodes of the
+        cluster should have the federation plugin enabled.
+      </p>
+
+      <p>
+        Information about federation upstreams is stored in the RabbitMQ
+        database, along with users, permissions, queues, etc. There
+        are three levels of configuration involved in federation:
+      </p>
+
+      <ul>
+        <li>
+          <b>Upstreams</b>: each upstream defines how to connect
+          to another broker.
+        </li>
+        <li>
+          <b>Upstream sets</b>: each upstream set groups together a
+          set of upstreams to use for federation.
+        </li>
+        <li>
+          <b>Policies</b>: each policy selects a set of exchanges,
+          queues or both, and applies a single upstream or an upstream
+          set to those objects.
+        </li>
+      </ul>
+
+      <p>
+        In practice, for simple use cases you can almost ignore the
+        existence of upstream sets, since there is an
+        implicitly-defined upstream set called <span class="code ">all</span> to
+        which all upstreams are added.
+      </p>
+
+      <p>
+        Upstreams and upstream sets are both instances of
+        <a href="/parameters.html">runtime parameters</a>.  Like exchanges and queues, each virtual host
+        has its own distinct set of parameters and policies. For more
+        generic information on parameters and policies, see the
+        documentation on <a href="/parameters.html">parameters and
+        policies</a>. For full details on the parameters used by
+        federation, see the <a href="federation-reference.html">federation
+        reference</a>.
+      </p>
+
+      <p>
+        Parameters and policies can be set in three ways - either with
+        an invocation of <span class="code ">rabbitmqctl</span>, a call to the
+        management HTTP API, or (usually) through the web UI presented
+        by <span class="code ">rabbitmq_federation_management</span>. (The web UI
+        does not present all possibilities - in particular, it does
+        not allow you to manage upstream sets.)
+      </p>
+
+      <div class="docSubsection"><a name="tutorial" id="tutorial"></a>
+        <h3 class="docHeading">A simple example</h3>
+
+        <p>
+          Here we will federate all the built-in exchanges except for
+          the default exchange, with a single upstream. The upstream
+          will be defined to buffer messages when disconnected for up
+          to one hour (3600000ms).
+        </p>
+
+        <p><b>Define an upstream:</b></p>
+        <table>
+        <tr>
+          <th>rabbitmqctl</th>
+          <td>
+            <span class="code ">rabbitmqctl set_parameter federation-upstream my-upstream \<br />'{"uri":"amqp://server-name","expires":3600000}'</span>
+          </td>
+        </tr>
+        <tr>
+          <th>rabbitmqctl (Windows)</th>
+          <td>
+            <span class="code ">rabbitmqctl set_parameter federation-upstream my-upstream ^<br />"{""uri"":""amqp://server-name"",""expires"":3600000}"</span>
+          </td>
+        </tr>
+        <tr>
+          <th>HTTP API</th>
+          <td>
+            PUT <span class="code ">/api/parameters/federation-upstream/%2f/my-upstream</span><br />
+            <span class="code ">{"value":{"uri":"amqp://server-name","expires":3600000}}</span>
+          </td>
+        </tr>
+        <tr>
+          <th>Web UI</th>
+          <td>
+            Navigate to <span class="code ">Admin</span> &gt; <span class="code ">Federation Upstreams</span> &gt;
+            <span class="code ">Add a new upstream</span>. Enter "my-upstream" next to Name,
+            "amqp://server-name" next to URI, and 36000000 next to
+            Expiry. Click Add upstream.
+          </td>
+        </tr>
+        </table>
+
+        <p><b>Then define a policy that will match built-in exchanges and use this upstream:</b></p>
+        <table>
+        <tr>
+          <th>rabbitmqctl</th>
+          <td>
+            <span class="code ">rabbitmqctl set_policy --apply-to exchanges federate-me "^amq\." \<br />'{"federation-upstream-set":"all"}'</span>
+          </td>
+        </tr>
+        <tr>
+          <th>rabbitmqctl (Windows)</th>
+          <td>
+            <span class="code ">rabbitmqctl set_policy --apply-to exchanges federate-me "^amq\." ^<br />"{""federation-upstream-set"":""all""}"</span>
+          </td>
+        </tr>
+        <tr>
+          <th>HTTP API</th>
+          <td>
+            PUT <span class="code ">/api/policies/%2f/federate-me</span><br />
+            <span class="code ">{"pattern":"^amq\.", "definition":{"federation-upstream-set":"all"}, \<br /> "apply-to":"exchanges"}</span>
+          </td>
+        </tr>
+        <tr>
+          <th>Web UI</th>
+          <td>
+            Navigate to Admin &gt; Policies &gt; Add / update a
+            policy. Enter "federate-me" next to "Name", "^amq\." next to
+            "Pattern", choose "Exchanges" from the "Apply to" drop down list
+            and enter "federation-upstream-set" = "all"
+            in the first line next to "Policy". Click "Add" policy.
+          </td>
+        </tr>
+        </table>
+
+        <p>
+          We tell the policy to federate all exchanges whose names
+          begin with "amq." (i.e. all the built in exchanges except
+          for the default exchange) with (implicit) low priority, and
+          to federate them using the implicitly created upstream set
+          "all", which includes our newly-created upstream.  Any other
+          matching policy with a priority greater than 0 will take
+          precedence over this policy. Keep in mind that <span class="code ">federate-me</span>
+          is just a name we used for this example, you can use any
+          string you want there.
+        </p>
+
+        <p>
+          The built in exchanges should now be federated because they are
+          matched by the policy. You can
+          check that the policy has applied to the exchanges by
+          checking the exchanges list in management or with:
+        </p>
+        <pre class="sourcecode bash">rabbitmqctl list_exchanges name policy | grep federate-me</pre>
+        <p>
+          And you can check that federation links for each exchange have come up with Admin &gt; Federation Status &gt; Running Links or with:
+        </p>
+        <pre class="sourcecode bash">rabbitmqctl eval 'rabbit_federation_status:status().'</pre>
+        <p>
+          In general there will be one federation link for each
+          upstream that is applied to an exchange. So for example with
+          three exchanges and two upstreams for each there will be six
+          links.
+        </p>
+
+        <p>
+          For simple use this should be all you need - you will probably
+          want to look at the <a href="uri-spec.html">AMQP URI
+          reference</a>. The <a href="federation-reference.html">federation
+          reference</a> contains more details on setting up upstreams and
+          upstream sets.
+        </p>
+      </div>
+    </div>
+
+
+    <div class="docSection"><a name="link-failures" id="link-failures"></a>
+      <h2 class="docHeading">Federation Connection (Link) Failures</h2>
+      <p>
+        Inter-node connections used by Federation are based on AMQP 0-9-1
+        connections. Federation links can be treated as special kind of clients
+        by operators.
+      </p>
+      <p>
+        Should a link fail, e.g. due to a network interruption, it will
+        attempt to re-connect. Reconnection period is a configurable value
+        that's defined in upstream definition. See
+        <a href="federation-reference.html">federation
+        reference</a> for more details on setting up upstreams and
+        upstream sets.
+      </p>
+      <p>
+        Links generally try to recover ad infinitum but there are scenarios
+        when they give up:
+
+        <ul>
+          <li>
+            Failure rate is too high (max tolerated rate depends on
+            upstream's <span class="code ">reconnect-delay</span> but is generally a failure
+            every few seconds by default).
+          </li>
+          <li>
+            Link no longer can locate its "source" queue or exchange.
+          </li>
+          <li>
+            Policy changes in such a way that a link considers itself no longer
+            necessary.
+          </li>
+        </ul>
+
+        By increasing <span class="code ">reconnect-delay</span> for upstreams it is possible
+        to tolerate higher link failure rates. This is primarily relevant
+        for RabbitMQ installations where a moderate or large number of active links.
+      </p>
+    </div>
+
+
+    <div class="docSection"><a name="clustering" id="clustering"></a>
+      <h2 class="docHeading">Federating Clusters</h2>
+      <p>
+        Clusters can be linked together with federation just as single brokers
+        can. To summarise how clustering and federation interact:
+      </p>
+      <ul>
+        <li>
+          You can define policies and parameters on any node in the downstream
+          cluster; once defined on one node they will apply on all nodes.
+        </li>
+        <li>
+          Exchange federation links will start on any node in the
+          downstream cluster. They will fail over to other nodes if
+          the node they are running on crashes or stops.
+        </li>
+        <li>
+          Queue federation links will start on the same node as the
+          downstream queue. If the downstream queue is mirrored, they
+          will start on the same node as the master, and will be
+          recreated on the same node as the new master if the node the
+          existing master is running on crashes or stops.
+        </li>
+        <li>
+          To connect to an upstream cluster, you can specify multiple URIs in
+          a single upstream. The federation link process will choose one of
+          these URIs at random each time it attempts to connect.
+        </li>
+      </ul>
+    </div>
+
+
+    <div class="docSection"><a name="tls-connections" id="tls-connections"></a>
+      <h2 class="docHeading">Securing Federation Connections with TLS</h2>
+      <p>
+        Federation connections (links) can be secured with TLS. Because Federation uses
+        a RabbitMQ client under the hood, it is necessary to both configure
+        source broker to <a href="/ssl.html">listen for TLS connections</a>
+        and Federation/Erlang client to use TLS.
+      </p>
+      <p>
+        To configure Federation to use TLS, one needs to
+
+        <ul>
+          <li>Use the <span class="code ">amqps</span> URI scheme instead of <span class="code ">amqp</span></li>
+          <li>Specify CA certificate and client certificate/key pair via
+          <a href="/uri-query-parameters.html">URI query parameters</a>
+          when configuring upstream(s)</li>
+          <li><a href="/ssl.html">Configure Erlang client to use TLS</a></li>
+        </ul>
+      </p>
+
+      <p>
+        Just like with "regular" client connections, server's CA should be
+        trusted on the node where federation link(s) runs, and vice versa.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="getting-help" id="getting-help"></a>
+      <h2 class="docHeading">Getting Help</h2>
+      <p>
+        If you have any questions or comments regarding RabbitMQ, feel free to
+        ask them on <a href="https://groups.google.com/forum/#!forum/rabbitmq-users">RabbitMQ mailing list</a>.
+      </p>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/clients.html">Client Documentation</a></li>
+     <li><a href="/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/management.html">Management plugin</a></li>
+       <li><a href="/federation.html" class="selected">Federation plugin</a><ul>
+         <li><a href="/federated-exchanges.html">Exchanges</a></li>
+         <li><a href="/federated-queues.html">Queues</a></li>
+         <li><a href="/federation-reference.html">Reference</a></li>
+       </ul></li>
+       <li><a href="/shovel.html">Shovel plugin</a></li>
+       <li><a href="/stomp.html">STOMP plugin</a></li>
+       <li><a href="/web-stomp.html">STOMP-over-WebSockets</a></li>
+       <li><a href="/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/web-mqtt.html">MQTT-over-WebSockets</a></li>
+       <li><a href="/ldap.html">LDAP plugin</a></li>
+       <li><a href="/web-dispatch.html">Configuring HTTP-based (Web) plugins</a></li>
+       <li><a href="/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/news.html">News</a></li>
+     <li><a href="/protocol.html">Protocol</a></li>
+     <li><a href="/extensions.html">Our Extensions</a></li>
+     <li><a href="/build.html">Building</a></li>
+     
+       <li><a href="/previous.html">Previous Releases</a></li>
+     
+     <li><a href="/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#introduction">Introduction</a></li><li><a href="#what-does-it-do">What Does It Do?</a></li><li><a href="#how-is-it-configured">How is Federation Set Up?</a></li><li><a href="#getting-started">Getting Started</a></li><li><a href="#link-failures">Federation Connection (Link) Failures</a></li><li><a href="#clustering">Federating Clusters</a></li><li><a href="#tls-connections">Securing Federation Connections with TLS</a></li><li><a href="#getting-help">Getting Help</a></li></ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

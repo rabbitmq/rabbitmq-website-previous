@@ -1,0 +1,773 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_0_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_0_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_0_x/favicon.ico" /><link rel="stylesheet" href="/v3_0_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_0_x/js/site.js"></script><script type="text/javascript" src="/v3_0_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Clustering Guide</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_0_x/"><img src="/v3_0_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v3_0_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_0_x/download.html">Installation</a></li><li><a href="/v3_0_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_0_x/getstarted.html">Tutorials</a></li><li><a href="/v3_0_x/services.html">Services</a></li><li><a href="/v3_0_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Clustering Guide</h1>
+      <div class="docSection"><a name="clustering" id="clustering"></a>
+        <p>
+          A RabbitMQ <i>broker</i> is a logical grouping of one or
+          several Erlang <i>nodes</i>, each running the RabbitMQ
+          <i>application</i> and sharing users, virtual hosts,
+          queues, exchanges, etc. Sometimes we refer to the collection
+          of nodes as a <i>cluster</i>.
+        </p>
+        <p>
+          All data/state required for the operation of a RabbitMQ
+          broker is replicated across all nodes, for reliability and
+          scaling, with full ACID properties. An exception to this are
+          message queues, which by default reside on the node that
+          created them, though they are visible and reachable from all
+          nodes. To replicate queues across nodes in a cluster, see
+          the documentation on <a href="ha.html">high availability</a>
+          (note that you will need a working cluster first).
+        </p>
+        <p>
+          <a href="partitions.html">RabbitMQ clustering does not
+          tolerate network partitions well</a>, so it should not be
+          used over a WAN.
+          The <a href="plugins.html#rabbitmq_shovel">shovel</a> or
+          <a href="federation.html">federation</a>
+          plugins are better solutions for connecting brokers across a
+          WAN.
+        </p>
+        <p>
+          The composition of a cluster can be altered dynamically.
+          All RabbitMQ brokers start out as running on a single
+          node. These nodes can be joined into clusters, and
+          subsequently turned back into individual brokers again.
+        </p>
+        <p>
+          RabbitMQ brokers tolerate the failure of individual
+          nodes. Nodes can be started and stopped at will.
+        </p>
+        <p>
+          A node can be a <em>disk node</em> or a <em>RAM node</em>.
+          (<b>Note:</b> <i>disk</i> and <i>disc</i> are used interchangeably.
+          Configuration syntax or status messages normally use <i>disc</i>.)
+          RAM nodes keep their state only in memory (with the exception of queue
+          contents, which can reside on disc if the queue is persistent or too
+          big to fit in memory). Disk nodes keep state in memory and on disk. As
+          RAM nodes don't have to write to disk as much as disk nodes, they can
+          perform better. However, note that since the queue data is always
+          stored on disc, the performance improvements will affect only
+          resources management (e.g. adding/removing queues, exchanges, or
+          vhosts), but not publishing or consuming speed. Because state is
+          replicated across all nodes in the cluster, it is sufficient (but not
+          recommended) to have just one disk node within a cluster, to store the
+          state of the cluster safely.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="transcript" id="transcript"></a>
+        <h2 class="docHeading">Clustering transcript</h2>
+        <p>
+          The following is a transcript of setting up and manipulating
+          a RabbitMQ cluster across three machines -
+          <span class="code ">rabbit1</span>, <span class="code ">rabbit2</span>,
+          <span class="code ">rabbit3</span>, with two of the machines replicating
+          data on ram and disk, and the other replicating data in ram
+          only.
+        </p>
+        <p>
+          We assume that the user is logged into all three machines,
+          that RabbitMQ has been installed on the machines, and that
+          the rabbitmq-server and rabbitmqctl scripts are in the
+          user's PATH.
+        </p>
+
+        <div class="docSubsection"><a name="setup" id="setup"></a>
+          <h3 class="docHeading">Initial setup</h3>
+          <p>
+            Erlang nodes use a cookie to determine whether they are
+            allowed to communicate with each other - for two nodes to
+            be able to communicate they must have the same cookie.
+          </p>
+          <p>
+            The cookie is just a string of alphanumeric characters. It
+            can be as long or short as you like.
+          </p>
+          <p>
+            Erlang will automatically create a random cookie file when
+            the RabbitMQ server starts up. This will be typically
+            located in <span class="code ">/var/lib/rabbitmq/.erlang.cookie</span>
+            on Unix systems and <span class="code ">C:\Users\<i>Current
+            User</i>\.erlang.cookie</span> or <span class="code ">C:\Documents and
+            Settings\<i>Current User</i>\.erlang.cookie</span> on
+            Windows systems. The easiest way to proceed is to allow
+            one node to create the file, and then copy it to all the
+            other nodes in the cluster.
+          </p>
+          <p>
+            As an alternative, you can insert the option "<span class="code ">-setcookie
+            <i>cookie</i></span>" in the <span class="code ">erl</span> call in the
+            <span class="code ">rabbitmq-server</span> and <span class="code ">rabbitmqctl</span>
+            scripts.
+          </p>
+        </div>
+
+        <div class="docSubsection"><a name="starting" id="starting"></a>
+          <h3 class="docHeading">Starting independent nodes</h3>
+          <p>
+            Clusters are set up by re-configuring existing RabbitMQ
+            nodes into a cluster configuration. Hence the first step
+            is to start RabbitMQ on all nodes in the normal way:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmq-server -detached</i>
+rabbit2$ <i>rabbitmq-server -detached</i>
+rabbit3$ <i>rabbitmq-server -detached</i></pre>
+          <p>
+            This creates three <i>independent</i> RabbitMQ brokers,
+            one on each node, as confirmed by the <i>cluster_status</i>
+            command:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit1 ...
+[{nodes,[{disc,[rabbit@rabbit1]}]},{running_nodes,[rabbit@rabbit1]}]
+...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit2]}]},{running_nodes,[rabbit@rabbit2]}]
+...done.
+rabbit3$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit3 ...
+[{nodes,[{disc,[rabbit@rabbit3]}]},{running_nodes,[rabbit@rabbit3]}]
+...done.</pre>
+
+          <p>
+            The node name of a RabbitMQ broker started from the
+            <span class="code ">rabbitmq-server</span> shell script is
+            <span class="code ">rabbit@<i>shorthostname</i></span>, where the short
+            node name is lower-case (as in <span class="code ">rabbit@rabbit1</span>,
+            above). If you use the <span class="code ">rabbitmq-server.bat</span>
+            batch file on Windows, the short node name is upper-case (as
+            in <span class="code ">rabbit@RABBIT1</span>). When you type node names,
+            case matters, and these strings must match exactly.
+          </p>
+        </div>
+
+        <div class="docSubsection"><a name="creating" id="creating"></a>
+          <h3 class="docHeading">Creating the cluster</h3>
+          <p>
+            In order to link up our three nodes in a cluster, we tell
+            two of the nodes, say <span class="code ">rabbit@rabbit2</span> and
+            <span class="code ">rabbit@rabbit3</span>, to join the cluster of the
+            third, say <span class="code ">rabbit@rabbit1</span>.
+          </p>
+          <p>
+            We first join <span class="code ">rabbit@rabbit2</span> as a ram node in a cluster
+            with <span class="code ">rabbit@rabbit1</span> in a cluster. To do that, on
+            <span class="code ">rabbit@rabbit2</span> we stop the RabbitMQ application and
+            join the <span class="code ">rabbit@rabbit1</span> cluster enabling the
+            <span class="code ">--ram</span> flag, and restart the RabbitMQ application. Note
+            that joining a cluster implicitly resets the node, thus removing all
+            resources and data that were previously present on that node.
+          </p>
+          <pre class="sourcecode">
+rabbit2$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit2 ...done.
+rabbit2$ <i>rabbitmqctl join_cluster --ram rabbit@rabbit1</i>
+Clustering node rabbit@rabbit2 with [rabbit@rabbit1] ...done.
+rabbit2$ <i>rabbitmqctl start_app</i>
+Starting node rabbit@rabbit2 ...done.</pre>
+          <p>
+            We can see that the two nodes are joined in a cluster by
+            running the <i>cluster_status</i> command on either of the nodes:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit1 ...
+[{nodes,[{disc,[rabbit@rabbit1]},{ram,[rabbit@rabbit2]}]},
+ {running_nodes,[rabbit@rabbit2,rabbit@rabbit1]}]
+...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit1]},{ram,[rabbit@rabbit2]}]},
+ {running_nodes,[rabbit@rabbit1,rabbit@rabbit2]}]
+...done.
+</pre>
+          <p>
+            Now we join <span class="code ">rabbit@rabbit3</span> as a disk node to the same
+            cluster. The steps are identical to the ones above, except that we
+            omit the <span class="code ">--ram</span> flag in order to turn it into a disk
+            rather than ram node. This time we'll cluster to
+            <span class="code ">rabbit2</span> to demonstrate that the node chosen to cluster
+            to does not matter - it is enough to provide one online node and the
+            node will be clustered to the cluster that the specified node
+            belongs to.
+          </p>
+          <pre class="sourcecode">
+rabbit3$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit3 ...done.
+rabbit3$ <i>rabbitmqctl join_cluster rabbit@rabbit2</i>
+Clustering node rabbit@rabbit3 with rabbit@rabbit2 ...done.
+rabbit3$ <i>rabbitmqctl start_app</i>
+Starting node rabbit@rabbit3 ...done.</pre>
+          <p>
+            We can see that the three nodes are joined in a cluster by
+            running the <i>cluster_status</i> command on any of the nodes:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit1 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit3]},{ram,[rabbit@rabbit2]}]},
+ {running_nodes,[rabbit@rabbit3,rabbit@rabbit2,rabbit@rabbit1]}]
+...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit3]},{ram,[rabbit@rabbit2]}]},
+ {running_nodes,[rabbit@rabbit3,rabbit@rabbit1,rabbit@rabbit2]}]
+...done.
+rabbit3$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit3 ...
+[{nodes,[{disc,[rabbit@rabbit3,rabbit@rabbit1]},{ram,[rabbit@rabbit2]}]},
+ {running_nodes,[rabbit@rabbit2,rabbit@rabbit1,rabbit@rabbit3]}]
+...done.</pre>
+          <p>
+            By following the above steps we can add new nodes to the
+            cluster at any time, while the cluster is running.
+          </p>
+        </div>
+
+        <div class="docSubsection"><a name="change-type" id="change-type"></a>
+          <h3 class="docHeading">Changing node types</h3>
+          <p>
+            We can change the type of a node from ram to disk and vice
+            versa. Say we wanted to reverse the types of
+            <span class="code ">rabbit@rabbit2</span> and <span class="code ">rabbit@rabbit3</span>, turning
+            the former from a ram node into a disk node and the latter from a
+            disk node into a ram node. To do that we can use the
+            <span class="code ">change_cluster_node_type</span> command. The node must be
+            stopped first.
+          </p>
+          <pre class="sourcecode">
+rabbit2$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit2 ...done.
+rabbit2$ <i>rabbitmqctl change_cluster_node_type disc</i>
+Turning rabbit@rabbit2 into a disc node ...
+...done.
+Starting node rabbit@rabbit2 ...done.
+rabbit3$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit3 ...done.
+rabbit3$ <i>rabbitmqctl change_cluster_node_type ram</i>
+Turning rabbit@rabbit3 into a ram node ...
+rabbit3$ <i>rabbitmqctl start_app</i>
+Starting node rabbit@rabbit3 ...done.</pre>
+        </div>
+
+        <div class="docSubsection"><a name="restarting" id="restarting"></a>
+          <h3 class="docHeading">Restarting cluster nodes</h3>
+
+          <p>
+            Nodes that have been joined to a cluster can be stopped at
+            any time. It is also ok for them to crash. In both cases
+            the rest of the cluster continues operating unaffected,
+            and the nodes automatically "catch up" with the other
+            cluster nodes when they start up again.
+          </p>
+          <p>
+            We shut down the nodes <span class="code ">rabbit@rabbit1</span> and
+            <span class="code ">rabbit@rabbit3</span> and check on the cluster
+            status at each step:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl stop</i>
+Stopping and halting node rabbit@rabbit1 ...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit3,rabbit@rabbit2]}]
+...done.
+rabbit3$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit3 ...
+[{nodes,[{disc,[rabbit@rabbit2,rabbit@rabbit1]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit2,rabbit@rabbit3]}]
+...done.
+rabbit3$ <i>rabbitmqctl stop</i>
+Stopping and halting node rabbit@rabbit3 ...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit2]}]
+...done.</pre>
+          <p>
+            Now we start the nodes again, checking on the cluster
+            status as we go along:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmq-server -detached</i>
+rabbit1$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit1 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit2,rabbit@rabbit1]}]
+...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit1,rabbit@rabbit2]}]
+...done.
+rabbit3$ <i>rabbitmq-server -detached</i>
+rabbit1$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit1 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit2,rabbit@rabbit1,rabbit@rabbit3]}]
+...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit1,rabbit@rabbit2,rabbit@rabbit3]}]
+...done.
+rabbit3$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit3 ...
+[{nodes,[{disc,[rabbit@rabbit2,rabbit@rabbit1]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit2,rabbit@rabbit1,rabbit@rabbit3]}]
+...done.</pre>
+          <p>
+            There are some important caveats:
+          </p>
+          <ul>
+            <li>
+              At least one disk node should be running at all times to prevent
+              data loss.  RabbitMQ will prevent the creation of a RAM-only
+              cluster in many situations, but it still won't stop you from
+              stopping and forcefully resetting all the disc nodes, which will
+              lead to a RAM-only cluster. Doing this is not advisable and makes
+              losing data very easy.
+            </li>
+            <li>
+              When the entire cluster is brought down, the last node to go down
+              must be the first node to be brought online. If this doesn't
+              happen, the nodes will wait 30 seconds for the last disc node to
+              come back online, and fail afterwards.  If the last node to go
+              offline cannot be brought back up, it can be removed from the
+              cluster using the <span class="code ">forget_cluster_node</span> command -
+              consult the <span class="code ">rabbitmqctl</span> manpage for more information.
+            </li>
+          </ul>
+        </div>
+
+        <div class="docSubsection"><a name="breakup" id="breakup"></a>
+          <h3 class="docHeading">Breaking up a cluster</h3>
+          <p>
+            Nodes need to be removed explicitly from a cluster when they are no
+            longer meant to be part of it. We first remove
+            <span class="code ">rabbit@rabbit3</span> from the cluster, returning it to
+            independent operation. To do that, on <span class="code ">rabbit@rabbit3</span> we
+            stop the RabbitMQ application, reset the node, and restart the
+            RabbitMQ application.
+          </p>
+          <pre class="sourcecode">
+rabbit3$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit3 ...done.
+rabbit3$ <i>rabbitmqctl reset</i>
+Resetting node rabbit@rabbit3 ...done.
+rabbit3$ <i>rabbitmqctl start_app</i>
+Starting node rabbit@rabbit3 ...done.</pre>
+          <p>
+            Note that it would have been equally valid to list
+            <span class="code ">rabbit@rabbit3</span> as a node.
+          </p>
+          <p>
+            Running the <i>cluster_status</i> command on the nodes confirms
+            that <span class="code ">rabbit@rabbit3</span> now is no longer part of
+            the cluster and operates independently:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit1 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]}]},
+ {running_nodes,[rabbit@rabbit2,rabbit@rabbit1]}]
+...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]}]},
+ {running_nodes,[rabbit@rabbit1,rabbit@rabbit2]}]
+...done.
+rabbit3$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit3 ...
+[{nodes,[{disc,[rabbit@rabbit3]}]},{running_nodes,[rabbit@rabbit3]}]
+...done.
+</pre>
+          <p>
+            We can also remove nodes remotely. This is useful, for example, when
+            having to deal with an unresponsive node. We can for example remove
+            <span class="code ">rabbit@rabbi1</span> from <span class="code ">rabbit@rabbit2</span>.
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit1 ...done.
+rabbit2$ <i>rabbitmqctl forget_cluster_node rabbit@rabbit1</i>
+Removing node rabbit@rabbit1 from cluster ...
+...done.</pre>
+          <p>
+            Note that <span class="code ">rabbit1</span> still thinks its clustered with
+            <span class="code ">rabbit2</span>, and trying to start it will result in an
+            error. We will need to reset it to be able to start it again.
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl start_app</i>
+Starting node rabbit@rabbit1 ...
+Error: inconsistent_cluster: Node rabbit@rabbit1 thinks it's clustered with node rabbit@rabbit2, but rabbit@rabbit2 disagrees
+rabbit1$ <i>rabbitmqctl reset</i>
+Resetting node rabbit@rabbit1 ...done.
+rabbit1$ <i>rabbitmqctl start_app</i>
+Starting node rabbit@mcnulty ...
+...done.</pre>
+          <p>
+            The <i>cluster_status</i> command now shows all three nodes
+            operating as independent RabbitMQ brokers:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit1 ...
+[{nodes,[{disc,[rabbit@rabbit1]}]},{running_nodes,[rabbit@rabbit1]}]
+...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit2]}]},{running_nodes,[rabbit@rabbit2]}]
+...done.
+rabbit3$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit3 ...
+[{nodes,[{disc,[rabbit@rabbit3]}]},{running_nodes,[rabbit@rabbit3]}]
+...done.</pre>
+          <p>
+            Note that <span class="code ">rabbit@rabbit2</span> retains the residual
+            state of the cluster, whereas <span class="code ">rabbit@rabbit1</span>
+            and <span class="code ">rabbit@rabbit3</span> are freshly initialised
+            RabbitMQ brokers. If we want to re-initialise
+            <span class="code ">rabbit@rabbit2</span> we follow the same steps as
+            for the other nodes:
+          </p>
+          <pre class="sourcecode">
+rabbit2$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit2 ...done.
+rabbit2$ <i>rabbitmqctl reset</i>
+Resetting node rabbit@rabbit2 ...done.
+rabbit2$ <i>rabbitmqctl start_app</i>
+Starting node rabbit@rabbit2 ...done.</pre>
+        </div>
+
+        <div class="docSubsection"><a name="auto-config" id="auto-config"></a>
+          <h3 class="docHeading">Auto-configuration of a cluster</h3>
+          <p>
+            Instead of configuring clusters "on the fly" using the
+            <span class="code ">cluster</span> command, clusters can also be set up
+            via the <a href="configure.html#configuration-file">RabbitMQ
+            configuration file</a>. The file should set the
+            <span class="code ">cluster_nodes</span> field in the rabbit application
+            to a tuple contanining a list of rabbit nodes, and an atom
+            - either <span class="code ">disc</span> or <span class="code ">ram</span> -
+            indicating whether the node should join them as a disc
+            node or not.
+          </p>
+          <p>
+            If <span class="code ">cluster_nodes</span> is specified, RabbitMQ will try to
+            cluster to each node provided, and stop after it can cluster with
+            one of them. RabbitMQ will try cluster to any node which is online
+            that has the same version of Erlang and RabbitMQ. If no suitable
+            nodes are found, the node is left unclustered.
+          </p>
+          <p>
+            Note that the cluster configuration is applied only to fresh
+            nodes. A fresh nodes is a node which has just been reset or is
+            being start for the first time. Thus, the automatic clustering won't
+            take place after restarts of nodes. This means that any change to
+            the clustering via <span class="code ">rabbitmqctl</span> will take precedence
+            over the automatic clustering configuration.
+          </p>
+          <p>
+            A common use of cluster configuration via the RabbitMQ config file
+            is to automatically configure nodes to join a common cluster. For
+            this purpose the same cluster nodes can be specified on all cluster,
+            plus the boolean to determine disc nodes.
+          </p>
+          <p>
+            Say we want to join our three separate nodes of our running example
+            back into a single cluster, with <span class="code ">rabbit@rabbit1</span> and
+            <span class="code ">rabbit@rabbit2</span> being the disk nodes of the
+            cluster. First we reset and stop all nodes, to make sure that we're
+            working with fresh nodes:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit1 ...done.
+rabbit1$ <i>rabbitmqctl reset</i>
+Resetting node rabbit@rabbit1 ...done.
+rabbit1$ <i>rabbitmqctl stop</i>
+Stopping and halting node rabbit@rabbit1 ...done.
+rabbit2$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit2 ...done.
+rabbit2$ <i>rabbitmqctl reset</i>
+Resetting node rabbit@rabbit2 ...done.
+rabbit2$ <i>rabbitmqctl stop</i>
+Stopping and halting node rabbit@rabbit2 ...done.
+rabbit3$ <i>rabbitmqctl stop_app</i>
+Stopping node rabbit@rabbit3 ...done.
+rabbit3$ <i>rabbitmqctl reset</i>
+Resetting node rabbit@rabbit3 ...done.
+rabbit3$ <i>rabbitmqctl stop</i>
+Stopping and halting node rabbit@rabbit3 ...done.</pre>
+          <p>
+            Now we set the relevant field in the config file:
+          </p>
+          <pre class="sourcecode">[
+  ...
+  {rabbit, [
+        ...
+        {cluster_nodes, {['rabbit@rabbit1', 'rabbit@rabbit2', 'rabbit@rabbit3'], disc}},
+        ...
+  ]},
+  ...
+].</pre>
+          <p>
+            For instance, if this were the only field we needed to set, we would simply create the RabbitMQ config file with the contents:
+          </p>
+          <pre class="sourcecode">[{rabbit,
+  [{cluster_nodes, {['rabbit@rabbit1', 'rabbit@rabbit2', 'rabbit@rabbit3'], disc}}]}].</pre>
+          <p>
+            Since we want <span class="code ">rabbit@rabbit3</span> to be a ram node, we need
+            to specify that in its configuration file:
+          </p>
+          <pre class="sourcecode">[{rabbit,
+  [{cluster_nodes, {['rabbit@rabbit1', 'rabbit@rabbit2', 'rabbit@rabbit3'], ram}}]}].</pre>
+          <p>
+            (Note for Erlang programmers and the curious: this is a
+            standard Erlang configuration file.  For more details, see the
+            <a href="configure.html#configuration-file">configuration guide</a>
+            and the
+            <a href="http://www.erlang.org/doc/man/config.html">Erlang Config Man Page</a>.)
+          </p>
+          <p>
+            Once we have the configuration files in place, we simply start the
+            nodes:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmq-server -detached</i>
+rabbit2$ <i>rabbitmq-server -detached</i>
+rabbit3$ <i>rabbitmq-server -detached</i></pre>
+          <p>
+            We can see that the three nodes are joined in a cluster by
+            running the <i>cluster_status</i> command on any of the nodes:
+          </p>
+          <pre class="sourcecode">
+rabbit1$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit1 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit1,rabbit@rabbit2,rabbit@rabbit3]}]
+...done.
+rabbit2$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit2 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit1,rabbit@rabbit2,rabbit@rabbit3]}]
+...done.
+rabbit3$ <i>rabbitmqctl cluster_status</i>
+Cluster status of node rabbit@rabbit3 ...
+[{nodes,[{disc,[rabbit@rabbit1,rabbit@rabbit2]},{ram,[rabbit@rabbit3]}]},
+ {running_nodes,[rabbit@rabbit1,rabbit@rabbit2,rabbit@rabbit3]}]
+...done.</pre>
+        <p>
+          Note that, in order to remove a node from an auto-configured
+          cluster, it must first be removed from the <a href="configure.html#configuration-file">RabbitMQ
+          configuration file</a> files of the other nodes in the
+          cluster.  Only then, can it be reset safely.
+        </p>
+        </div>
+      </div>
+      <div class="docSection"><a name="upgrading" id="upgrading"></a>
+          <h2 class="docHeading">Upgrading clusters</h2>
+          <p>
+            When upgrading from one major or minor version of RabbitMQ
+            to another (i.e. from 3.0.x to 3.1.x, or from 2.x.x to
+            3.x.x), or when upgrading Erlang, the whole cluster must
+            be taken down for the upgrade (since clusters cannot run
+            mixed versions like this). This will not be the case when
+            upgrading from one patch version to another (i.e. from
+            3.0.x to 3.0.y); these versions can be mixed in a cluster
+            (with the exception that 3.0.0 cannot be mixed with later
+            versions from the 3.0.x series).
+          </p>
+          <p>
+            RabbitMQ will automatically update its persistent data
+            structures if necessary when upgrading between major /
+            minor versions. In a cluster, this task is performed by
+            the first disc node to be started (the "upgrader"
+            node). Therefore when upgrading a RabbitMQ cluster, you
+            should not attempt to start any RAM nodes first; any RAM
+            nodes started will emit an error message and fail to start
+            up.
+          </p>
+          <p>
+            While not strictly necessary, it is a good idea to decide
+            ahead of time which disc node will be the upgrader, stop
+            that node last, and start it first. Otherwise changes to
+            the cluster configuration that were made between the
+            upgrader node stopping and the last node stopping will be
+            lost.
+          </p>
+          <p>
+            Automatic upgrades are only possible from RabbitMQ
+            versions 2.1.1 and later. If you have an earlier cluster,
+            you will need to rebuild it to upgrade.
+          </p>
+      </div>
+
+      <div class="docSection"><a name="single-machine" id="single-machine"></a>
+          <h2 class="docHeading">A cluster on a single machine</h2>
+          <p>
+            Under some circumstances it can be useful to run a cluster
+            of RabbitMQ nodes on a single machine. This would
+            typically be useful for experimenting with clustering on a
+            desktop or laptop without the overhead of starting several
+            virtual machines for the cluster. The two main
+            requirements for running more than one node on a single
+            machine are that each node should have a unique name and
+            bind to a unique port / IP address combination for each
+            protocol in use.
+          </p>
+          <p>
+	    You can start multiple nodes on the same host
+	    manually by repeated invocation of
+	    <span class="code ">rabbitmq-server</span> (
+	    <span class="code ">rabbitmq-server.bat</span> on Windows). You must
+	    ensure that for each invocation you set the environment
+	    variables <span class="code ">RABBITMQ_NODENAME</span> and
+	    <span class="code ">RABBITMQ_NODE_PORT</span> to suitable values.
+          </p>
+          <p>For example:</p>
+          <pre class="sourcecode">
+$ RABBITMQ_NODE_PORT=5672 RABBITMQ_NODENAME=rabbit rabbitmq-server -detached
+$ RABBITMQ_NODE_PORT=5673 RABBITMQ_NODENAME=hare rabbitmq-server -detached
+$ rabbitmqctl -n hare stop_app
+$ rabbitmqctl -n hare join_cluster rabbit@`hostname -s`
+$ rabbitmqctl -n hare start_app</pre>
+          <p>
+            will set up a two node cluster with one disc node and one
+            ram node. Note that if you have RabbitMQ opening any ports
+            other than AMQP, you'll need to configure those
+            not to clash as well - for example:
+          </p>
+          <pre class="sourcecode">
+$ RABBITMQ_NODE_PORT=5672 RABBITMQ_SERVER_START_ARGS="-rabbitmq_management listener [{port,15672}]" RABBITMQ_NODENAME=rabbit rabbitmq-server -detached
+$ RABBITMQ_NODE_PORT=5673 RABBITMQ_SERVER_START_ARGS="-rabbitmq_management listener [{port,15673}]" RABBITMQ_NODENAME=hare rabbitmq-server -detached</pre>
+          <p>
+            will start two nodes (which can then be clustered) when
+            the management plugin is installed.
+          </p>
+      </div>
+      <div class="docSection"><a name="firewall" id="firewall"></a>
+          <h2 class="docHeading">Firewalled nodes</h2>
+          <p>
+            The case for firewalled clustered nodes exists when nodes
+            are in a data center or on a reliable network, but separated
+            by firewalls. Again, clustering is not recommended over a WAN or
+            when network links between nodes are unreliable.
+          </p>
+          <p>
+            If different nodes of a cluster are in the same data center,
+            but behind firewalls then additional configuration will be
+            necessary to ensure inter-node communication. Erlang makes
+            use of a Port Mapper Daemon (epmd) for resolution of node
+            names in a cluster. Nodes must be able to reach each other
+            and the port mapper daemon for clustering to work.
+          </p>
+          <p>
+            The default epmd port is 4369, but this can be changed
+            using the <span class="envvar">ERL_EPMD_PORT</span>
+            environment variable. All nodes must use the same port.
+            Firewalls must permit traffic on this port to pass between
+            clustered nodes. For further details see the
+            <a href="http://www.erlang.org/doc/man/epmd.html">Erlang epmd
+            manpage</a>.
+          </p>
+          <p>
+            Once a distributed Erlang node address has been resolved via epmd,
+            other nodes will attempt to communicate directly with that address
+            using the Erlang distributed node protocol. The port range for this
+            communication can be configured with two parameters for the Erlang
+            kernel application:
+          </p>
+          <ul>
+            <li>inet_dist_listen_min</li>
+            <li>inet_dist_listen_max</li>
+          </ul>
+          <p>
+            Firewalls must permit traffic in this range to pass between
+            clustered nodes (assuming all nodes use the same port range).
+            The default port range is unrestricted.
+          </p>
+          <p>
+            The <a href="http://www.erlang.org/doc/man/kernel_app.html">
+            Erlang kernel_app manpage</a> contains more details on the
+            port range that distributed Erlang nodes listen on.
+            See the <a href="configure.html">configuration</a> page
+            for information on how to create and edit a configuration
+            file.
+          </p>
+      </div>
+      <div class="docSection"><a name="clients" id="clients"></a>
+        <h2 class="docHeading">Connecting to Clusters from Clients</h2>
+        <p>
+          A client can connect as normal to any node within a
+          cluster. If that node should fail, and the rest of the
+          cluster survives, then the client should notice the closed
+          connection, and should be able to reconnect to some
+          surviving member of the cluster. Generally, it's not
+          advisable to bake in node hostnames or IP addresses into
+          client applications: this introduces inflexibility and will
+          require client applications to be edited, recompiled and
+          redeployed should the configuration of the cluster change or
+          the number of nodes in the cluster change. Instead, we
+          recommend a more abstracted approach: this could be a
+          dynamic DNS service which has a very short TTL
+          configuration, or a plain TCP load balancer, or some sort of
+          mobile IP achieved with pacemaker or similar
+          technologies. In general, this aspect of managing the
+          connection to nodes within a cluster is beyond the scope of
+          RabbitMQ itself, and we recommend the use of other
+          technologies designed specifically to solve these problems.
+        </p>
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_0_x/features.html">Features</a></li>
+     <li><a href="/v3_0_x/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_0_x/configure.html">Configuration</a></li>
+       <li><a href="/v3_0_x/ssl.html">SSL Support</a></li>
+       <li><a href="/v3_0_x/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_0_x/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_0_x/clustering.html" class="selected">Clustering</a><ul>
+         <li><a href="/v3_0_x/partitions.html">Network Partitions</a></li>
+       </ul></li>
+       <li><a href="/v3_0_x/ha.html">High Availability</a></li>
+       <li><a href="/v3_0_x/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_0_x/access-control.html">Access Control</a></li>
+       <li><a href="/v3_0_x/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_0_x/memory.html">Flow Control</a></li>
+       <li><a href="/v3_0_x/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_0_x/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_0_x/manpages.html">Manual Pages</a></li>
+       <li><a href="/v3_0_x/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_0_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_0_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_0_x/news.html">News</a></li>
+     <li><a href="/v3_0_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_0_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_0_x/build.html">Building</a></li>
+     <li><a href="/v3_0_x/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#clustering"></a></li><li><a href="#transcript">Clustering transcript</a></li><li><a href="#upgrading">Upgrading clusters</a></li><li><a href="#single-machine">A cluster on a single machine</a></li><li><a href="#firewall">Firewalled nodes</a></li><li><a href="#clients">Connecting to Clusters from Clients</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_0_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_0_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

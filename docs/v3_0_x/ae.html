@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_0_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_0_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_0_x/favicon.ico" /><link rel="stylesheet" href="/v3_0_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_0_x/js/site.js"></script><script type="text/javascript" src="/v3_0_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Alternate Exchanges</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_0_x/"><img src="/v3_0_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v3_0_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_0_x/download.html">Installation</a></li><li><a href="/v3_0_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_0_x/getstarted.html">Tutorials</a></li><li><a href="/v3_0_x/services.html">Services</a></li><li><a href="/v3_0_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Alternate Exchanges</h1>
+    <p>
+      It is sometimes desirable to let clients handle messages
+      that an exchange was unable to route (i.e. either because
+      there were no bound queues our no matching
+      bindings). Typical examples of this are
+      <ul>
+        <li>detecting when clients accidentally or maliciously
+          publish messages that cannot be routed</li>
+        <li>"or else" routing semantics where some messages are
+          handled specially and the rest by a generic handler</li>
+      </ul>
+    </p>
+    <p>
+      RabbitMQ's <em>Alternate Exchange</em> ("AE") feature
+      addresses these use cases.
+    </p>
+
+    <h4>Configuration</h4>
+    <p>
+      When creating an exchange the name of an AE can be
+      optionally supplied in the <span class="code ">exchange.declare</span>
+      method's <span class="code ">arguments</span> table by specifying a key
+      of 'alternate-exchange' and a value of type 'S' (string)
+      containing the name.
+    </p>
+    <p>
+      When an AE has been specified, in addition to the usual
+      <em>configure</em> permissions on the declared exchange,
+      the user needs to have <em>read</em> permissions on that
+      exchange and <em>write</em> permissions on the AE.
+    </p>
+    <p>
+      For example:
+    </p>
+    <pre class="sourcecode">
+Map&lt;String, Object&gt; args = new HashMap&lt;String, Object&gt;();
+args.put("alternate-exchange", "my-ae");
+channel.exchangeDeclare("my-direct", "direct", false, false, args);
+channel.exchangeDeclare("my-ae", "fanout");
+channel.queueDeclare("routed");
+channel.queueBind("routed", "my-direct", "key1");
+channel.queueDeclare("unrouted");
+channel.queueBind("unrouted", "my-ae", "");</pre>
+    <p>
+      In the above fragment of Java code we create a direct
+      exchange 'my-direct' that is configured with an AE called
+      'my-ae'. The latter is declared as a fanout exchange. We
+      bind one queue 'routed' to 'my-direct' with a binding key
+      of 'key1', and a queue 'unrouted' to 'my-ae'.
+    </p>
+    <p>
+      Whenever an exchange with a configured AE cannot route a message
+      to any queue, it publishes the message to the specified AE
+      instead. If that AE does not exist then a warning is logged. If
+      an AE cannot route a message, it in turn publishes the message
+      to its AE, if it has one configured. This process continues
+      until either the message is successfully routed, the end of the
+      chain of AEs is reached, or an AE is encountered which has
+      already attempted to route the message.
+    </p>
+    <p>
+      For example if we publish a message to 'my-direct' with a
+      routing key of 'key1' then that message is routed to the
+      'routed' queue, in accordance with the standard AMQP
+      behaviour.  However, when publishing a message to
+      'my-direct' with a routing key of 'key2', rather than
+      being discarded the message is routed via our configured
+      AE to the 'unrouted' queue.
+    </p>
+    <p>
+      The behaviour of an AE purely pertains to routing. If a message
+      is routed via an AE it still counts as routed for the purpose of
+      the 'mandatory' flag, and the message is otherwise unchanged.
+    </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_0_x/features.html">Features</a></li>
+     <li><a href="/v3_0_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_0_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_0_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_0_x/news.html">News</a></li>
+     <li><a href="/v3_0_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_0_x/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_0_x/confirms.html">Confirms</a></li>
+       <li><a href="/v3_0_x/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_0_x/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_0_x/nack.html">basic.nack</a></li>
+       <li><a href="/v3_0_x/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_0_x/ae.html" class="selected">Alternate Exchanges</a></li>
+       <li><a href="/v3_0_x/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_0_x/ttl.html">TTL</a></li>
+       <li><a href="/v3_0_x/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_0_x/undeprecated.html">Undeprecation</a></li>
+     </ul></li>
+     <li><a href="/v3_0_x/build.html">Building</a></li>
+     <li><a href="/v3_0_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_0_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_0_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - RabbitMQ tutorial - Remote procedure call (RPC) </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html">Installation</a></li><li><a href="/v3_4_x/documentation.html">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div>
+<div id="sidebar" class="tutorial-six">
+   <ul id="tutorials" xml:base="site/tutorials/tutorials-menu.xml.inc">
+
+        <li id="tutorial-one">
+          <h2><span class="tute-num">1</span> <a href="/v3_4_x/tutorials/tutorial-one-python.html">"Hello World!"</a></h2>
+          <p>
+            The simplest thing that does <em>something</em>
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-one.png" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-one-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-two">
+          <h2><span class="tute-num">2</span> <a href="/v3_4_x/tutorials/tutorial-two-python.html">Work queues</a></h2>
+          <p>
+            Distributing tasks among workers
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-two.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-two-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-three">
+          <h2><span class="tute-num">3</span> <a href="/v3_4_x/tutorials/tutorial-three-python.html">Publish/Subscribe</a></h2>
+          <p>
+            Sending messages to many consumers at once
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-three.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-three-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-four">
+          <h2><span class="tute-num">4</span> <a href="/v3_4_x/tutorials/tutorial-four-python.html">Routing</a></h2>
+          <p>
+            Receiving messages selectively
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-four.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-four-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-five">
+          <h2><span class="tute-num">5</span> <a href="/v3_4_x/tutorials/tutorial-five-python.html">Topics</a></h2>
+          <p>
+            Receiving messages based on a pattern
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-five.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-five-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-six">
+          <h2><span class="tute-num">6</span> <a href="/v3_4_x/tutorials/tutorial-six-python.html">RPC</a></h2>
+          <p>
+            Remote procedure call implementation
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-six.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-six-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-dotnet.html">C#</a>
+          </p>
+        </li>
+      </ul>
+</div>
+
+<div id="tutorial"><h2>Remote procedure call (RPC)</h2>
+<h3>(using the Bunny client)</h3>
+<p><div class="aside" xml:base="site/tutorials/tutorials-help.xml.inc">
+    <h3>Prerequisites</h3>
+    <p>
+      This tutorial assumes RabbitMQ is <a href="/v3_4_x/download.html">installed</a> and running
+      on <span class="code ">localhost</span> on standard port (<span class="code ">5672</span>). In case you use
+      a different host, port or credentials, connections settings would require adjusting.
+    </p>
+
+    <h3>Where to get help</h3>
+    <p>
+        If you're having trouble going through this tutorial you can
+        <a href="https://groups.google.com/forum/#!forum/rabbitmq-users">contact us</a> through the mailing list.
+    </p>
+  </div></p>
+<p>In the <a href="tutorial-two-ruby.html">second tutorial</a> we learned how to
+use <em>Work Queues</em> to distribute time-consuming tasks among multiple
+workers.</p>
+<p>But what if we need to run a function on a remote computer and wait for
+the result?  Well, that's a different story. This pattern is commonly
+known as <em>Remote Procedure Call</em> or <em>RPC</em>.</p>
+<p>In this tutorial we're going to use RabbitMQ to build an RPC system: a
+client and a scalable RPC server. As we don't have any time-consuming
+tasks that are worth distributing, we're going to create a dummy RPC
+service that returns Fibonacci numbers.</p>
+<h3>Client interface</h3>
+<p>To illustrate how an RPC service could be used we're going to
+create a simple client class. It's going to expose a method named <span class="code ">call</span>
+which sends an RPC request and blocks until the answer is received:</p>
+<div class="highlight"><pre><span class="n">client</span>   <span class="o">=</span> <span class="no">FibonacciClient</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="s2">"rpc_queue"</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="s2">" [.] Got </span><span class="si">#{</span><span class="n">response</span><span class="si">}</span><span class="s2">"</span>
+</pre></div>
+
+
+<blockquote>
+<h4>A note on RPC</h4>
+<p>Although RPC is a pretty common pattern in computing, it's often criticised.
+The problems arise when a programmer is not aware
+whether a function call is local or if it's a slow RPC. Confusions
+like that result in an unpredictable system and adds unnecessary
+complexity to debugging. Instead of simplifying software, misused RPC
+can result in unmaintainable spaghetti code.</p>
+<p>Bearing that in mind, consider the following advice:</p>
+<ul>
+<li>Make sure it's obvious which function call is local and which is remote.</li>
+<li>Document your system. Make the dependencies between components clear.</li>
+<li>Handle error cases. How should the client react when the RPC server is
+   down for a long time?</li>
+</ul>
+<p>When in doubt avoid RPC. If you can, you should use an asynchronous
+pipeline - instead of RPC-like blocking, results are asynchronously
+pushed to a next computation stage.</p>
+</blockquote>
+<h3>Callback queue</h3>
+<p>In general doing RPC over RabbitMQ is easy. A client sends a request
+message and a server replies with a response message. In order to
+receive a response we need to send a 'callback' queue address with the
+request. We can use the default queue.
+Let's try it:</p>
+<div class="highlight"><pre><span class="n">q</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">queue</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="ss">:exclusive</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">default_exchange</span>
+
+<span class="n">x</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ss">:routing_key</span> <span class="o">=&gt;</span> <span class="s2">"rpc_queue"</span><span class="p">,</span> <span class="ss">:reply_to</span> <span class="o">=&gt;</span> <span class="n">q</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># ... then code to read a response message from the callback_queue ...</span>
+</pre></div>
+
+
+<blockquote>
+<h4>Message properties</h4>
+<p>The AMQP protocol predefines a set of 14 properties that go with
+a message. Most of the properties are rarely used, with the exception of
+the following:</p>
+<ul>
+<li><span class="code ">:persistent</span>: Marks a message as persistent (with a value of <span class="code ">true</span>)
+   or transient (<span class="code ">false</span>). You may remember this property
+   from <a href="tutorial-two-ruby.html">the second tutorial</a>.</li>
+<li><span class="code ">:content_type</span>: Used to describe the mime-type of the encoding.
+   For example for the often used JSON encoding it is a good practice
+   to set this property to: <span class="code ">application/json</span>.</li>
+<li><span class="code ">:reply_to</span>: Commonly used to name a callback queue.</li>
+<li><span class="code ">:correlation_id</span>: Useful to correlate RPC responses with requests.</li>
+</ul>
+</blockquote>
+<h3>Correlation Id</h3>
+<p>In the method presented above we suggest creating a callback queue for
+every RPC request. That's pretty inefficient, but fortunately there is
+a better way - let's create a single callback queue per client.</p>
+<p>That raises a new issue, having received a response in that queue it's
+not clear to which request the response belongs. That's when the
+<span class="code ">:correlation_id</span> property is used. We're going to set it to a unique
+value for every request. Later, when we receive a message in the
+callback queue we'll look at this property, and based on that we'll be
+able to match a response with a request. If we see an unknown
+<span class="code ">:correlation_id</span> value, we may safely discard the message - it
+doesn't belong to our requests.</p>
+<p>You may ask, why should we ignore unknown messages in the callback
+queue, rather than failing with an error? It's due to a possibility of
+a race condition on the server side. Although unlikely, it is possible
+that the RPC server will die just after sending us the answer, but
+before sending an acknowledgment message for the request. If that
+happens, the restarted RPC server will process the request again.
+That's why on the client we must handle the duplicate responses
+gracefully, and the RPC should ideally be idempotent.</p>
+<h3>Summary</h3>
+<div class="diagram">
+  <img src="/v3_4_x/img/tutorials/python-six.png" height="200" />
+  <div class="diagram_source">
+    digraph {
+      bgcolor=transparent;
+      truecolor=true;
+      rankdir=LR;
+      node [style="filled"];
+      //
+      subgraph cluster_C {
+        label="Client";
+    color=transparent;
+        C [label="C", fillcolor="#00ffff"];
+      };
+      subgraph cluster_XXXa {
+    color=transparent;
+      subgraph cluster_Note {
+    color=transparent;
+        N [label="Request\nreplyTo=amqp.gen-Xa2...\ncorrelationId=abc",
+       fontsize=12,
+       shape=note];
+      };
+      subgraph cluster_Reply {
+    color=transparent;
+        R [label="Reply\ncorrelationId=abc",
+       fontsize=12,
+       shape=note];
+      };
+      };
+      subgraph cluster_XXXb {
+    color=transparent;
+      subgraph cluster_RPC {
+        label="rpc_queue";
+    color=transparent;
+        RPC [label="{&lt;s&gt;||||&lt;e&gt;}", fillcolor="red", shape="record"];
+      };
+      subgraph cluster_REPLY {
+        label="replyTo=amq.gen-Xa2...";
+    color=transparent;
+        REPLY [label="{&lt;s&gt;||||&lt;e&gt;}", fillcolor="red", shape="record"];
+      };
+      };
+      subgraph cluster_W {
+        label="Server";
+    color=transparent;
+        W [label="S", fillcolor="#00ffff"];
+      };
+      //
+      C -&gt; N;
+      N -&gt; RPC:s;
+      RPC:e -&gt; W;
+      W -&gt; REPLY:e;
+      REPLY:s -&gt; R;
+      R -&gt; C;
+    }
+  </div>
+</div>
+
+<p>Our RPC will work like this:</p>
+<ul>
+<li>When the Client starts up, it creates an anonymous exclusive
+    callback queue.</li>
+<li>For an RPC request, the Client sends a message with two properties:
+    <span class="code ">:reply_to</span>, which is set to the callback queue and <span class="code ">:correlation_id</span>,
+    which is set to a unique value for every request.</li>
+<li>The request is sent to an <span class="code ">rpc_queue</span> queue.</li>
+<li>The RPC worker (aka: server) is waiting for requests on that queue.
+    When a request appears, it does the job and sends a message with the
+    result back to the Client, using the queue from the <span class="code ">:reply_to</span> field.</li>
+<li>The client waits for data on the callback queue. When a message
+    appears, it checks the <span class="code ">:correlation_id</span> property. If it matches
+    the value from the request it returns the response to the
+    application.</li>
+</ul>
+<h2>Putting it all together</h2>
+<p>The Fibonacci task:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+  <span class="k">case</span> <span class="n">n</span>
+  <span class="k">when</span> <span class="mi">0</span> <span class="k">then</span> <span class="mi">0</span>
+  <span class="k">when</span> <span class="mi">1</span> <span class="k">then</span> <span class="mi">1</span>
+  <span class="k">else</span>
+    <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>We declare our fibonacci function. It assumes only valid positive integer input.
+(Don't expect this one to work for big numbers,
+and it's probably the slowest recursive implementation possible).</p>
+<p>The code for our RPC server <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/ruby/rpc_server.rb">rpc_server.rb</a> looks like this:</p>
+<div class="highlight"><pre><span class="c1">#!/usr/bin/env ruby</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="nb">require</span> <span class="s2">"bunny"</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="no">Bunny</span><span class="o">.</span><span class="n">new</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">start</span>
+
+<span class="n">ch</span>   <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">create_channel</span>
+
+<span class="k">class</span> <span class="nc">FibonacciServer</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+    <span class="vi">@ch</span> <span class="o">=</span> <span class="n">ch</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="n">queue_name</span><span class="p">)</span>
+    <span class="vi">@q</span> <span class="o">=</span> <span class="vi">@ch</span><span class="o">.</span><span class="n">queue</span><span class="p">(</span><span class="n">queue_name</span><span class="p">)</span>
+    <span class="vi">@x</span> <span class="o">=</span> <span class="vi">@ch</span><span class="o">.</span><span class="n">default_exchange</span>
+
+    <span class="vi">@q</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="ss">:block</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">delivery_info</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">payload</span><span class="o">|</span>
+      <span class="n">n</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">to_i</span>
+      <span class="n">r</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+      <span class="vi">@x</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="ss">:routing_key</span> <span class="o">=&gt;</span> <span class="n">properties</span><span class="o">.</span><span class="n">reply_to</span><span class="p">,</span> <span class="ss">:correlation_id</span> <span class="o">=&gt;</span> <span class="n">properties</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">case</span> <span class="n">n</span>
+    <span class="k">when</span> <span class="mi">0</span> <span class="k">then</span> <span class="mi">0</span>
+    <span class="k">when</span> <span class="mi">1</span> <span class="k">then</span> <span class="mi">1</span>
+    <span class="k">else</span>
+      <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">begin</span>
+  <span class="n">server</span> <span class="o">=</span> <span class="no">FibonacciServer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+  <span class="s2">" [x] Awaiting RPC requests"</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="s2">"rpc_queue"</span><span class="p">)</span>
+<span class="k">rescue</span> <span class="no">Interrupt</span> <span class="o">=&gt;</span> <span class="n">_</span>
+  <span class="n">ch</span><span class="o">.</span><span class="n">close</span>
+  <span class="n">conn</span><span class="o">.</span><span class="n">close</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>The server code is rather straightforward:</p>
+<ul>
+<li>As usual we start by establishing the connection, channel and declaring
+    the queue.</li>
+<li>We might want to run more than one server process. In order
+    to spread the load equally over multiple servers we need to set the
+    <span class="code ">prefetch</span> setting on channel.</li>
+<li>We use <span class="code ">Bunny::Queue#subscribe</span> to consume messages from the queue. Then we enter the while loop in which
+    we wait for request messages, do the work and send the response back.</li>
+</ul>
+<p>The code for our RPC client <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/ruby/rpc_client.rb">rpc_client.rb</a>:</p>
+<div class="highlight"><pre><span class="c1">#!/usr/bin/env ruby</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="nb">require</span> <span class="s2">"bunny"</span>
+<span class="nb">require</span> <span class="s2">"thread"</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="no">Bunny</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:automatically_recover</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">start</span>
+
+<span class="n">ch</span>   <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">create_channel</span>
+
+<span class="k">class</span> <span class="nc">FibonacciClient</span>
+  <span class="kp">attr_reader</span> <span class="ss">:reply_queue</span>
+  <span class="kp">attr_accessor</span> <span class="ss">:response</span><span class="p">,</span> <span class="ss">:call_id</span>
+  <span class="kp">attr_reader</span> <span class="ss">:lock</span><span class="p">,</span> <span class="ss">:condition</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">server_queue</span><span class="p">)</span>
+    <span class="vi">@ch</span>             <span class="o">=</span> <span class="n">ch</span>
+    <span class="vi">@x</span>              <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">default_exchange</span>
+
+    <span class="vi">@server_queue</span>   <span class="o">=</span> <span class="n">server_queue</span>
+    <span class="vi">@reply_queue</span>    <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">queue</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="ss">:exclusive</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span>
+
+    <span class="vi">@lock</span>      <span class="o">=</span> <span class="no">Mutex</span><span class="o">.</span><span class="n">new</span>
+    <span class="vi">@condition</span> <span class="o">=</span> <span class="no">ConditionVariable</span><span class="o">.</span><span class="n">new</span>
+    <span class="n">that</span>       <span class="o">=</span> <span class="nb">self</span>
+
+    <span class="vi">@reply_queue</span><span class="o">.</span><span class="n">subscribe</span> <span class="k">do</span> <span class="o">|</span><span class="n">delivery_info</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">payload</span><span class="o">|</span>
+      <span class="k">if</span> <span class="n">properties</span><span class="o">[</span><span class="ss">:correlation_id</span><span class="o">]</span> <span class="o">==</span> <span class="n">that</span><span class="o">.</span><span class="n">call_id</span>
+        <span class="n">that</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">to_i</span>
+        <span class="n">that</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">synchronize</span><span class="p">{</span><span class="n">that</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">signal</span><span class="p">}</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">call_id</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">generate_uuid</span>
+
+    <span class="vi">@x</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span>
+      <span class="ss">:routing_key</span>    <span class="o">=&gt;</span> <span class="vi">@server_queue</span><span class="p">,</span>
+      <span class="ss">:correlation_id</span> <span class="o">=&gt;</span> <span class="n">call_id</span><span class="p">,</span>
+      <span class="ss">:reply_to</span>       <span class="o">=&gt;</span> <span class="vi">@reply_queue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="n">lock</span><span class="o">.</span><span class="n">synchronize</span><span class="p">{</span><span class="n">condition</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">lock</span><span class="p">)}</span>
+    <span class="n">response</span>
+  <span class="k">end</span>
+
+  <span class="kp">protected</span>
+
+  <span class="k">def</span> <span class="nf">generate_uuid</span>
+    <span class="c1"># very naive but good enough for code</span>
+    <span class="c1"># examples</span>
+    <span class="s2">"</span><span class="si">#{</span><span class="nb">rand</span><span class="si">}#{</span><span class="nb">rand</span><span class="si">}#{</span><span class="nb">rand</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">client</span>   <span class="o">=</span> <span class="no">FibonacciClient</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="s2">"rpc_queue"</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="s2">" [x] Requesting fib(30)"</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="s2">" [.] Got </span><span class="si">#{</span><span class="n">response</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="n">ch</span><span class="o">.</span><span class="n">close</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span>
+</pre></div>
+
+
+<p>Now is a good time to take a look at our full example source code (which includes basic exception handling) for
+<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/ruby/rpc_client.rb">rpc_client.rb</a> and <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/ruby/rpc_server.rb">rpc_server.rb</a>.</p>
+<p>Our RPC service is now ready. We can start the server:</p>
+<div class="highlight"><pre><span class="nv">$ </span>ruby -rubygems rpc_server.rb
+ <span class="o">[</span>x<span class="o">]</span> Awaiting RPC requests
+</pre></div>
+
+
+<p>To request a fibonacci number run the client:</p>
+<div class="highlight"><pre><span class="nv">$ </span>ruby -rubygems rpc_client.rb
+ <span class="o">[</span>x<span class="o">]</span> Requesting fib<span class="o">(</span>30<span class="o">)</span>
+</pre></div>
+
+
+<p>The design presented here is not the only possible implementation of a RPC
+service, but it has some important advantages:</p>
+<ul>
+<li>If the RPC server is too slow, you can scale up by just running
+   another one. Try running a second <span class="code ">rpc_server.rb</span> in a new console.</li>
+<li>On the client side, the RPC requires sending and
+   receiving only one message. No synchronous calls like <span class="code ">Bunny::Channel#queue</span>
+   are required. As a result the RPC client needs only one network
+   round trip for a single RPC request.</li>
+</ul>
+<p>Our code is still pretty simplistic and doesn't try to solve more
+complex (but important) problems, like:</p>
+<ul>
+<li>How should the client react if there are no servers running?</li>
+<li>Should a client have some kind of timeout for the RPC?</li>
+<li>If the server malfunctions and raises an exception, should it be
+   forwarded to the client?</li>
+<li>Protecting against invalid incoming messages
+   (eg checking bounds, type) before processing.</li>
+</ul>
+<blockquote>
+<p>If you want to experiment, you may find the <a href="/v3_4_x/plugins.html">rabbitmq-management plugin</a> useful for viewing the queues.</p>
+</blockquote></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

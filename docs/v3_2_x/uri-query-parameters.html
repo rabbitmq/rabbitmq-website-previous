@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_2_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_2_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_2_x/favicon.ico" /><link rel="stylesheet" href="/v3_2_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_2_x/js/site.js"></script><script type="text/javascript" src="/v3_2_x/js/ga-bootstrap.js"></script><title>RabbitMQ - URI query parameters</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_2_x/"><img src="/v3_2_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_2_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_2_x/features.html">Features</a></li><li><a href="/v3_2_x/download.html">Installation</a></li><li><a href="/v3_2_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_2_x/getstarted.html">Tutorials</a></li><li><a href="/v3_2_x/services.html">Services</a></li><li><a href="/v3_2_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>URI query parameters</h1>
+    <p class="intro">
+      This page is a less-formal companion to the <a href="uri-spec.html">URI specification</a>, documenting how the
+      officially-supported clients interpret URI parameters. Currently
+      only the Erlang client does so.
+    </p>
+
+    <p>
+      The <a href="federation-reference.html#upstreams">federation</a>
+      and <a href="shovel.html#uris">shovel</a> plugins specify
+      connections to other brokers using URIs, and are implemented
+      using the Erlang client, so they take all the parameters
+      described here for it.
+    </p>
+
+    <p>
+      Query parameters are added to the URI in the usual way. Any
+      parameter can be omitted. The client will pick sensible defaults
+      when they are.
+    </p>
+
+    <p>
+      Example:
+    </p>
+
+    <pre>amqp://myhost?heartbeat=5&amp;frame_max=8192</pre>
+
+    <p>
+      This specifies a (non-encrypted) network connection to the host
+      <span class="code ">myhost</span>. The heartbeat interval is set to 5 seconds,
+      and the maximum frame size to 8192 bytes. Other parameters are
+      set to their default values.
+    </p>
+
+    
+
+    <table>
+      <tr>
+        <th>Parameter name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>
+          <span class="code ">cacertfile</span><br />
+          <span class="code ">certfile</span><br />
+          <span class="code ">keyfile</span>
+        </td>
+        <td>
+          Paths to files to use in order to present a client-side SSL
+          certificate to the server. Only of use for the
+          <span class="code ">amqps</span> scheme.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="code ">verify</span><br />
+          <span class="code ">fail_if_no_peer_cert</span>
+        </td>
+        <td>
+          Use to configure verification of the server's SSL
+          certificate. See the <a href="ssl.html">SSL guide</a> for
+          details of SSL in RabbitMQ in general and specifically the
+          <a href="ssl.html#configure-erlang">Erlang client</a>
+          section. Only of use for the <span class="code ">amqps</span> scheme.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">auth_mechanism</span></td>
+        <td>
+          SASL authentication mechanisms to consider when negotiating
+          a mechanism with the server. This parameter can be specified
+          multiple times,
+          e.g. <span class="code ">?sasl_mechanism=plain&amp;sasl_mechanism=amqplain</span>,
+          to specify multiple mechanisms.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">heartbeat</span></td>
+        <td>
+          Heartbeat value (in seconds) to negotiate withe the server.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">connection_timeout</span></td>
+        <td>
+          Time (in seconds) to wait while establishing a connection
+          before giving up.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">channel_max</span></td>
+        <td>
+          Maximum number of channels to permit on this connection.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="code ">frame_max</span></td>
+        <td>
+          Maximum frame size (in bytes) to permit on this connection.
+        </td>
+      </tr>
+    </table>
+
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_2_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_2_x/clients.html" class="selected">Client Documentation</a><ul>
+       <li><a href="/v3_2_x/api-guide.html">Java Client Guide</a></li>
+       <li><a href="/v3_2_x/erlang-client-user-guide.html">Erlang Client Guide</a></li>
+       <li><a href="/v3_2_x/uri-spec.html" class="selected">AMQP URI Spec</a><ul>
+         <li><a href="/v3_2_x/uri-query-parameters.html" class="selected">AMQP URI Params</a></li>
+       </ul></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_2_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_2_x/news.html">News</a></li>
+     <li><a href="/v3_2_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_2_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_2_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_2_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_2_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_2_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

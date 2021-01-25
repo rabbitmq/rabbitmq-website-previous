@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Protocol Extensions</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Protocol Extensions</h1>
+      <p class="intro">
+        The RabbitMQ Server implements a number of extensions of the
+        <a href="specification.html">AMQP specification</a>, which we
+        document here.
+      </p>
+
+    <div class="landing-box">
+      <h2>Publishing</h2>
+      <ul>
+        <li>
+          <a href="confirms.html">Confirms</a> (aka Publisher
+          Acknowledgements) are a lightweight way to know when
+          RabbitMQ has taken responsibility for messages.
+        </li>
+        <li>
+          <a href="connection-blocked.html">Blocked Connection Notifications</a>
+          allows clients to be notified when a connection is blocked and unblocked.
+        </li>
+      </ul>
+    </div>
+
+    <div class="landing-box">
+      <h2>Consuming</h2>
+      <ul>
+        <li>
+          <a href="consumer-cancel.html">Consumer Cancellation
+          Notifications</a> let a consumer know if it has been
+          cancelled by the server.
+        </li>
+        <li>
+          <a href="nack.html"><span class="code ">basic.nack</span></a>
+          extends <span class="code ">basic.reject</span> to support rejecting
+          multiple messages at once.
+        </li>
+        <li>
+          <a href="consumer-priority.html">Consumer Priorities</a> allow you
+          to send messages to higher priority consumers first.
+        </li>
+        <li>
+          <a href="direct-reply-to.html">Fast reply-to</a> allows RPC
+          clients to receive replies to their queries without needing
+          to declare a temporary queue.
+        </li>
+      </ul>
+    </div>
+
+    <div class="landing-box">
+      <h2>Message Routing</h2>
+
+      <ul>
+        <li>
+          <a href="e2e.html">Exchange to Exchange Bindings</a> allow
+          messages to pass through multiple exchanges for more flexible
+          routing.
+        </li>
+        <li>
+          <a href="ae.html">Alternate Exchanges</a> route messages
+          that were otherwise unroutable.
+        </li>
+        <li>
+          <a href="sender-selected.html">Sender-selected
+          Distribution</a> allows a publisher to decide where messages
+          are routed directly.
+        </li>
+      </ul>
+    </div>
+
+    <div class="landing-box">
+      <h2>Message Lifecycle</h2>
+      <ul>
+        <li>
+          <a href="ttl.html#per-queue-message-ttl">Per-Queue Message TTL</a>
+          determines how long an unconsumed message can live in a queue before
+          it is automatically deleted.
+        </li>
+        <li>
+          <a href="ttl.html#per-message-ttl">Per-Message TTL</a>
+          determines the TTL on a per-message basis.
+        </li>
+        <li>
+          <a href="ttl.html#queue-ttl">Queue TTL</a> determines how
+          long an unused queue can live before it is automatically
+          deleted.
+        </li>
+        <li>
+          <a href="dlx.html">Dead Letter Exchanges</a> ensure messages
+          get re-routed when they are rejected or expire.
+        </li>
+        <li>
+          <a href="maxlength.html">Length Limit</a>
+          allows the maximum length of a queue to be set.
+        </li>
+        <li>
+          <a href="priority.html">Priority Queues</a>
+          support the AMQP message priority field (in a slightly
+          different way).
+        </li>
+      </ul>
+    </div>
+
+    <div class="landing-box">
+      <h2>Authentication and Identity</h2>
+      <ul>
+        <li>
+          The <a href="validated-user-id.html">User-ID</a> message
+          property is validated by the server.
+        </li>
+
+        <li>
+          Clients that advertise the appropriate capability may receive
+          explicit <a href="auth-notification.html">authentication failure notifications</a>
+          from the broker.
+        </li>
+      </ul>
+    </div>
+
+    <div class="landing-box">
+      <h2>AMQP 0-9-1 Spec Differences</h2>
+      <ul>
+        <li>
+          Some features that were in AMQP 0-8 were deprecated in AMQP
+          0-9-1. We have undeprecated some of them and introduced a
+          couple of tiny behaviour changes that improve usability of
+          the product. Please refer to the <a href="spec-differences.html">spec differences</a> page.
+        </li>
+      </ul>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_5_7/confirms.html">Confirms</a></li>
+       <li><a href="/v3_5_7/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_5_7/consumer-prefetch.html">Consumer Prefetch</a></li>
+       <li><a href="/v3_5_7/consumer-priority.html">Consumer Priorities</a></li>
+       <li><a href="/v3_5_7/direct-reply-to.html">Direct reply-to</a></li>
+       <li><a href="/v3_5_7/connection-blocked.html">Blocked Connections</a></li>
+       <li><a href="/v3_5_7/nack.html">basic.nack</a></li>
+       <li><a href="/v3_5_7/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_5_7/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_5_7/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_5_7/ttl.html">TTL</a></li>
+       <li><a href="/v3_5_7/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_5_7/maxlength.html">Length Limit</a></li>
+       <li><a href="/v3_5_7/priority.html">Priority Queues</a></li>
+       <li><a href="/v3_5_7/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_5_7/auth-notification.html">Auth Failure</a></li>
+       <li><a href="/v3_5_7/spec-differences.html">Spec Differences</a></li>
+     </ul></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

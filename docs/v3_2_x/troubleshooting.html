@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_2_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_2_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_2_x/favicon.ico" /><link rel="stylesheet" href="/v3_2_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_2_x/js/site.js"></script><script type="text/javascript" src="/v3_2_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Troubleshooting</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_2_x/"><img src="/v3_2_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_2_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_2_x/features.html">Features</a></li><li><a href="/v3_2_x/download.html">Installation</a></li><li><a href="/v3_2_x/documentation.html">Documentation</a></li><li><a href="/v3_2_x/getstarted.html">Tutorials</a></li><li><a href="/v3_2_x/services.html">Services</a></li><li><a href="/v3_2_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Troubleshooting</h1>
+        <dl class="instructions">
+          <dt><strong>Checking Broker Status</strong></dt>
+          <dd>
+            <p>
+              You can use <span class="code ">rabbitmqctl status</span>
+              to verify whether a broker is running.<br />
+              Normal output from a running broker without plugins follows this pattern:
+              <pre>
+  Status of node 'rabbit@xxx' ...
+  [{pid,...},
+   {running_applications,[{rabbit,"RabbitMQ","3.2.4"},
+                          {os_mon,"..."},
+                          {sasl,"..."},
+                          {mnesia,"..."},
+                          {stdlib,"..."},
+                          {kernel,"..."},
+  {os,"..."},
+  {erlang_version,"..."},
+  {memory,"..."}}]</pre>
+            </p>
+            <p>
+              This example indicates that no broker is running:
+              <pre>
+  Status of node 'rabbit@xxx' ...
+  Error: unable to connect to node 'rabbit@xxx': nodedown
+  diagnostics:
+  - nodes and their ports on xxx: [{rabbitmqctl,...}]
+  - current node: 'rabbitmqctlxxx@xxx'
+  - current node home dir: [...]
+  - current node cookie hash: [...]</pre>
+            </p>
+            <p>
+              If the diagnostic line looks like this:
+              <pre>
+  - nodes and their ports on xxx: [{rabbit,...},{rabbitmqctl,...}]</pre>
+  and the <a href="relocate.html">broker log file</a> contains entries
+  similar to
+              <pre>
+  Connection attempt from disallowed node...</pre> then you should
+  make sure the <a href="clustering.html#setup">erlang cookies</a> are
+  the same, e.g. by checking that the cookie hash displayed in the
+  diagnostics is the same as that shown by the broker when it starts
+  up.
+            </p>
+            <p>
+              A common reason for cookie mismatches when invoking
+              rabbitmqctl against a broker on the same host is that
+              broker and rabbitmqctl were run as different
+              user. Evidence of this comes in the form of a mismatch
+              in the node home dir shown by the broker on startup vs
+              what is displayed in the rabbitmqctl diagnostics.
+            </p>
+            <p>
+              In the absence of the "<span class="code ">Connection attempt from
+              disallowed node...</span>" log entry, check that the
+              Erlang distribution port on which the broker is
+              listening is not blocked by a <a href="clustering.html#firewall">firewall</a>. The port
+              is shown in the <span class="code ">{rabbit,...}</span> part of the
+              "<span class="code ">nodes and their ports...</span>" diagnostics
+              line. Try connecting to it with e.g. telnet.
+            </p>
+            <p>
+              If the "<span class="code ">nodes and their ports...</span>" line
+              contains no entry for rabbit then the broker probably
+              isn't running. Check the broker logs for errors.
+            </p>
+          </dd>
+          <dt><strong>Server Fails to Start</strong></dt>
+          <dd>
+            <p>
+              When the server fails to start, usually a crash dump file
+              <span class="code ">erl_crash.dump</span> is created in the directory
+              where the server was started. This can provide very detailed
+              information on the causes of a start up failure, but its
+              analysis requires Erlang expertise.
+            </p>
+            <p>
+          If you attempt to start another server while a broker is already running,
+          then you will receive an error report.
+          You can confirm whether the broker is already running by checking the status.
+            </p>
+            <p>
+              If the server fails to start, examine the console output and
+              the log files in the <b>RABBITMQ_LOG_BASE</b> directory.
+              Configuration and permission errors are frequently the cause, e.g. the
+              Mnesia directory cannot be created.
+            </p>
+          </dd>
+          <dt><strong>Windows Service fails to Install</strong></dt>
+          <dd>
+            <p>
+            If the service fails to install, check the service account has full access permission for
+            <b>RABBITMQ_BASE</b>, <b>RABBITMQ_MNESIA_BASE</b> and
+            <b>RABBITMQ_LOG_BASE</b> directories
+            [<a href="http://www.microsoft.com/windowsxp/using/security/learnmore/accesscontrol.mspx">XP</a>,
+                <a href="http://windows.microsoft.com/en-US/windows-vista/Troubleshoot-access-denied-when-opening-files-or-folders">Vista</a>].
+            </p>
+          </dd>
+          <dt><strong>Windows Service fails to Start</strong></dt>
+          <dd>
+            <p>
+            If the service fails to start, make sure the service has been
+            installed.
+            </p>
+            <p>
+                On starting the service, if the service output reads "<span class="code ">The process
+                terminated unexpectedly</span>" instead, then the
+                service did not start correctly. Check that the
+                environment variables are set correctly. The logfiles in
+                <span class="code ">RABBITMQ_BASE</span> may also contain useful diagnostic
+                information.
+            </p>
+          </dd>
+          <dt><strong>You receive an error message reading "The handle is invalid" after upgrading the Windows Service</strong></dt>
+          <dd>
+            <p>
+            The solution is to uninstall RabbitMQ and Erlang.
+            Then remove all registry keys under <span class="code ">HKLM/SOFTWARE/Ericsson/Erlang/ErlSrv</span>,
+            and then install Erlang and RabbitMQ (in that order).
+            </p>
+            <p>
+            </p>
+          </dd>
+          <dt><strong>Plugin fails to activate</strong></dt>
+          <dd>
+            <p>
+            If a plugin fails to activate, check the output of
+            <span class="code ">rabbitmq-plugins list</span>.
+            </p>
+          </dd>
+          <dt><strong>Problems with SSL</strong></dt>
+          <dd>
+            <p>
+              See <a href="troubleshooting-ssl.html">SSL troubleshooting</a>.
+            </p>
+          </dd>
+        </dl>
+        <p>
+          If the server is not behaving as expected during operation,
+          examine the log files and use the <span class="code ">rabbitmqctl</span>
+          commands from the <a href="admin-guide.html">admin guide</a>
+          to obtain further information on the server status.
+        </p>
+        <p>
+          For problems encountered in the handling of AMQP traffic,
+          the <a href="api-guide.html#tracer">AMQP capture and analysis
+          tool</a> may help in the analysis.
+        </p>
+        <p>
+          Failing that, it's possible that we've solved the problem for someone else.
+          Try using the search box at the top of our web pages to find site,
+          mailing list and blog information.
+           You might also check our
+          <a href="http://lists.rabbitmq.com/pipermail/rabbitmq-discuss/">mailing list archives</a>.
+        </p>
+        <p>
+          If you still can't find a solution to your problem then
+          please post a new message to
+          <a href="mailto:rabbitmq-discuss@lists.rabbitmq.com">rabbitmq-discuss@lists.rabbitmq.com</a>
+          (you may have to
+          <a href="http://lists.rabbitmq.com/cgi-bin/mailman/listinfo/rabbitmq-discuss">
+          join the mailing list first</a>).
+          Let us know what you were trying to do, the error you received and
+          relevant entries from the logfile and one of our engineers will help you get it fixed.
+        </p>
+        <p>
+          If all of the above fails, please <a href="contact.html">tell us about the problem</a>,
+          including the log files under <b>RABBITMQ_LOG_BASE</b> in your report.
+        </p>
+  </div><div id="right-nav"></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_2_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_2_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

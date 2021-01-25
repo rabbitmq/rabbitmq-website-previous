@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Nightly Builds</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html" class="selected">Installation</a></li><li><a href="/v3_4_x/documentation.html">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Nightly Builds</h1>
+      <p class="intro">
+          We now produce nightly builds for the RabbitMQ broker
+          and official client libraries. These builds are available
+          so that users can try out the latest features and bug fixes
+          as soon as they become available.
+      </p>
+      <div class="docSection"><a name="stability-and-safety" id="stability-and-safety"></a>
+	  <p>
+          Nightly builds are based on the 'master' branch of our GitHub
+          repositories. This represents the <i>bleeding edge</i> and therefore
+          should not be considered complete or completely stable. It is quite
+          possible that existing features, APIs and/or configuration data
+          formats have been changed in ways that are not backwards compatible
+          or even removed altogether.
+      </p>
+      <p>
+          In addition to the changes described above, it is also possible that
+          incompatible changes have been made to the way persistent storage
+          is handled. Such changes may mean that after installing a nightly
+          build, your RabbitMQ installation <i>cannot be rolled back to a
+          previous (stable) version</i>. To avoid conflicting with an existing
+          installation, you should either remove it first, or configure the
+          nightly build installation to use an alternative location for its
+          persistent storage and (potentially) other configuration elements
+          using the <a href="relocate.html">provided instructions</a>.
+      </p>
+      </div>
+      <div class="docSection"><a name="packaging-repositories" id="packaging-repositories"></a>
+        <p>
+          We publish a debian repository containing the nighty build artefacts,
+          so that you can install them using the relevant package manager for
+          your system. You should be aware that this repository will be
+          overwritten each night, so you can <i>only</i> use the latest version
+          when installing in this manner.
+      </p>
+      <p>
+          As with our published live releases, we continue to digitally
+          sign the nightly build artefacts using
+          <a href="http://www.gnupg.org/">GnuPG</a> and
+          <a href="rabbit-nightly-signing-key-public.asc">
+              our nightly builds public signing key</a>.
+      </p>
+      <p>
+        You can find documentation about any new features available in
+        our nightly builds
+        at <a href="http://next.rabbitmq.com/documentation.html">next.rabbitmq.com</a>.
+      </p>
+
+    </div>
+    <div class="docSection"><a name="downloads" id="downloads"></a>
+    <div class="landing-box">
+      <h2>Downloading and installing RabbitMQ nightly builds</h2>
+      <h3>RabbitMQ Server</h3>
+      <ul>
+        <li>
+          <a href="/v3_4_x/nightlies/rabbitmq-server/">Download</a> |
+          <a href="/v3_4_x/debian-snapshot">Debian Repository</a> |
+        </li>
+      </ul>
+      <h3>Official Clients</h3>
+      <ul>
+        <li id="rabbitmq-java-client">
+          <a href="/v3_4_x/nightlies/rabbitmq-java-client">Java Client</a>
+        </li>
+        <li id="rabbitmq-dotnet-client">
+            <a href="/v3_4_x/nightlies/rabbitmq-dotnet-client">.NET/C# Client</a>
+        </li>
+        <li id="rabbitmq-erlang-client">
+          <a href="/v3_4_x/nightlies/rabbitmq-erlang-client">Erlang Client</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+  </div><div id="right-nav"></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

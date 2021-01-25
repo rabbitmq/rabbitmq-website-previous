@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Blocked Connection Notifications</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Blocked Connection Notifications</h1>
+    <p>
+      It is sometimes desirable for clients to receive a notification
+      when their connection gets <a href="memory.html">blocked</a>
+      due to the broker running low on resources (memory or disk).
+    </p>
+
+    <p>
+      We have introduced an AMQP protocol extension in which the
+      broker sends to the client a <span class="code ">connection.blocked</span>
+      method when the connection gets blocked, and
+      <span class="code ">connection.unblocked</span> when it is unblocked.
+    </p>
+    <p>
+      To receive these notifications, the client must present a
+      <span class="code ">capabilities</span> table in its
+      <span class="code ">client-properties</span> in which there is a key
+      <span class="code ">connection.blocked</span> and a boolean value
+      <span class="code ">true</span>. See the <a href="#capabilities">capabilities</a> section for further
+      details on this. Our supported clients indicate this capability
+      by default and provide a way to register handlers for the
+      <span class="code ">connection.blocked</span> and
+      <span class="code ">connection.unblocked</span> methods.
+    </p>
+
+    <div class="docSection">
+      <h2 class="docHeading">Using Blocked Connection Notifications with Java Client</h2>
+
+      <p>With the official Java client, blocked connection
+      notifications are handled by <span class="code ">BlockedListener</span>
+      interface implementations. They can be registered on a
+      <span class="code ">Connection</span> using the
+      <span class="code ">Connection.addBlockedListener</span> method:</p>
+
+      <pre class="sourcecode">
+ConnectionFactory factory = new ConnectionFactory();
+Connection connection = factory.newConnection();
+connection.addBlockedListener(new BlockedListener() {
+    public void handleBlocked(String reason) throws IOException {
+        // Connection is now blocked
+    }
+
+    public void handleUnblocked() throws IOException {
+        // Connection is now unblocked
+    }
+});
+      </pre>
+    </div>
+
+
+
+    <div class="docSection">
+      <h2 class="docHeading">Using Blocked Connection Notifications with .NET Client</h2>
+
+      <p>With the official .NET client, blocked connection
+      notifications are handled by the
+      <span class="code ">RabbitMQ.Client.Events.ConnectionBlockedEventHandler</span>
+      delegate. <span class="code ">IConnection</span> provides
+      <span class="code ">IConnection.ConnectionBlocked</span> and
+      <span class="code ">IConnection.ConnectionUnblocked</span> events:</p>
+
+      <pre class="sourcecode">
+        public void HandleBlocked(IConnection sender, ConnectionBlockedEventArgs args)
+        {
+            // Connection is now blocked
+        }
+
+        public void HandleUnblocked(IConnection sender)
+        {
+            // Connection is now unblocked
+        }
+
+Conn.ConnectionBlocked   += HandleBlocked;
+Conn.ConnectionUnblocked += HandleUnblocked;
+      </pre>
+    </div>
+
+    <div class="docSection">
+      <h2 class="docHeading">When Notifications are Sent</h2>
+      <p>
+        A <span class="code ">connection.blocked</span> notification is sent to
+        publishing connections the first time RabbitMQ is low on a
+        resource. For example, when a RabbitMQ node detects that it
+        is low on RAM, it sends
+        <span class="code ">connection.blocked</span> to all connected publishing
+        clients supporting this feature. If before the connections
+        are unblocked the node also starts running low on disk space,
+        another <span class="code ">connection.blocked</span> will not be sent.
+      </p>
+      <p>
+        A <span class="code ">connection.unblocked</span> is sent when <em>all</em>
+        resource alarms have cleared and the connection is fully
+        unblocked.
+      </p>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_5_7/confirms.html">Confirms</a></li>
+       <li><a href="/v3_5_7/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_5_7/consumer-prefetch.html">Consumer Prefetch</a></li>
+       <li><a href="/v3_5_7/consumer-priority.html">Consumer Priorities</a></li>
+       <li><a href="/v3_5_7/direct-reply-to.html">Direct reply-to</a></li>
+       <li><a href="/v3_5_7/connection-blocked.html" class="selected">Blocked Connections</a></li>
+       <li><a href="/v3_5_7/nack.html">basic.nack</a></li>
+       <li><a href="/v3_5_7/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_5_7/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_5_7/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_5_7/ttl.html">TTL</a></li>
+       <li><a href="/v3_5_7/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_5_7/maxlength.html">Length Limit</a></li>
+       <li><a href="/v3_5_7/priority.html">Priority Queues</a></li>
+       <li><a href="/v3_5_7/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_5_7/auth-notification.html">Auth Failure</a></li>
+       <li><a href="/v3_5_7/spec-differences.html">Spec Differences</a></li>
+     </ul></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Management Plugin</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Management Plugin</h1>
+      <div class="docSection"><a name="features" id="features"></a>
+        <p>
+          The rabbitmq-management plugin provides an HTTP-based API
+          for management and monitoring of your RabbitMQ server, along
+          with a browser-based UI and a command line tool, <a href="management-cli.html">rabbitmqadmin</a>. Features
+          include:
+        </p>
+        <ul>
+          <li>
+            Declare, list and delete exchanges, queues, bindings,
+            users, virtual hosts and permissions.
+          </li>
+          <li>
+            Monitor queue length, message rates globally and per
+            channel, data rates per connection, etc.
+          </li>
+          <li>
+            Send and receive messages.
+          </li>
+          <li>
+            Monitor Erlang processes, file descriptors, memory use.
+          </li>
+          <li>
+            Export / import object definitions to JSON.
+          </li>
+          <li>
+            Force close connections, purge queues.
+          </li>
+        </ul>
+        <div class="docSubsection"><a name="screenshots" id="screenshots"></a>
+          <h3 class="docHeading">Screenshots</h3>
+          <table class="screenshots">
+            <tr>
+              <th>Overview</th>
+              <th>Import / Export</th>
+            </tr>
+            <tr>
+              <td>
+                <a href="/v3_5_7/img/management/overview.png">
+                  <img src="/v3_5_7/img/management/thumbs/overview.png" />
+                </a>
+              </td>
+              <td>
+                <a href="/v3_5_7/img/management/import-export.png">
+                  <img src="/v3_5_7/img/management/thumbs/import-export.png" />
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <th>Channel List</th>
+              <th>Queue Details</th>
+            </tr>
+            <tr>
+              <td>
+                <a href="/v3_5_7/img/management/channels.png">
+                  <img src="/v3_5_7/img/management/thumbs/channels.png" />
+                </a>
+              </td>
+              <td>
+                <a href="/v3_5_7/img/management/queue.png">
+                  <img src="/v3_5_7/img/management/thumbs/queue.png" />
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="docSection"><a name="getting-started" id="getting-started"></a>
+        <h2 class="docHeading">Getting started</h2>
+
+        <p>
+          The management plugin is included in the RabbitMQ
+          distribution.  To enable it, use <a href="man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a>:
+        </p>
+        <pre class="example">rabbitmq-plugins enable rabbitmq_management</pre>
+        <p>
+          If you wish to build the plugin from source, it can be built
+          like any other. See
+          the <a href="plugin-development.html">plugin development</a>
+          page for more information.
+        </p>
+
+        <ul>
+          <li>
+            The web UI is located at:
+            http://<i>server-name</i>:15672/
+          </li>
+          <li>
+            The HTTP API and its documentation are both located at:
+            http://<i>server-name</i>:15672/api/ (or view
+            our <a href="https://raw.githack.com/rabbitmq/rabbitmq-management/rabbitmq_v3_5_7/priv/www/api/index.html">
+            latest HTTP API documentation here</a>).
+          </li>
+          <li>
+            Download <a href="management-cli.html">rabbitmqadmin</a>
+            at: http://<i>server-name</i>:15672/cli/
+          </li>
+        </ul>
+        <p>
+          NB: The port for RabbitMQ versions prior to 3.0 is 55672.
+        </p>
+        <p>
+          To use the web UI you will need to authenticate as a
+          RabbitMQ user (on a fresh installation the user "guest" is
+          created with password "guest"). From here you can manage
+          exchanges, queues, bindings, virtual hosts, users and
+          permissions. Hopefully the UI is fairly self-explanatory.
+        </p>
+        <p>
+          The management UI is implemented as a single static HTML
+          page which makes background queries to the HTTP API. As such
+          it makes heavy use of Javascript. It has been tested with
+          recent versions of Firefox, Chromium and Safari, and with
+          versions of Microsoft Internet Explorer back to 6.0.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="permissions" id="permissions"></a>
+        <h2 class="docHeading">Permissions</h2>
+        <p>
+          The management plugin extends the existing <a href="access-control.html">permissions model</a> somewhat. Users can
+          be given arbitrary tags within RabbitMQ. The management plugin makes
+          use of tags called "management", "policymaker", "monitoring" and
+          "administrator". The following table shows what the different types
+          of user can do:
+        </p>
+        <table>
+          <tr>
+            <th>Tag</th>
+            <th>Capabilities</th>
+          </tr>
+          <tr>
+            <td>(None)</td>
+            <td>
+              No access to the management plugin
+            </td>
+          </tr>
+          <tr>
+            <td>management</td>
+            <td>
+              Anything the user could do via AMQP plus:
+              <ul>
+                <li>List virtual hosts to which they can log in via AMQP</li>
+                <li>
+                  View all queues, exchanges and bindings in "their"
+                  virtual hosts
+                </li>
+                <li>View and close their own channels and connections</li>
+                <li>
+                  View "global" statistics covering all their
+                  virtual hosts, including activity by other users
+                  within them
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>policymaker</td>
+            <td>
+              Everything "management" can plus:
+              <ul>
+                <li>
+                  View, create and delete policies and parameters for virtual
+                  hosts to which they can log in via AMQP
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>monitoring</td>
+            <td>
+              Everything "management" can plus:
+              <ul>
+                <li>
+                  List all virtual hosts, including ones they could
+                  not log in to via AMQP
+                </li>
+                <li>View other users's connections and channels</li>
+                <li>View node-level data such as memory use and clustering</li>
+                <li>View truly global statistics for all virtual hosts</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>administrator</td>
+            <td>
+              Everything "policymaker" and "monitoring" can plus:
+              <ul>
+                <li>Create and delete virtual hosts</li>
+                <li>View, create and delete users</li>
+                <li>View, create and delete permissions</li>
+                <li>Close other users's connections</li>
+              </ul>
+            </td>
+          </tr>
+        </table>
+        <p>
+          Note that since "administrator" does everything "monitoring"
+          does, and "monitoring" does everything "management" does,
+          you frequently only need to give each user a maximum of one tag.
+        </p>
+        <p>
+          Normal RabbitMQ permissions still apply to monitors and
+          administrators; just because a user is a monitor or
+          administrator does not give them full access to exchanges,
+          queues and bindings through either AMQP or the management
+          plugin.
+        </p>
+        <p>
+          All users can only list objects within a particular virtual
+          host if they have any permissions for that virtual host.
+        </p>
+        <p>
+          If you get locked out due to only having non-administrator
+          users, or no users at all, you can use <a href="/v3_5_7/man/rabbitmqctl.1.man.html#">rabbitmqctl add_user</a>
+          to create a non-administrator user and <a href="/v3_5_7/man/rabbitmqctl.1.man.html#set_user_tags">rabbitmqctl
+          set_user_tags</a> to promote a user to administrator.
+        </p>
+      </div>
+
+
+      <div class="docSection"><a name="http-api" id="http-api"></a>
+        <h2 class="docHeading">HTTP API</h2>
+        <p>
+          The management plugin will create an HTTP-based API at
+          http://<i>server-name</i>:15672/api/. Browse to that
+          location for more information on the API.
+          For convenience you can read the
+          <a href="https://cdn.rawgit.com/rabbitmq/rabbitmq-management/rabbitmq_v3_5_7/priv/www/api/index.html">
+          latest HTTP API documentation</a> on GitHub.
+        </p>
+        <p>
+          For HTTP API clients in several languages,
+          see <a href="/v3_5_7/devtools.html">Developer Tools</a>.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="configuration" id="configuration"></a>
+        <h2 class="docHeading">Configuration</h2>
+        <p>
+          There are several configuration options which affect the
+          management plugin. These are managed through the main
+          RabbitMQ
+          <a href="configure.html#configuration-file">configuration file</a>.
+        </p>
+        <div class="docSubsection"><a name="load-definitions" id="load-definitions"></a>
+          <h3 class="docHeading">Load definitions at startup</h3>
+          <p>
+            The management plugin lets you export a JSON file
+            containing definitions of all broker objects (queues,
+            exchanges, bindings, users, virtual hosts, permissions and
+            parameters). In some scenarios it may be useful to ensure
+            the existence of these objects at every startup.
+          </p>
+          <p>
+            To do this, set the <span class="code ">load_definitions</span> variable
+            to the path of a previously exported JSON file containing
+            the definitions you want.
+          </p>
+          <p>
+            Note that the definitions in the file will overwrite
+            anything already in the broker; using this option will not
+            delete anything that is already there. However, if you
+            start from a completely reset broker, use of this
+            option <b>will</b> prevent the usual default user /
+            virtual host / permissions from being created.
+          </p>
+        </div>
+        <div class="docSubsection"><a name="fine-stats" id="fine-stats"></a>
+          <h3 class="docHeading">Message rates</h3>
+          <p>
+            The management plugin by default shows message rates
+            globally, and for each queue, channel, exchange, and
+            vhost. These are known as the <i>basic</i> message rates.
+          </p>
+          <p>
+            It can also show message rates for all the combinations of
+            channel to exchange, exchange to queue, and queue to
+            channel. These are known as <i>detailed</i> message rates.
+            Detailed message rates are disabled by default as they can
+            have a large memory footprint when there are a large
+            number of combinations of channels, queues and exchanges.
+          </p>
+          <p>
+            Alternatively, the message rates can be disabled
+            altogether. This can help get the best possible
+            performance out of a CPU-bound server.
+          </p>
+          <p>
+            The message rate mode is controlled by the
+            <span class="code ">rates_mode</span> configuration variable in
+            <span class="code ">rabbitmq_management</span>. This can be one of
+            <span class="code ">basic</span> (the default), <span class="code ">detailed</span> or
+            <span class="code ">none</span>.
+          </p>
+        </div>
+        <div class="docSubsection"><a name="statistics-interval" id="statistics-interval"></a>
+          <h3 class="docHeading">Statistics interval</h3>
+          <p>
+            By default the server will emit statistics events every
+            5000ms. The message rate values shown in the management
+            plugin are calculated over this period. You may therefore
+            want to increase this value in order to sample rates over
+            a longer period, or to reduce the statistics load on a
+            server with a very large number of queues or channels.
+          </p>
+          <p>
+            In order to do so, set the value of
+            the <span class="code ">collect_statistics_interval</span> variable for
+            the <span class="code ">rabbit</span> application to the desired
+            interval in milliseconds and restart RabbitMQ.
+          </p>
+        </div>
+        <div class="docSubsection"><a name="http-logging" id="http-logging"></a>
+          <h3 class="docHeading">HTTP request logging</h3>
+          <p>
+            To create simple access logs of requests to the HTTP API,
+            set the value of the <span class="code ">http_log_dir</span> variable in
+            the <span class="code ">rabbitmq_management</span> application to the name
+            of a directory in which logs can be created and restart
+            RabbitMQ. Note that only requests to the API
+            at <span class="code ">/api</span> are logged, not requests to the static
+            files which make up the browser-based GUI.
+          </p>
+        </div>
+        <div class="docSubsection"><a name="example-config" id="example-config"></a>
+          <h3 class="docHeading">Example</h3>
+          <p>
+            An example configuration file for RabbitMQ that switches
+            on request logging, increases the statistics interval to
+            10000ms and explicitly sets some other relevant parameters
+            to their default values, would look like this:
+          </p>
+          <pre class="example">[
+  {rabbit,                    [ {tcp_listeners,               [5672]},
+                                {collect_statistics_interval, 10000} ] },
+  {rabbitmq_management,       [ {http_log_dir,  "/tmp/rabbit-mgmt"},
+                                {rates_mode,    basic}] }
+].</pre>
+        </div>
+        <div class="docSubsection"><a name="mochiweb-config" id="mochiweb-config"></a>
+          <h3 class="docHeading">Configuring the HTTP listener</h3>
+          <p>
+            It is possible to configure rabbitmq-mochiweb to serve the
+            management plugin on a different port or network
+            interface, with SSL, etc. To do so, you should configure the
+            <span class="code ">listener</span> configuration item; for example to
+            change the port:
+          </p>
+          <pre class="example">[
+  ...
+  {rabbitmq_management, [{listener, [{port, 12345}]}]},
+  ...
+].</pre>
+
+          <p>
+            or to make the management plugin use HTTPS:
+          </p>
+          <pre class="example">
+[{rabbitmq_management,
+  [{listener, [{port,     15671},
+               {ssl,      true},
+               {ssl_opts, [{cacertfile, "/path/to/cacert.pem"},
+                           {certfile,   "/path/to/cert.pem"},
+                           {keyfile,    "/path/to/key.pem"}]}
+              ]}
+  ]}
+].</pre>
+          <p>
+            See the <a href="mochiweb.html">rabbitmq-mochiweb</a>
+            guide for more details.
+          </p>
+        </div>
+
+        <div class="docSubsection"><a name="sample-retention" id="sample-retention"></a>
+          <h3 class="docHeading">Sample retention policies</h3>
+          <p>
+            The management plugin will retain samples of some data
+            such as message rates and queue lengths. You can
+            configure how long such data is retained.
+          </p>
+          <pre class="example">[
+  ...
+  {rabbitmq_management,
+    %% List of {MaxAgeInSeconds, SampleEveryNSeconds}
+    [{global,   [{605, 5}, {3660, 60}, {29400, 600}, {86400, 1800}]},
+     {basic,    [{605, 5}, {3600, 60}]},
+     {detailed, [{10, 5}]}],
+  ...
+].</pre>
+          <p>
+            There are three policies:
+            <ul>
+              <li><span class="code ">global</span> - how long to retain data for the overview and virtual host pages</li>
+              <li><span class="code ">basic</span> - how long to retain data for individual connections, channels, exchanges and queues</li>
+              <li><span class="code ">detailed</span> - how long to retain data for message rates between pairs of connections, channels, exchanges and queues (as shown under "Message rates breakdown")</li>
+            </ul>
+
+            This configuration (which is the default) retains global
+            data at a 5 second resolution (sampling happens every 5 seconds) for 10 minutes and 5 seconds,
+            then at a 1 minute resolution for 1 hour and 1 minute, then at a 10 minute
+            resolution for about 8 hours. It retains basic data at a 5 second
+            resolution for 1 minute and 5 seconds, then at a 1 minute resolution for
+            1 hour, and detailed data only for 10 seconds.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="docSection"><a name="clustering" id="clustering"></a>
+        <h2 class="docHeading">Note on clustering</h2>
+        <p>
+          The management plugin is aware of clusters. You can enable
+          it on one or more nodes in a cluster, and see information
+          pertaining to the entire cluster no matter which node you
+          connect to.
+        </p>
+        <p>
+          If you want to deploy cluster nodes which do not have the
+          full management plugin enabled, you will still need to
+          enable the <span class="code ">rabbitmq-management-agent</span> plugin on
+          each node.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="proxy" id="proxy"></a>
+        <h2 class="docHeading">Proxy setup</h2>
+        <p>
+          It is possible to make the web UI available via any proxy that
+          conforms with RFC 1738. The following sample Apache configuration
+          illustrates the minimum necessary directives to coax Apache into
+          conformance. It assumes a management web UI on the default port of 15672:
+          <pre class="example">
+AllowEncodedSlashes On
+ProxyPass        /api http://localhost:15672/api nocanon
+ProxyPass        /    http://localhost:15672/
+ProxyPassReverse /    http://localhost:15672/</pre>
+        </p>
+      </div>
+
+      <div class="docSection"><a name="stats-db" id="stats-db"></a>
+        <h2 class="docHeading">Restart Statistics Database</h2>
+
+        <p>
+          Statistics database is stored entirely in memory. All of its contents
+          is transient and should be treated as such.
+
+          It is possible to restart stats database process, for example,
+          to make it move to another node.
+
+<pre class="example">
+rabbitmqctl eval 'exit(erlang:whereis(rabbit_mgmt_db), please_terminate).'
+</pre>
+        </p>
+      </div>
+
+
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_5_7/management.html" class="selected">Management plugin</a><ul>
+         <li><a href="/v3_5_7/management-cli.html">Management CLI</a></li>
+       </ul></li>
+       <li><a href="/v3_5_7/federation.html">Federation plugin</a></li>
+       <li><a href="/v3_5_7/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v3_5_7/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_5_7/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_5_7/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_5_7/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_5_7/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/v3_5_7/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#features">Screenshots</a></li><li><a href="#getting-started">Getting started</a></li><li><a href="#permissions">Permissions</a></li><li><a href="#http-api">HTTP API</a></li><li><a href="#configuration">Configuration</a></li><li><a href="#clustering">Note on clustering</a></li><li><a href="#proxy">Proxy setup</a></li><li><a href="#stats-db">Restart Statistics Database</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

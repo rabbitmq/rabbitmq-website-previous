@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Clustering and Network Partitions</title>
+    
+  </head>
+  <body id="partitions"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Clustering and Network Partitions</h1>
+    <p>
+      RabbitMQ clusters do not tolerate network partitions well. If
+      you are thinking of clustering across a WAN, don't. You should
+      use <a href="federation.html">federation</a> or
+      the <a href="shovel.html">shovel</a> instead.
+    </p>
+    <p>
+      However, sometimes accidents happen. This page documents how
+      to detect network partitions, some of the bad effects that may
+      happen during partitions, and how to recover from them.
+    </p>
+    <p>
+      RabbitMQ stores information about queues, exchanges, bindings
+      etc in Erlang's distributed database, <i>Mnesia</i>. Many of
+      the details of what happens around network partitions are
+      related to Mnesia's behaviour.
+    </p>
+
+    <div class="docSection"><a name="detecting" id="detecting"></a>
+    <h2 class="docHeading">Detecting network partitions</h2>
+    <p>
+      Mnesia will typically determine that a node is down if another
+      node is unable to contact it for a minute or so (see the page
+      on <a href="nettick.html">net_ticktime</a>). If two nodes come back into
+      contact, both having thought the other is down, Mnesia will
+      determine that a partition has occurred. This will be written to
+      the RabbitMQ log in a form like:
+    </p>
+    <pre class="sourcecode">=ERROR REPORT==== 15-Oct-2012::18:02:30 ===
+Mnesia(rabbit@smacmullen): ** ERROR ** mnesia_event got
+    {inconsistent_database, running_partitioned_network, hare@smacmullen}</pre>
+    <p>
+      RabbitMQ nodes will record whether this event has ever occurred
+      while the node is up, and expose this information
+      through <span class="code ">rabbitmqctl cluster_status</span> and the
+      management plugin.
+    </p>
+    <p>
+      <span class="code ">rabbitmqctl cluster_status</span> will normally show an
+      empty list for <span class="code ">partitions</span>:
+    </p>
+    <pre class="sourcecode bash">
+rabbitmqctl cluster_status
+# =&gt; Cluster status of node rabbit@smacmullen ...
+# =&gt; [{nodes,[{disc,[hare@smacmullen,rabbit@smacmullen]}]},
+# =&gt;  {running_nodes,[rabbit@smacmullen,hare@smacmullen]},
+# =&gt;  {partitions,[]}]
+# =&gt; ...done.
+    </pre>
+    <p>
+      However, if a network partition has occurred then information
+      about partitions will appear there:
+    </p>
+    <pre class="sourcecode bash">
+rabbitmqctl cluster_status
+# =&gt; Cluster status of node rabbit@smacmullen ...
+# =&gt; [{nodes,[{disc,[hare@smacmullen,rabbit@smacmullen]}]},
+# =&gt;  {running_nodes,[rabbit@smacmullen,hare@smacmullen]},
+# =&gt;  {partitions,[{rabbit@smacmullen,[hare@smacmullen]},
+# =&gt;               {hare@smacmullen,[rabbit@smacmullen]}]}]
+# =&gt; ...done.
+    </pre>
+    <p>
+      The management plugin API will return partition
+      information for each node under <span class="code ">partitions</span>
+      in <span class="code ">/api/nodes</span>. The management plugin UI will show a
+      large red warning on the overview page if a partition has
+      occurred.
+    </p>
+    </div>
+
+    <div class="docSection"><a name="during" id="during"></a>
+    <h2 class="docHeading">During a network partition</h2>
+    <p>
+      While a network partition is in place, the two (or more!) sides
+      of the cluster can evolve independently, with both sides
+      thinking the other has crashed. Queues, bindings, exchanges can
+      be created or deleted separately. <a href="ha.html">Mirrored
+      queues</a> which are split across the partition will end up with
+      one master on each side of the partition, again with both sides
+      acting independently. Other undefined and weird behaviour may
+      occur.
+    </p>
+    <p>
+      <b>It is important to understand that when network connectivity
+      is restored, this state of affairs persists. The cluster
+      will continue to act in this way until you take action to
+      fix it.</b>
+    </p>
+    </div>
+
+    <div class="docSection"><a name="suspend" id="suspend"></a>
+    <h2 class="docHeading">Partitions caused by suspend / resume</h2>
+    <p>
+      While we refer to "network" partitions, really a partition is
+      any case in which the different nodes of a cluster can have
+      communication interrupted without any node failing. In addition
+      to network failures, suspending and resuming an entire OS can
+      also cause partitions when used against running cluster nodes -
+      as the suspended node will not consider itself to have failed, or
+      even stopped, but the other nodes in the cluster will consider
+      it to have done so.
+    </p>
+
+    <p>
+      While you could suspend a cluster node by running it on a laptop
+      and closing the lid, the most common reason for this to happen
+      is for a virtual machine to have been suspended by the
+      hypervisor. While it's fine to run RabbitMQ clusters in
+      virtualised environments, you should make sure that VMs are not
+      suspended while running. Note that some virtualisation features
+      such as migration of a VM from one host to another will tend to
+      involve the VM being suspended.
+    </p>
+
+    <p>
+      Partitions caused by suspend and resume will tend to be
+      asymmetrical - the suspended node will not necessarily see the
+      other nodes as having gone down, but will be seen as down by the
+      rest of the cluster. This has particular implications for <a href="#pause-minority">pause_minority</a> mode.
+    </p>
+    </div>
+
+    <div class="docSection"><a name="recovering" id="recovering"></a>
+    <h2 class="docHeading">Recovering from a network partition</h2>
+    <p>
+      To recover from a network partition, first choose one partition
+      which you trust the most. This partition will become the
+      authority for the state of Mnesia to use; any changes which have
+      occurred on other partitions will be lost.
+    </p>
+    <p>
+      Stop all nodes in the other partitions, then start them all up
+      again. When they rejoin the cluster they will restore state from
+      the trusted partition.
+    </p>
+    <p>
+      Finally, you should also restart all the nodes in the trusted
+      partition to clear the warning.
+    </p>
+    <p>
+      It may be simpler to stop the whole cluster and start it again;
+      if so make sure that the <b>first</b> node you start is from the
+      trusted partition.
+    </p>
+    </div>
+
+    <div class="docSection"><a name="automatic-handling" id="automatic-handling"></a>
+    <h2 class="docHeading">Automatically handling partitions</h2>
+    <p>
+      RabbitMQ also offers three ways to deal with network partitions
+      automatically: <i>pause-minority</i> mode, <i>pause-if-all-down</i>
+      mode and <i>autoheal</i> mode. (The default behaviour is referred
+      to as <i>ignore</i> mode).
+    </p>
+
+    <p>
+      In pause-minority mode RabbitMQ will automatically pause cluster
+      nodes which determine themselves to be in a minority (i.e. fewer
+      or equal than half the total number of nodes) after seeing other
+      nodes go down. It therefore chooses partition tolerance over
+      availability from the CAP theorem. This ensures that in the
+      event of a network partition, at most the nodes in a single
+      partition will continue to run. The minority nodes will pause as
+      soon as a partition starts, and will start again when the
+      partition ends.
+    </p>
+
+    <p>
+      In pause-if-all-down mode, RabbitMQ will automatically pause
+      cluster nodes which cannot reach any of the listed nodes. In
+      other words, all the listed nodes must be down for RabbitMQ to
+      pause a cluster node. This is close to the pause-minority mode,
+      however, it allows an administrator to decide which nodes to
+      prefer, instead of relying on the context. For instance, if the
+      cluster is made of two nodes in rack A and two nodes in rack B,
+      and the link between racks is lost, pause-minority mode will pause
+      all nodes. In pause-if-all-down mode, if the administrator listed
+      the two nodes in rack A, only nodes in rack B will pause. Note
+      that it is possible the listed nodes get split across both sides
+      of a partition: in this situation, no node will pause. That is why
+      there is an additional <i>ignore</i>/<i>autoheal</i> argument to
+      indicate how to recover from the partition.
+    </p>
+
+    <p>
+      In autoheal mode RabbitMQ will automatically decide on a winning
+      partition if a partition is deemed to have occurred, and will
+      restart all nodes that are not in the winning partition. Unlike
+      pause_minority mode it therefore takes effect when a partition
+      ends, rather than when one starts.
+    </p>
+    <p>
+      The winning partition is the one which has the most clients
+      connected (or if this produces a draw, the one with the most
+      nodes; and if that still produces a draw then one of the
+      partitions is chosen in an unspecified way).
+    </p>
+
+    <p>
+      You can enable either mode by setting the configuration
+      parameter <span class="code ">cluster_partition_handling</span> for
+      the <span class="code ">rabbit</span> application in
+      your <a href="configure.html#configuration-file">configuration
+      file</a> to:
+    </p>
+    <ul>
+      <li><span class="code ">pause_minority</span></li>
+      <li><span class="code ">{pause_if_all_down, [nodes], ignore | autoheal}</span></li>
+      <li><span class="code ">autoheal</span></li>
+    </ul>
+
+    <h3 id="which-mode">Which mode should I pick?</h3>
+
+    <p>
+      It's important to understand that allowing RabbitMQ to deal with
+      network partitions automatically does not make them less of a
+      problem. Network partitions will always cause problems for
+      RabbitMQ clusters; you just get some degree of choice over what
+      kind of problems you get. As stated in the introduction, if you
+      want to connect RabbitMQ clusters over generally unreliable
+      links, you should use federation or the shovel.
+    </p>
+
+    <p>
+      With that said, you might wish to pick a recovery mode as
+      follows:
+    </p>
+
+    <ul>
+      <li>
+        <span class="code ">ignore</span> - Your network really is reliable. All
+        your nodes are in a rack, connected with a switch, and that
+        switch is also the route to the outside world. You don't want
+        to run any risk of any of your cluster shutting down if any
+        other part of it fails (or you have a two node cluster).
+      </li>
+      <li>
+        <span class="code ">pause_minority</span> - Your network is maybe less
+        reliable. You have clustered across 3 AZs in EC2, and you
+        assume that only one AZ will fail at once. In that scenario
+        you want the remaining two AZs to continue working and the
+        nodes from the failed AZ to rejoin automatically and without
+        fuss when the AZ comes back.
+      </li>
+      <li>
+        <span class="code ">autoheal</span> - Your network may not be reliable. You
+        are more concerned with continuity of service than with data
+        integrity. You may have a two node cluster.
+      </li>
+    </ul>
+
+    <h3 id="pause-minority">More about pause-minority mode</h3>
+    <p>
+      The Erlang VM on the paused nodes will continue running but the
+      nodes will not listen on any ports or do any other work. They
+      will check once per second to see if the rest of the cluster has
+      reappeared, and start up again if it has.
+    </p>
+    <p>
+      Note that nodes will not enter the paused state at startup, even
+      if they are in a minority then. It is expected that any such
+      minority at startup is due to the rest of the cluster not having
+      been started yet.
+    </p>
+    <p>
+      Also note that RabbitMQ will pause nodes which are not in a
+      <i>strict</i> majority of the cluster - i.e. containing more
+      than half of all nodes. It is therefore not a good idea to
+      enable pause-minority mode on a cluster of two nodes since in
+      the event of any network partition <b>or node failure</b>, both
+      nodes will pause. However, <span class="code ">pause_minority</span> mode is
+      likely to be safer than <span class="code ">ignore</span> mode for clusters of
+      more than two nodes, especially if the most likely form of
+      network partition is that a single minority of nodes drops off
+      the network.
+    </p>
+    <p>
+      Finally, note that <span class="code ">pause_minority</span> mode will do
+      nothing to defend against partitions caused by cluster nodes
+      being <a href="#suspend">suspended</a>. This is because
+      the suspended node will never see the rest of the cluster
+      vanish, so will have no trigger to disconnect itself from the
+      cluster.
+    </p>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/configure.html">Configuration</a></li>
+       <li><a href="/ssl.html">TLS/SSL Support</a></li>
+       <li><a href="/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/clustering.html" class="selected">Clustering</a><ul>
+         <li><a href="/partitions.html" class="selected">Network Partitions</a></li>
+         <li><a href="/nettick.html">Net Tick Time</a></li>
+         <li><a href="/clustering-ssl.html">TLS for Inter-node (Clustering) Traffic</a></li>
+       </ul></li>
+       <li><a href="/vhosts.html">Virtual Hosts</a></li>
+       <li><a href="/ha.html">High Availability</a></li>
+       <li><a href="/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/access-control.html">Access Control (Authorisation)</a></li>
+       <li><a href="/authentication.html">Authentication Mechanisms</a></li>
+       <li><a href="/ldap.html">LDAP</a></li>
+       <li><a href="/production-checklist.html">Production Checklist</a></li>
+       <li><a href="/alarms.html">Alarms</a></li>
+       <li><a href="/networking.html">Networking</a></li>
+       <li><a href="/memory-use.html">Memory Use</a></li>
+       <li><a href="/lazy-queues.html">Lazy Queues</a></li>
+       <li><a href="/event-exchange.html">Internal Event Exchange</a></li>
+       <li><a href="/firehose.html">Firehose (Message Tracing)</a></li>
+       <li><a href="/manpages.html">Manual Pages</a></li>
+       <li><a href="/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/clients.html">Client Documentation</a></li>
+     <li><a href="/plugins.html">Plugins</a></li>
+     <li><a href="/news.html">News</a></li>
+     <li><a href="/protocol.html">Protocol</a></li>
+     <li><a href="/extensions.html">Our Extensions</a></li>
+     <li><a href="/build.html">Building</a></li>
+     
+       <li><a href="/previous.html">Previous Releases</a></li>
+     
+     <li><a href="/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#detecting">Detecting network partitions</a></li><li><a href="#during">During a network partition</a></li><li><a href="#suspend">Partitions caused by suspend / resume</a></li><li><a href="#recovering">Recovering from a network partition</a></li><li><a href="#automatic-handling">Automatically handling partitions</a></li></ul></div><div id="related-links"><h4>Related Links</h4><ul><li><a href="/heartbeats.html">Heartbeats</a></li></ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

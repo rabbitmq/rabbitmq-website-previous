@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - RabbitMQ tutorial - "Hello World!" </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html">Installation</a></li><li><a href="/v3_4_x/documentation.html">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div>
+<div id="sidebar" class="tutorial-one">
+   <ul id="tutorials" xml:base="site/tutorials/tutorials-menu.xml.inc">
+
+        <li id="tutorial-one">
+          <h2><span class="tute-num">1</span> <a href="/v3_4_x/tutorials/tutorial-one-python.html">"Hello World!"</a></h2>
+          <p>
+            The simplest thing that does <em>something</em>
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-one.png" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-one-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-two">
+          <h2><span class="tute-num">2</span> <a href="/v3_4_x/tutorials/tutorial-two-python.html">Work queues</a></h2>
+          <p>
+            Distributing tasks among workers
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-two.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-two-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-three">
+          <h2><span class="tute-num">3</span> <a href="/v3_4_x/tutorials/tutorial-three-python.html">Publish/Subscribe</a></h2>
+          <p>
+            Sending messages to many consumers at once
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-three.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-three-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-four">
+          <h2><span class="tute-num">4</span> <a href="/v3_4_x/tutorials/tutorial-four-python.html">Routing</a></h2>
+          <p>
+            Receiving messages selectively
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-four.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-four-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-five">
+          <h2><span class="tute-num">5</span> <a href="/v3_4_x/tutorials/tutorial-five-python.html">Topics</a></h2>
+          <p>
+            Receiving messages based on a pattern
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-five.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-five-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-six">
+          <h2><span class="tute-num">6</span> <a href="/v3_4_x/tutorials/tutorial-six-python.html">RPC</a></h2>
+          <p>
+            Remote procedure call implementation
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-six.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-six-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-dotnet.html">C#</a>
+          </p>
+        </li>
+      </ul>
+</div>
+
+<div id="tutorial"><h2>Introduction</h2>
+<p><div class="aside" xml:base="site/tutorials/tutorials-help.xml.inc">
+    <h3>Prerequisites</h3>
+    <p>
+      This tutorial assumes RabbitMQ is <a href="/v3_4_x/download.html">installed</a> and running
+      on <span class="code ">localhost</span> on standard port (<span class="code ">5672</span>). In case you use
+      a different host, port or credentials, connections settings would require adjusting.
+    </p>
+
+    <h3>Where to get help</h3>
+    <p>
+        If you're having trouble going through this tutorial you can
+        <a href="https://groups.google.com/forum/#!forum/rabbitmq-users">contact us</a> through the mailing list.
+    </p>
+  </div></p>
+<p>RabbitMQ is a message broker. In essence, it accepts messages from
+<em>producers</em>, and delivers them to <em>consumers</em>. In-between, it can
+route, buffer, and persist the messages according to rules you give
+it.</p>
+<p>RabbitMQ, and messaging in general, uses some jargon.</p>
+<ul>
+<li>
+<p><em>Producing</em> means nothing more than sending. A program that sends messages
+   is a <em>producer</em>. We'll draw it like that, with "P":
+   <div class="diagram">
+     <img src="/v3_4_x/img/tutorials/producer.png" height="50" />
+     <div class="diagram_source">
+     digraph {
+       bgcolor=transparent;
+       truecolor=true;
+       rankdir=LR;
+       node [style="filled"];
+       //
+       P1 [label="P", fillcolor="#00ffff"];
+     }
+     </div>
+   </div></p>
+</li>
+<li>
+<p><em>A queue</em> is the name for a mailbox. It lives inside
+   RabbitMQ. Although messages flow through RabbitMQ and your
+   applications, they can be stored only inside a <em>queue</em>. A <em>queue</em>
+   is not bound by any limits, it can store as many messages as you
+   like - it's essentially an infinite buffer. Many <em>producers</em> can send
+   messages that go to one queue - many <em>consumers</em> can try to
+   receive data from one <em>queue</em>. A queue will be drawn like this, with
+   its name above it:
+   <div class="diagram">
+     <img src="/v3_4_x/img/tutorials/queue.png" height="90" />
+     <div class="diagram_source">
+     digraph {
+       bgcolor=transparent;
+       truecolor=true;
+       rankdir=LR;
+       node [style="filled"];
+       //
+       subgraph cluster_Q1 {
+         label="queue_name";
+         color=transparent;
+         Q1 [label="{||||}", fillcolor="red", shape="record"];
+       };
+     }
+     </div>
+   </div></p>
+</li>
+<li>
+<p><em>Consuming</em> has a similar meaning to receiving. A <em>consumer</em> is a program
+   that mostly waits to receive messages. On our drawings it's shown with "C":
+   <div class="diagram">
+     <img src="/v3_4_x/img/tutorials/consumer.png" height="50" />
+     <div class="diagram_source">
+     digraph {
+       bgcolor=transparent;
+       truecolor=true;
+       rankdir=LR;
+       node [style="filled"];
+       //
+       C1 [label="C", fillcolor="#33ccff"];
+     }
+     </div>
+   </div></p>
+</li>
+</ul>
+<p>Note that the producer, consumer, and  broker do not have to reside on
+the same machine; indeed in most applications they don't.</p>
+<h2>"Hello World"</h2>
+<h3>(using the Bunny Ruby Client)</h3>
+<p>In this part of the tutorial we'll write two small programs in Ruby; a
+producer that sends a single message, and a consumer that receives
+messages and prints them out.  We'll gloss over some of the detail in
+the <a href="http://rubybunny.info">Bunny</a> API, concentrating on this very simple thing just to get
+started. It's a "Hello World" of messaging.</p>
+<p>In the diagram below, "P" is our producer and "C" is our consumer. The
+box in the middle is a queue - a message buffer that RabbitMQ keeps
+on behalf of the consumer.</p>
+<div class="diagram">
+  <img src="/v3_4_x/img/tutorials/python-one.png" alt="(P) -&gt; [|||] -&gt; (C)" height="60" />
+</div>
+
+<blockquote>
+<h4>The Bunny client library</h4>
+<p>RabbitMQ speaks AMQP 0.9.1, which is an open,
+general-purpose protocol for messaging. There are a number of clients
+for RabbitMQ in <a href="/v3_4_x/devtools.html">many different
+languages</a>. We'll
+use the Bunny client in this tutorial.</p>
+<p>First, install Bunny using <a href="http://rubygems.org">Rubygems</a>:</p>
+<div class="highlight"><pre><span class="nv">$ </span>gem install bunny --version <span class="s2">"&gt;= 1.6.0"</span>
+</pre></div>
+
+
+</blockquote>
+<p>Now we have Bunny installed, we can write some
+code.</p>
+<h3>Sending</h3>
+<div class="diagram">
+  <img src="/v3_4_x/img/tutorials/sending.png" alt="(P) -&gt; [|||]" height="100" />
+</div>
+
+<p>We'll call our message sender <span class="code ">send.rb</span> and our message receiver
+<span class="code ">receive.rb</span>.  The sender will connect to RabbitMQ, send a single message,
+then exit.</p>
+<p>In
+<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/ruby/send.rb"><span class="code ">send.rb</span></a>,
+we need to require the library first:</p>
+<div class="highlight"><pre><span class="c1">#!/usr/bin/env ruby</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="nb">require</span> <span class="s2">"bunny"</span>
+</pre></div>
+
+
+<p>then connect to RabbitMQ server</p>
+<div class="highlight"><pre><span class="n">conn</span> <span class="o">=</span> <span class="no">Bunny</span><span class="o">.</span><span class="n">new</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">start</span>
+</pre></div>
+
+
+<p>The connection abstracts the socket connection, and takes care of
+protocol version negotiation and authentication and so on for us. Here
+we connect to a broker on the local machine with all default settings.</p>
+<p>If we wanted to connect to a broker on a different
+machine we'd simply specify its name or IP address using the <span class="code ">:hostname</span>
+option:</p>
+<div class="highlight"><pre><span class="n">conn</span> <span class="o">=</span> <span class="no">Bunny</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:hostname</span> <span class="o">=&gt;</span> <span class="s2">"rabbit.local"</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">start</span>
+</pre></div>
+
+
+<p>Next we create a channel, which is where most of the API for getting
+things done resides:</p>
+<div class="highlight"><pre><span class="n">ch</span>   <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">create_channel</span>
+</pre></div>
+
+
+<p>To send, we must declare a queue for us to send to; then we can publish a message
+to the queue:</p>
+<div class="highlight"><pre><span class="n">q</span>    <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">queue</span><span class="p">(</span><span class="s2">"hello"</span><span class="p">)</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">default_exchange</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">"Hello World!"</span><span class="p">,</span> <span class="ss">:routing_key</span> <span class="o">=&gt;</span> <span class="n">q</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="s2">" [x] Sent 'Hello World!'"</span>
+</pre></div>
+
+
+<p>Declaring a queue is idempotent - it will only be created if it doesn't
+exist already. The message content is a byte array, so you can encode
+whatever you like there.</p>
+<p>Lastly, we close the connection;</p>
+<div class="highlight"><pre><span class="n">conn</span><span class="o">.</span><span class="n">close</span>
+</pre></div>
+
+
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/ruby/send.rb">Here's the whole send.rb script</a>.</p>
+<blockquote>
+<h4>Sending doesn't work!</h4>
+<p>If this is your first time using RabbitMQ and you don't see the "Sent"
+message then you may be left scratching your head wondering what could
+be wrong. Maybe the broker was started without enough free disk space
+(by default it needs at least 1Gb free) and is therefore refusing to
+accept messages. Check the broker logfile to confirm and reduce the
+limit if necessary. The <a href="http://www.rabbitmq.com/configure.html#config-items">configuration
+file documentation</a> will show you how to set <span class="code ">disk_free_limit</span>.</p>
+</blockquote>
+<h3>Receiving</h3>
+<p>That's it for our sender.  Our receiver is pushed messages from
+RabbitMQ, so unlike the sender which publishes a single message, we'll
+keep it running to listen for messages and print them out.</p>
+<div class="diagram">
+  <img src="/v3_4_x/img/tutorials/receiving.png" alt="[|||] -&gt; (C)" height="100" />
+</div>
+
+<p>The code (in <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/ruby/receive.rb"><span class="code ">receive.rb</span></a>) has the same require as <span class="code ">send</span>:</p>
+<div class="highlight"><pre><span class="c1">#!/usr/bin/env ruby</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="nb">require</span> <span class="s2">"bunny"</span>
+</pre></div>
+
+
+<p>Setting up is the same as the sender; we open a connection and a
+channel, and declare the queue from which we're going to consume.
+Note this matches up with the queue that <span class="code ">send</span> publishes to.</p>
+<div class="highlight"><pre><span class="n">conn</span> <span class="o">=</span> <span class="no">Bunny</span><span class="o">.</span><span class="n">new</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">start</span>
+
+<span class="n">ch</span>   <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">create_channel</span>
+<span class="n">q</span>    <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">queue</span><span class="p">(</span><span class="s2">"hello"</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Note that we declare the queue here, as well. Because we might start
+the receiver before the sender, we want to make sure the queue exists
+before we try to consume messages from it.</p>
+<p>We're about to tell the server to deliver us the messages from the
+queue. Since it will push us messages asynchronously, we provide a
+callback that will be executed when RabbitMQ pushes messages to
+our consumer. This is what <span class="code ">Bunny::Queue#subscribe</span> does.</p>
+<div class="highlight"><pre><span class="nb">puts</span> <span class="s2">" [*] Waiting for messages in </span><span class="si">#{</span><span class="n">q</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. To exit press CTRL+C"</span>
+<span class="n">q</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="ss">:block</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">delivery_info</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="o">|</span>
+  <span class="nb">puts</span> <span class="s2">" [x] Received </span><span class="si">#{</span><span class="n">body</span><span class="si">}</span><span class="s2">"</span>
+
+  <span class="c1"># cancel the consumer to exit</span>
+  <span class="n">delivery_info</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">cancel</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p><span class="code ">Bunny::Queue#subscribe</span> is used with the <span class="code ">:block</span> option that makes it
+block the calling thread (we don't want the script to finish running immediately!).</p>
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/ruby/receive.rb">Here's the whole receive.rb script</a>.</p>
+<h3>Putting it all together</h3>
+<p>Now we can run both scripts. In a terminal, run the sender:</p>
+<div class="highlight"><pre><span class="nv">$ </span>ruby -rubygems send.rb
+</pre></div>
+
+
+<p>then, run the receiver:</p>
+<div class="highlight"><pre><span class="nv">$ </span>ruby -rubygems receive.rb
+</pre></div>
+
+
+<p>The receiver will print the message it gets from the sender via
+RabbitMQ. The receiver will keep running, waiting for messages (Use Ctrl-C to stop it), so try running
+the sender from another terminal.</p>
+<p>If you want to check on the queue, try using <span class="code ">rabbitmqctl list_queues</span>.</p>
+<p>Hello World!</p>
+<p>Time to move on to <a href="tutorial-two-ruby.html">part 2</a> and build a simple <em>work queue</em>.</p></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

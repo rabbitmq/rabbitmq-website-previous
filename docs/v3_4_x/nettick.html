@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Net Tick Time</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html">Installation</a></li><li><a href="/v3_4_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Net Tick Time</h1>
+    <div class="docSection"><a name="background-info" id="background-info"></a>
+      <p class="intro">
+        This page explains the Erlang <span class="code ">net_ticktime</span> configuration
+        setting. See the <a href="http://erlang.org/doc/man/kernel_app.html">Erlang kernel
+        documentation</a> for more details.
+      </p>
+    </div>
+    <div class="docSection"><a name="net-tick-overview" id="net-tick-overview"></a>
+      <h2 class="docHeading">Overview</h2>
+      <p>
+        Each pair of nodes in a cluster are connected by the transport layer.
+        Periodic tick messages are exchanged between all pairs of nodes to
+        maintain the connections and to detect disconnections.
+        Network interruptions could otherwise go undetected for a period
+        that depends on the transport.
+      </p>
+
+      <p>
+        When one RabbitMQ node determines that another node has gone
+        down it will log a message giving the other node's name and
+        the reason, like:
+      </p>
+
+      <pre class="sourcecode">=INFO REPORT==== 23-Sep-2014::16:21:22 ===
+node rabbit@cordelia down: net_tick_timeout
+      </pre>
+
+      <p>
+        In this case the <span class="code ">net_tick_timeout</span> tells us that
+        the other node was detected as down due to the net ticktime
+        being exceeded. Another common reason is
+        <span class="code ">connection_closed</span>, meaning that the connection
+        was explicitly closed at the TCP level.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="net-tick-frequency" id="net-tick-frequency"></a>
+      <h2 class="docHeading">Tick Frequency</h2>
+      <p>
+        The frequency of both tick messages and detection of failures is controlled
+        by the <span class="code ">net_ticktime</span> configuration setting. Normally four ticks
+        are exchanged between a pair of nodes every <span class="code ">net_ticktime</span> seconds.
+        If no communication is received from a node within <span class="code ">net_ticktime</span>
+        (± 25%) seconds then the node is considered down and no longer a member
+        of the cluster.
+      </p>
+      <p>
+        Increasing the <span class="code ">net_ticktime</span> across all nodes in a cluster will
+        make the cluster more resilient to short network outtages, but it will take
+        longer for remaing nodes to detect crashed nodes. Conversely, reducing the
+        <span class="code ">net_ticktime</span> across all nodes in a cluster will reduce detection
+        latency, but increases the risk of detecting spurious
+        <a href="partitions.html">partitions</a>.
+      </p>
+      <p>
+        The impact of changing the default <span class="code ">net_ticktime</span> should be
+        carefully considered. All nodes in a cluster must use the same
+        <span class="code ">net_ticktime</span>. The following sample <span class="code ">rabbitmq.config</span>
+        configuration demonstrates doubling the default <span class="code ">net_ticktime</span> from
+        60 to 120 seconds:
+      </p>
+      <p>
+<pre>    [
+        {rabbit, [{tcp_listeners, [5672]}]},
+        {kernel, [{net_ticktime,  120}]}
+    ].</pre>
+      </p>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_4_x/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_4_x/configure.html">Configuration</a></li>
+       <li><a href="/v3_4_x/ssl.html">SSL Support</a></li>
+       <li><a href="/v3_4_x/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_4_x/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_4_x/clustering.html" class="selected">Clustering</a><ul>
+         <li><a href="/v3_4_x/partitions.html">Network Partitions</a></li>
+         <li><a href="/v3_4_x/nettick.html" class="selected">Net Tick Time</a></li>
+         <li><a href="/v3_4_x/clustering-ssl.html">Clustering SSL</a></li>
+       </ul></li>
+       <li><a href="/v3_4_x/ha.html">High Availability</a></li>
+       <li><a href="/v3_4_x/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_4_x/access-control.html">Access Control</a></li>
+       <li><a href="/v3_4_x/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_4_x/alarms.html">Alarms</a></li>
+       <li><a href="/v3_4_x/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_4_x/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_4_x/manpages.html">Manual Pages</a></li>
+       <li><a href="/v3_4_x/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_4_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_4_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_4_x/news.html">News</a></li>
+     <li><a href="/v3_4_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_4_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_4_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_4_x/mpl.html">License</a></li>
+   </ul></div><div id="related-links"><h4>Related Links</h4><ul><li><a href="/v3_4_x/heartbeats.html">Heartbeats</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Installing on RPM-based Linux (RHEL, CentOS, Fedora, openSUSE)</title>
+    
+  </head>
+  <body id="install-rpm"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Installing on RPM-based Linux (RHEL, CentOS, Fedora, openSUSE)</h1>
+    <div class="docSection"><a name="rpm-packages" id="rpm-packages"></a>
+      <h2 class="docHeading">Download the Server</h2>
+      <table class="downloads" border="0" cellpadding="0" cellspacing="0"><tr><th class="desc">Description</th><th>Download </th><th> </th></tr>
+        <tr><td class="desc" id="">
+	  RPM for RHEL 7.x, CentOS 7.x, Fedora 19+ (supports systemd, from <a href="https://bintray.com/rabbitmq/rabbitmq-server-rpm">Bintray</a>)
+        </td><td><a class="adownload" href="https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.14-1.el7.noarch.rpm">rabbitmq-server-3.6.14-1.el7.noarch.rpm</a></td><td class="signature"><a class="adownload" href="https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.14-1.el7.noarch.rpm.asc">(Signature)</a></td></tr>
+        <tr><td class="desc" id="">
+	  RPM for RHEL Linux 6.x, CentOS 6.x, Fedora prior to 19 (from <a href="https://bintray.com/rabbitmq/rabbitmq-server-rpm">Bintray</a>)
+        </td><td><a class="adownload" href="https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.14-1.el6.noarch.rpm">rabbitmq-server-3.6.14-1.el6.noarch.rpm</a></td><td class="signature"><a class="adownload" href="https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.14-1.el6.noarch.rpm.asc">(Signature)</a></td></tr>
+
+        <tr><td class="desc" id="">
+	  RPM for RHEL Linux 7.x, CentOS 7.x, Fedora 19+ (supports systemd, from <a href="https://github.com/rabbitmq/rabbitmq-server/releases">GitHub</a>)
+        </td><td><a class="adownload" href="https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_14/rabbitmq-server-3.6.14-1.el7.noarch.rpm">rabbitmq-server-3.6.14-1.el7.noarch.rpm</a></td><td class="signature"><a class="adownload" href="https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_14/rabbitmq-server-3.6.14-1.el7.noarch.rpm.asc">(Signature)</a></td></tr>
+        <tr><td class="desc" id="">
+	  RPM for RHEL Linux 6.x, CentOS 6.x, Fedora prior to 19 (from <a href="https://github.com/rabbitmq/rabbitmq-server/releases">GitHub</a>)
+        </td><td><a class="adownload" href="https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_14/rabbitmq-server-3.6.14-1.el6.noarch.rpm">rabbitmq-server-3.6.14-1.el6.noarch.rpm</a></td><td class="signature"><a class="adownload" href="https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_14/rabbitmq-server-3.6.14-1.el6.noarch.rpm.asc">(Signature)</a></td></tr>
+
+        <tr><td class="desc" id="">
+	  RPM for openSUSE Linux (from <a href="https://bintray.com/rabbitmq/rabbitmq-server-rpm">Bintray</a>)
+        </td><td><a class="adownload" href="https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.14-1.suse.noarch.rpm">rabbitmq-server-3.6.14-1.suse.noarch.rpm</a></td><td class="signature"><a class="adownload" href="https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.14-1.suse.noarch.rpm.asc">(Signature)</a></td></tr>
+        <tr><td class="desc" id="">
+	  RPM for SLES 11.x (from <a href="https://bintray.com/rabbitmq/rabbitmq-server-rpm">Bintray</a>)
+        </td><td><a class="adownload" href="https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.14-1.sles11.noarch.rpm">rabbitmq-server-3.6.14-1.sles11.noarch.rpm</a></td><td class="signature"><a class="adownload" href="https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.14-1.sles11.noarch.rpm.asc">(Signature)</a></td></tr>
+      </table>
+    </div>
+
+    <div class="docSection"><a name="overview" id="overview"></a>
+      <h2 class="docHeading">Overview</h2>
+      <p>
+        <span class="code ">rabbitmq-server</span> is included in Fedora. However,
+        the versions included are often quite old. You will probably
+        get better results installing the .rpm from <a href="https://packagecloud.io/rabbitmq/rabbitmq-server/">PackageCloud</a>
+        or <a href="https://bintray.com/rabbitmq/rabbitmq-server-rpm">Bintray</a>. Check
+        the <a href="https://admin.fedoraproject.org/updates/rabbitmq-server">Fedora
+        package</a> details for which version of the server is
+        available for which versions of the distribution.
+      </p>
+
+      <p>
+        The package is distributed via Yum repositories on <a href="https://packagecloud.io/rabbitmq/rabbitmq-server/">PackageCloud</a>
+        and <a href="https://bintray.com/rabbitmq/rabbitmq-server-rpm">Bintray</a>.
+      </p>
+    </div>
+
+   <div class="docSection"><a name="supported-rpm-distributions" id="supported-rpm-distributions"></a>
+       <h2 class="docHeading">Supported Distributions</h2>
+
+       <p>
+         Below is a list of supported RPM-based distributions as of RabbitMQ 3.6.3:
+         <ul>
+           <li>CentOS 6.x and 7.x (note: there are two separate RPM packages for 6.x and 7.x)</li>
+           <li>RedHat Enterprise Linux 6.x and 7.x (same as for CentOS, there are two separate packages)</li>
+           <li>Fedora 23 through 25 (use the RHEL 7.x package)</li>
+         </ul>
+
+         The packages may work on other RPM-based distributions
+         if dependencies (see below) are satisfied (e.g. using the
+         Wheezy backports repository) but their testing and support
+         is done on a best effort basis.
+       </p>
+   </div>
+
+    <div class="docSection"><a name="install-erlang" id="install-erlang"></a>
+      <h2 class="docHeading">Install Erlang</h2>
+
+      <p>
+        Before installing RabbitMQ, you must install a <a href="/which-erlang.html">supported version</a> of Erlang/OTP. We strongly
+        recommend using a packaged version. There are three suggested sources
+        for Erlang packages:
+      </p>
+
+      <ul>
+        <li>
+          We produce <a href="https://github.com/rabbitmq/erlang-rpm">a package</a> stripped
+          down to only provide those components needed to run
+          RabbitMQ. <b>It may not be as up to date as Erlang Solutions'
+          packages</b>, but it might be easiest to use if installing
+          Erlang's dependencies is proving difficult.
+        </li>
+        <li>
+          <a href="https://www.erlang-solutions.com/resources/download.html">Erlang
+          Solutions</a> produces packages that are usually up to
+          date. They produce two sets of packages - ones which are split
+          up and are more convenient to use if you can add a yum
+          repository, and a monolithic package which might be easier if
+          you have to download manually.
+        </li>
+        <li>
+          <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> ("Extra Packages
+          for Enterprise Linux"); part of the Red Hat / Fedora organisation,
+          provides many additional packages, including Erlang. These are the
+          most official packages, and are split into many small packages, but
+          are not always up to date.
+        </li>
+      </ul>
+
+      <div class="docSubsection"><a name="install-zero-dependency-rpm" id="install-zero-dependency-rpm"></a>
+        <h3 class="docHeading">Install zero-dependency Erlang from RabbitMQ</h3>
+
+        <ol class="plain">
+          <li>
+            Download and install the <a href="https://github.com/rabbitmq/erlang-rpm">zero dependency Erlang RPM package for running RabbitMQ</a>. As the name suggests, the package strips off some Erlang modules and dependencies
+            that are not essential for running RabbitMQ.
+          </li>
+        </ol>
+
+        <h3>Install Erlang from the EPEL repository <i>or</i></h3>
+        <ol class="plain">
+          <li>
+            Follow the steps in the <a href="http://fedoraproject.org/wiki/EPEL/FAQ#howtouse">EPEL FAQ</a> to enable EPEL on your machine.
+          </li>
+          <li>
+            Issue the following command as 'root':
+            <pre>yum install erlang</pre>
+          </li>
+        </ol>
+      </div>
+
+      <div class="docSubsection"><a name="install-from-esl-repository" id="install-from-esl-repository"></a>
+        <h3 class="docHeading">Install Erlang from the Erlang Solutions repository <i>or</i></h3>
+        <ol class="plain">
+          <li>
+            Follow the instructions under "Installation using repository"
+            at <a href="https://www.erlang-solutions.com/resources/download.html">Erlang Solutions</a>.
+            Note that Erlang Solutions tend to provide cutting edge Erlang versions that may or may not
+            be <a href="/which-erlang.html">supported by RabbitMQ</a>. Version locking (see below) is recommended
+            when Erlang installed using this option.
+          </li>
+        </ol>
+      </div>
+
+      <div class="docSubsection"><a name="install-monolithic-from-esl-repository" id="install-monolithic-from-esl-repository"></a>
+        <h3 class="docHeading">Install monolithic Erlang from Erlang Solutions <i>or</i></h3>
+
+        <ol class="plain">
+          <li>
+            Download and install the <a href="/which-erlang.html">appropriate</a> <span class="code ">esl-erlang</span> RPM
+            from <a href="https://www.erlang-solutions.com/resources/download.html">Erlang Solutions</a>.
+          </li>
+          <li>
+            Download and install
+            the <a href="https://github.com/jasonmcintosh/esl-erlang-compat">esl-erlang-compat</a>
+            RPM
+            (<a href="https://github.com/jasonmcintosh/esl-erlang-compat/releases/download/1.1.1/esl-erlang-compat-18.1-1.noarch.rpm">direct
+            download</a>) produced by <a href="https://github.com/jasonmcintosh/">Jason
+            McIntosh</a>.
+            <p>
+              This is needed since Erlang Solutions' monolithic packages provide
+              "esl-erlang"; this package just requires "esl-erlang" and provides
+              "erlang".
+            </p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="docSubsection"><a name="rpm-version-locking" id="rpm-version-locking"></a>
+        <h3 class="docHeading">Package Version Locking in Yum</h3>
+
+        <p>
+          <a href="https://access.redhat.com/solutions/98873">yum version locking</a> plugin is recommended
+          to prevent unwanted Erlang upgrades. This is highly recommended when Erlang is installed
+          via the Erlang Solutions repository.
+        </p>
+      </div>
+    </div>
+
+    <div class="docSection"><a name="install-rabbitmq" id="install-rabbitmq"></a>
+      <h2 class="docHeading">Install RabbitMQ Server</h2>
+
+      <div class="docSubsection"><a name="with-rpm" id="with-rpm"></a>
+        <h3 class="docHeading">With rpm and Downloaded RPM</h3>
+
+        <p>
+          After downloading the server package, issue the following command as
+          'root':
+        </p>
+        <pre>rpm --import https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+        yum install rabbitmq-server-3.6.14-1.noarch.rpm</pre>
+
+        <p>
+          Our public signing key is also <a href="https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc">available from Bintray</a>:
+                  <pre>rpm --import https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+        yum install rabbitmq-server-3.6.14-1.noarch.rpm</pre>
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="from-package-cloud" id="from-package-cloud"></a>
+        <h3 class="docHeading">Using PackageCloud RPM Repository</h3>
+
+        <p>
+          PackageCloud installs packages via HTTPS and signs them using their GPG key.
+          There are multiple ways to install:
+
+          <ul>
+            <li>Provided installation scripts</li>
+            <li>Using PackageCloud Chef cookbook</li>
+            <li>Using PackageCloud Puppet module</li>
+            <li>Manually</li>
+          </ul>
+
+          See <a href="https://packagecloud.io/rabbitmq/rabbitmq-server/install">PackageCloud RabbitMQ repository instructions</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="docSection"><a name="run-rabbitmq" id="run-rabbitmq"></a>
+      <h2 class="docHeading">Run RabbitMQ Server</h2>
+
+      <h3>Customise RabbitMQ Environment Variables</h3>
+      <p>
+        The server should start using defaults. You can
+        <a href="configure.html#customise-general-unix-environment">customise the RabbitMQ environment</a>.
+        Also see how to <a href="configure.html#configuration-file">configure components</a>.
+      </p>
+      <h3>Start the Server</h3>
+      <p>
+        The server is not started as a daemon by default when the
+        RabbitMQ server package is installed. To start the daemon by default
+        when the system boots, as an administrator run
+        <span class="code ">chkconfig rabbitmq-server on</span>.
+      </p>
+      <p>
+        As an administrator, start and stop the
+        server as usual using
+        <span class="code ">/sbin/service rabbitmq-server <i>stop/start/etc</i></span>.
+      </p>
+      <p>
+        <em>Note: </em>The server is set up to run as system user
+        <span class="code ">rabbitmq</span>.
+        If you change the location of the Mnesia database or the logs,
+        you must ensure the files are owned by this user
+        (and also update the environment variables).
+      </p>
+    </div>
+
+    <div class="docSection"><a name="selinux-ports" id="selinux-ports"></a>
+  <h2 class="docHeading">Port Access</h2>
+  <p xmlns="">
+    SELinux, and similar mechanisms may prevent RabbitMQ from binding to a port. When that happens,
+    RabbitMQ will fail to start. Firewalls can prevent nodes and CLI tools from communicating with each other.
+    Make sure the following ports can be opened:
+
+    <ul>
+  <li>4369: <a href="http://erlang.org/doc/man/epmd.html">epmd</a>, a peer discovery service used by RabbitMQ nodes and CLI tools</li>
+  <li>5672, 5671: used by AMQP 0-9-1 and 1.0 clients without and with TLS</li>
+  <li>
+    25672: used by Erlang distribution for inter-node and CLI tools communication
+    and is allocated from a dynamic range (limited to a single port by default,
+    computed as AMQP port + 20000). See <a href="/networking.html">networking guide</a> for details.
+  </li>
+  <li>15672: <a href="/management.html">HTTP API</a> clients and <a href="/management-cli.html">rabbitmqadmin</a> (only if the <a href="/management.html">management plugin</a> is enabled)</li>
+  <li>61613, 61614: <a href="https://stomp.github.io/stomp-specification-1.2.html">STOMP clients</a> without and with TLS (only if the <a href="/stomp.html">STOMP plugin</a> is enabled)</li>
+  <li>1883, 8883: (<a href="http://mqtt.org/">MQTT clients</a> without and with TLS, if the <a href="/mqtt.html">MQTT plugin</a> is enabled</li>
+  <li>15674: STOMP-over-WebSockets clients (only if the <a href="/web-stomp.html">Web STOMP plugin</a> is enabled)</li>
+  <li>15675: MQTT-over-WebSockets clients (only if the <a href="/web-mqtt.html">Web MQTT plugin</a> is enabled)</li>
+</ul>
+
+    It is possible to <a href="/configure.html">configure RabbitMQ</a>
+    to use <a href="/networking.html">different ports and specific network interfaces</a>.
+  </p>
+</div>
+    <div class="docSection"><a name="default-user-access" id="default-user-access"></a>
+  <h2 class="docHeading">Default user access</h2>
+  <p xmlns="">
+    The broker creates a user <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> with password
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span>. Unconfigured clients will in general use these
+    credentials. <strong>By default, these credentials can only be
+    used when connecting to the broker as localhost</strong> so you
+    will need to take action before connecting from any other
+    machine.
+  </p>
+  <p xmlns="">
+    See the documentation on <a href="access-control.html">access
+    control</a> for information on how to create more users, delete
+    the <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> user, or allow remote access to the
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> user.
+  </p>
+</div>
+
+    <div class="docSection"><a name="kernel-resource-limits" id="kernel-resource-limits"></a>
+      <h2 class="docHeading">Controlling System Limits on Linux</h2>
+      <div class="docSubsection"><a name="max-open-files-intro" id="max-open-files-intro"></a>
+  <p xmlns="">
+    RabbitMQ installations running production workloads may need system
+    limits and kernel parameters tuning in order to handle a decent number of
+    concurrent connections and queues. The main setting that needs adjustment
+    is the max number of open files, also known as <span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit -n</span>.
+    The default value on many operating systems is too low for a messaging
+    broker (eg. 1024 on several Linux distributions). We recommend allowing
+    for at least 65536 file descriptors for user <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmq</span> in
+    production environments. 4096 should be sufficient for most development
+    workloads.
+  </p>
+</div>
+      <div class="docSubsection"><a name="linux-max-open-files-limit-different-limits" id="linux-max-open-files-limit-different-limits"></a>
+    <p xmlns="">
+      There are two limits in play: the maximum number of open files the OS kernel
+      allows (<span xmlns="http://www.w3.org/1999/xhtml" class="code ">fs.file-max</span>) and the per-user limit (<span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit -n</span>).
+      The former must be higher than the latter.
+    </p>
+</div>
+      <div class="docSection"><a name="linux-max-open-files-limit-options-other-linux" id="linux-max-open-files-limit-options-other-linux"></a>
+
+  <h3 xmlns="">With systemd (Recent Linux Distributions)</h3>
+  <p xmlns="">
+    On distributions that use systemd, the OS limits are controlled via
+    a configuration file at <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/etc/systemd/system/rabbitmq-server.service.d/limits.conf</span>,
+    for example:
+
+<pre class="sourcecode">
+[Service]
+LimitNOFILE=300000
+</pre>
+  </p>  
+
+  <h3 xmlns="">Without systemd (Older Linux Distributions)</h3>
+  <p xmlns="">
+    The most straightforward way to adjust the per-user limit for
+    RabbitMQ on distributions that do not use systemd is to edit the <a href="http://www.rabbitmq.com/configure.html">rabbitmq-env.conf</a>
+    to invoke <span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit</span> before the service is started.
+
+<pre class="sourcecode">
+ulimit -S -n 4096
+</pre>
+  </p>
+
+  <p xmlns="">
+    This <em>soft</em> limit cannot go higher than the <em>hard</em> limit
+    (which defaults to 4096 in many distributions).
+    <a href="https://github.com/basho/basho_docs/blob/master/content/riak/kv/2.2.3/using/performance/open-files-limit.md">The hard limit can be increased</a> via
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/etc/security/limits.conf</span>. This also requires enabling the <a href="http://askubuntu.com/a/34559">pam_limits.so</a> module
+    and re-login or reboot.
+  </p>
+
+  <p xmlns="">
+    Note that limits cannot be changed for running OS processes.
+  </p>
+</div>
+      <div class="docSubsection"><a name="linux-max-open-files-limit-different-limits" id="linux-max-open-files-limit-different-limits"></a>
+    <p xmlns="">
+      For more information about controlling <span xmlns="http://www.w3.org/1999/xhtml" class="code ">fs.file-max</span>
+      with <span xmlns="http://www.w3.org/1999/xhtml" class="code ">sysctl</span>, please refer to the excellent
+      <a href="https://github.com/basho/basho_docs/blob/master/content/riak/kv/2.2.3/using/performance/open-files-limit.md#debian--ubuntu">Riak guide on open file limit tuning</a>.
+    </p>
+</div>
+      <div class="docSubsection"><a name="verifying-limits" id="verifying-limits"></a>
+  <h3 class="docHeading">Verifying the Limit</h3>
+  <p xmlns="">
+    <a href="management.html">RabbitMQ management UI</a> displays the number of file descriptors available
+    for it to use on the Overview tab.
+<pre class="sourcecode">rabbitmqctl status</pre>
+    includes the same value.
+  </p>
+  <p xmlns="">
+    The following command
+
+<pre class="sourcecode">
+cat /proc/$RABBITMQ_BEAM_PROCESS_PID/limits
+</pre>
+
+    can be used to display effective limits of a running process. <span xmlns="http://www.w3.org/1999/xhtml" class="code ">$RABBITMQ_BEAM_PROCESS_PID</span>
+    is the OS PID of the Erlang VM running RabbitMQ, as returned by <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl status</span>.
+  </p>
+</div>
+      <div class="docSubsection"><a name="chef-puppet-bosh" id="chef-puppet-bosh"></a>
+  <h3 class="docHeading">Configuration Management Tools</h3>
+  <p xmlns="">
+    Configuration management tools (e.g. Chef, Puppet, BOSH) provide assistance
+    with system limit tuning. Our <a href="devtools.html#devops-tools">developer tools</a> guide
+    lists relevant modules and projects.
+  </p>
+</div>
+    </div>
+
+    <div class="docSection"><a name="managing-unix" id="managing-unix"></a>
+  <h2 class="docHeading">Managing the Broker</h2>
+  <p xmlns="">
+    To stop the server or check its status, etc., you can use package-specific
+    scripts (e.g. the <span xmlns="http://www.w3.org/1999/xhtml" class="code ">service</span> tool) or invoke
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl</span> (as an administrator). It should be
+    available on the path. All <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl</span> commands will
+    report the node absence if no broker is running.
+  </p>
+  <ul xmlns="">
+    <li>Invoke <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl stop</span> to stop the server.</li>
+    <li>Invoke <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl status</span> to check whether it is
+      running.</li>
+  </ul>
+  <p xmlns="">
+    More <a href="man/rabbitmqctl.1.man.html">info on rabbitmqctl</a>.
+  </p>
+
+  <h3 xmlns="">Logging</h3>
+  <p xmlns="">
+    Output from the server is sent to a
+    <b>RABBITMQ_NODENAME</b>.log file in the
+    <b>RABBITMQ_LOG_BASE</b> directory. Additional log data is
+    written to <b>RABBITMQ_NODENAME</b>-sasl.log.
+  </p>
+  <p xmlns="">
+    The broker always appends to the log files, so a complete
+    log history is retained.
+  </p>
+  <p xmlns="">
+    You can use the <span xmlns="http://www.w3.org/1999/xhtml" class="code ">logrotate</span> program
+    to do all necessary rotation and compression,
+    and you can change it. By default,
+    this script runs weekly on files located in default
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/var/log/rabbitmq</span> directory. See
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/etc/logrotate.d/rabbitmq-server</span>
+    to configure
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">logrotate</span>.
+  </p>
+</div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+   
+     <li><a href="/install-windows.html">Install: Windows</a></li>
+     <li><a href="/install-debian.html">Install: Debian / Ubuntu</a></li>
+     <li><a href="/install-rpm.html" class="selected">Install: RPM-based Linux</a></li>
+     <li><a href="/install-standalone-mac.html">Install: Mac OS X</a></li>
+     <li><a href="/install-homebrew.html">Install: Homebrew</a></li>
+     <li><a href="/install-windows-manual.html">Install: Windows (manual)</a></li>
+     <li><a href="/install-generic-unix.html">Install: Generic Unix</a></li>
+     <li><a href="/install-solaris.html">Install: Solaris</a></li>
+     <li class="gap-after"><a href="/ec2.html">Install: EC2</a></li>
+     <li><a href="/platforms.html">Supported Platforms</a></li>
+     <li><a href="/changelog.html">Changelog</a></li>
+     <li><a href="/which-erlang.html">Erlang Versions</a></li>
+     <li class="gap-after"><a href="/signatures.html">Signed Packages</a></li>
+     <li><a href="/java-client.html">Java Client Downloads</a></li>
+     <li><a href="/dotnet.html">.NET Client Downloads</a></li>
+     <li><a href="/erlang-client.html">Erlang Client Downloads</a></li>
+     <li class="gap-after"><a href="/community-plugins.html">Community Plugins</a></li>
+     <li><a href="/snapshots.html">Snapshots</a></li>
+     
+   
+   </ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

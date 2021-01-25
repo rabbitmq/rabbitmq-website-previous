@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_3_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_3_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_3_x/favicon.ico" /><link rel="stylesheet" href="/v3_3_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_3_x/js/site.js"></script><script type="text/javascript" src="/v3_3_x/js/ga-bootstrap.js"></script><title>RabbitMQ - HTTP server plugin </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_3_x/"><img src="/v3_3_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_3_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_3_x/features.html">Features</a></li><li><a href="/v3_3_x/download.html">Installation</a></li><li><a href="/v3_3_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_3_x/getstarted.html">Tutorials</a></li><li><a href="/v3_3_x/services.html">Services</a></li><li><a href="/v3_3_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>HTTP server plugin </h1>
+<p>The <span class="code ">rabbitmq-mochiweb</span> plugin provides hosting for other plugins that
+have HTTP interfaces. It allows these interfaces to co-exist on one or
+more HTTP listeners.</p>
+<h2>Configuration</h2>
+<p>Plugins using <span class="code ">rabbitmq-mochiweb</span> typically take a <span class="code ">listener</span>
+configuration item to configure their listening HTTP port. In this
+page we will give examples for the <span class="code ">rabbitmq_management</span> application,
+but the same configuration can be applied to <span class="code ">rabbitmq_jsonrpc</span> and
+<span class="code ">rabbitmq_web_stomp_examples</span>.</p>
+<p>The <span class="code ">listener</span> configuration item can contain the following keys:</p>
+<ul>
+<li><span class="code ">port</span> (mandatory)</li>
+<li><span class="code ">ip</span> (to listen on only one interface)</li>
+<li><span class="code ">ssl</span> (to enable SSL)</li>
+<li><span class="code ">ssl_opts</span> (to configure SSL)</li>
+</ul>
+<h2>Listening on a single interface</h2>
+<p>Use <span class="code ">ip</span> to specify an interface for mochiweb to bind to (giving an IP
+address as a string or tuple). For example:</p>
+<pre><span class="code ">[{rabbitmq_management,
+  [{listener, [{port, 15672},
+               {ip, "127.0.0.1"}
+              ]}
+  ]}
+].
+</span></pre>
+<h2>SSL</h2>
+<p>Set <span class="code ">ssl</span> to <span class="code ">true</span> to turn on SSL for a listener. Use <span class="code ">ssl_opts</span> to
+specify SSL options. These are the standard Erlang SSL options - <a href="ssl.html">see
+the main page on SSL for more information</a>.</p>
+<p>For convenience, if you do not specify <span class="code ">ssl_opts</span> then
+rabbitmq-mochiweb will use the same options as the main RabbitMQ
+server does for AMQP over SSL, <b>but with client certificate
+verification turned off</b>. If you wish to use client certificate
+verification, specify <span class="code ">ssl_opts</span> explicitly.</p>
+<p>For example:</p>
+<pre><span class="code ">[{rabbitmq_management,
+  [{listener, [{port,     15672},
+               {ssl,      true},
+               {ssl_opts, [{cacertfile, "/path/to/cacert.pem"},
+                           {certfile,   "/path/to/cert.pem"},
+                           {keyfile,    "/path/to/key.pem"}]}
+              ]}
+  ]}
+].
+</span></pre></div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_3_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_3_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_3_x/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_3_x/management.html">Management plugin</a></li>
+       <li><a href="/v3_3_x/federation.html">Federation plugin</a></li>
+       <li><a href="/v3_3_x/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v3_3_x/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_3_x/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_3_x/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_3_x/mochiweb.html" class="selected">Configuring web plugins</a></li>
+       <li><a href="/v3_3_x/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/v3_3_x/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_3_x/news.html">News</a></li>
+     <li><a href="/v3_3_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_3_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_3_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_3_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_3_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_3_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

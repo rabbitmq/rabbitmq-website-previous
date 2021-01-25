@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - RabbitMQ MQTT Adapter </title>
+    
+  </head>
+  <body id="mqtt"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>RabbitMQ MQTT Adapter </h1>
+
+
+<p>RabbitMQ supports MQTT as of 3.0 (currently targeting version 3.1.1 of the spec).</p>
+<h2><a id="smf"></a> Supported MQTT 3.1.1 features</h2>
+<ul>
+<li>QoS0 and QoS1 publish &amp; consume</li>
+<li>Last Will and Testament (LWT)</li>
+<li>TLS/SSL</li>
+<li>Session stickiness</li>
+<li>Retained messages with pluggable storage backends</li>
+</ul>
+<p>MQTT clients can interoperate with other protocols. All the functionality in
+the <a href="/management.html">management UI</a> and several other clients can be
+used with MQTT, although there may be some limitations or the need to
+tweak the defaults.</p>
+<h2><a id="ifb"></a>Enabling the Plugin</h2>
+<p>The MQTT adapter is included in the RabbitMQ distribution. To enable
+it, use <a href="/man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a>:</p>
+<pre><span class="code ">rabbitmq-plugins enable rabbitmq_mqtt
+</span></pre>
+<p>After the plugin has been enabled, RabbitMQ needs restarting.</p>
+<h2><a id="overview"></a> How it Works</h2>
+<p>RabbitMQ MQTT plugin targets MQTT 3.1.1 and supports a broad range
+of MQTT clients. It also makes it possible for MQTT clients to interoperate
+with <a href="https://www.rabbitmq.com/protocols.html">AMQP 0-9-1, AMQP 1.0, and STOMP</a> clients.
+There is also support for multi-tenancy.</p>
+<p>The plugin builds on top of RabbitMQ core protocol's entities: exchanges and queues. Messages published
+to MQTT topics use a topic exchange (<span class="code ">amq.topic</span> by default) internally. Subscribers consume from
+RabbitMQ queues bound to the topic exchange. This both enables interoperability
+with other protocols and makes it possible to use the <a href="/management.html">Management plugin</a>
+to inspect queue sizes, message rates, and so on.</p>
+<p>Note that MQTT uses slashes ("/") for topic segment separators and
+AMQP 0-9-1 uses dots.  This plugin translates patterns under the hood
+to bridge the two, for example, <span class="code ">cities/london</span> becomes
+<span class="code ">cities.london</span> and vice versa. This has one important limitation:
+MQTT topics that have dots in them won't work as expected and are to
+be avoided, the same goes for AMQP 0-9-1 routing keys that contains
+slahes.</p>
+<h3><a id="durability"></a> Subscription Durability</h3>
+<p>MQTT 3.1 assumes two primary usage scenarios:</p>
+<ul>
+<li>Transient clients that use transient (non-persistent) messages</li>
+<li>Stateful clients that use durable subscriptions (non-clean sessions, QoS1)</li>
+</ul>
+<p>This section briefly covers how these scenarios map to RabbitMQ queue durability and persistence
+features.</p>
+<p>Transient (QoS0) subscription use non-durable, auto-delete queues
+that will be deleted when the client disconnects.</p>
+<p>Durable (QoS1) subscriptions use durable queues. Whether the queues are
+auto-deleted is controlled by the client's clean session flag. Clients with
+clean sessions use auto-deleted queues, others use non-auto-deleted ones.</p>
+<p>For transient (QoS0) publishes, the plugin will publish messages as transient
+(non-persistent). Naturally, for durable (QoS1) publishes, persistent
+messages will be used internally.</p>
+<p>Queues created for MQTT subscribers will have names starting with <span class="code ">mqtt-subscription-</span>,
+one per subscription QoS level. The queues will have <a href="/ttl.html">queue TTL</a> depending
+on MQTT plugin configuration, 24 hours by default.</p>
+<h2><a id="config"></a> Plugin Configuration</h2>
+<p>Here is a sample configuration that sets every MQTT option:</p>
+<pre><span class="code ">[{rabbit,        [{tcp_listeners,    [5672]}]},
+ {rabbitmq_mqtt, [{default_user,     &lt;&lt;"guest"&gt;&gt;},
+                  {default_pass,     &lt;&lt;"guest"&gt;&gt;},
+                  {allow_anonymous,  true},
+                  {vhost,            &lt;&lt;"/"&gt;&gt;},
+                  {exchange,         &lt;&lt;"amq.topic"&gt;&gt;},
+                  {subscription_ttl, 1800000},
+                  {prefetch,         10},
+                  {ssl_listeners,    []},
+                  %% Default MQTT with TLS port is 8883
+                  %% {ssl_listeners,    [8883]}
+                  {tcp_listeners,    [1883]},
+                  {tcp_listen_options, [{backlog,   128},
+                                        {nodelay,   true}]}]}
+].
+</span></pre>
+<h3><a id="authentication"></a> Authentication</h3>
+<p>The <span class="code ">default_user</span> and <span class="code ">default_pass</span> options are used to authenticate
+the adapter in case MQTT clients provide no login credentials. If the
+<span class="code ">allow_anonymous</span> option is set to <span class="code ">false</span> then clients MUST provide credentials.
+The presence of client-supplied credentials over the network overrides
+the <span class="code ">allow_anonymous</span> option. Colons may not appear in usernames.</p>
+<h4>Virtual Host Selection</h4>
+<p>RabbitMQ is a multi-tenant system at the core and every connection belongs
+to a virtual host. Some messaging protocols have the concept of vhosts,
+others don't. MQTT falls into the latter category. Therefor the MQTT plugin
+needs to provide a way to map connections to vhosts.</p>
+<p>The <span class="code ">vhost</span> option controls which RabbitMQ vhost the adapter connects to
+by default. The <span class="code ">vhost</span>
+configuration is only consulted if no vhost is provided during connection establishment.
+There are several (optional) ways to specify the vhost the client will
+connect to.</p>
+<h4>Port to Virtual Host Mapping</h4>
+<p>First way is mapping MQTT plugin (TCP or TLS) listener ports to vhosts. The mapping
+is specified thanks to the <span class="code ">mqtt_port_to_vhost_mapping</span> <a href="/parameters.html">global runtime parameter</a>.
+Let's take the following plugin configuration:</p>
+<pre><span class="code ">[{rabbitmq_mqtt, [{default_user,     &lt;&lt;"guest"&gt;&gt;},
+                  {default_pass,     &lt;&lt;"guest"&gt;&gt;},
+                  {allow_anonymous,  true},
+                  {vhost,            &lt;&lt;"/"&gt;&gt;},
+                  {tcp_listeners,    [1883, 1884]},
+                  {ssl_listeners,    [8883, 8884]}]
+}].
+</span></pre>
+<p>Note the plugin listens on ports 1883, 1884, 8883, and 8884. Imagine you
+want clients connecting to ports 1883 and 8883 to connect to the <span class="code ">vhost1</span> virtual
+host, and clients connecting to ports 1884 and 8884 to connect to the <span class="code ">vhost2</span>
+virtual vhost. You can specify port-to-vhost mapping by setting the
+<span class="code ">mqtt_port_to_vhost_mapping</span> global parameter with <span class="code ">rabbitmqctl</span>:</p>
+<pre><span class="code ">rabbitmqctl set_global_parameter mqtt_port_to_vhost_mapping \
+    '{"1883":"vhost1", "8883":"vhost1", "1884":"vhost2", "8884":"vhost2"}'
+</span></pre>
+<p>with <span class="code ">rabbitmqctl.bat</span> on Windows:</p>
+<pre><span class="code ">rabbitmqctl.bat set_global_parameter mqtt_port_to_vhost_mapping ^
+    "{""1883"":""vhost1"", ""8883"":""vhost1"", ""1884"":""vhost2"", ""8884"":""vhost2""}"
+</span></pre>
+<p>and with the HTTP API:</p>
+<pre><span class="code ">PUT /api/global-parameters/mqtt_port_to_vhost_mapping
+{"value": {"1883":"vhost1", "8883":"vhost1", "1884":"vhost2", "8884":"vhost2"}}
+</span></pre>
+<p>If there's no mapping for a given port (because the port cannot be found in
+the <span class="code ">mqtt_port_to_vhost_mapping</span> global parameter JSON document or if the global parameter
+isn't set at all), the plugin will try to extract the virtual host from the username
+(see below) and will ultimately use the <span class="code ">vhost</span> plugin config option.</p>
+<p>The broker queries the <span class="code ">mqtt_port_to_vhost_mapping</span> global parameter value at connection time.
+If the value changes, connected clients are not notified or disconnected. They need
+to reconnect to switch to a new virtual host.</p>
+<h4>Virtual Host as Part of Username</h4>
+<p>Another and more specific way to specify a vhost while connecting is to prepend the vhost
+to the username and to separate with a colon.</p>
+<p>For example, connecting with</p>
+<pre><span class="code ">/:guest
+</span></pre>
+<p>is equivalent to the default vhost and username.</p>
+<pre><span class="code ">mqtt-vhost:mqtt-username
+</span></pre>
+<p>means connecting to the vhost <span class="code ">mqtt-host</span> with username <span class="code ">mqtt-username</span>.</p>
+<p>Specifying the virtual host in the username takes precedence over the port-to-vhost
+mapping specified with the <span class="code ">mqtt_port_to_vhost_mapping</span> global parameter.</p>
+<h3>Host and Port</h3>
+<p>The <span class="code ">tcp_listeners</span> and <span class="code ">tcp_listen_options</span> options are interpreted in the same way
+as the corresponding options in the <span class="code ">rabbit</span> section, as explained in the
+<a href="/networking.html">networking</a> and <a href="/configure.html">broker configuration</a> doc guides.</p>
+<h3>TLS/SSL</h3>
+<p>The <span class="code ">ssl_listeners</span> option in the <span class="code ">rabbitmq_mqtt</span> config section controls the
+endpoint (if any) that the adapter accepts SSL connections on. The
+default MQTT SSL port is 8883. If this option is non-empty then the
+<span class="code ">rabbit</span> section of the configuration file must contain an
+<span class="code ">ssl_options</span> entry:</p>
+<pre><span class="code ">[{rabbit,        [
+                  {ssl_options, [{cacertfile, "/path/to/tls/ca/cacert.pem"},
+                                 {certfile,   "/path/to/tls/server/cert.pem"},
+                                 {keyfile,    "/path/to/tls/server/key.pem"},
+                                 {verify,     verify_peer},
+                                 {fail_if_no_peer_cert, true}]}
+                 ]},
+ {rabbitmq_mqtt, [
+                  {ssl_listeners,    [8883]},
+                  {tcp_listeners,    [1883]}
+                  ]}
+].
+</span></pre>
+<p>Note that RabbitMQ rejects SSLv3 connections by default because that protocol
+is known to be compromised.</p>
+<p>See the <a href="http://www.rabbitmq.com/ssl.html">TLS/SSL configuration guide</a> for details.</p>
+<h3><a id="cta.ssl"></a>Authentication with SSL client certificates</h3>
+<p>The MQTT adapter can authenticate SSL-based connections by extracting
+a name from the client's SSL certificate, without using a password.</p>
+<p>For safety the server must be configured with the SSL options
+<span class="code ">fail_if_no_peer_cert</span> set to <span class="code ">true</span> and <span class="code ">verify</span> set to <span class="code ">verify_peer</span>, to
+force all SSL clients to have a verifiable client certificate.</p>
+<p>To switch this feature on, set <span class="code ">ssl_cert_login</span> to <span class="code ">true</span> for the
+<span class="code ">rabbitmq_mqtt</span> application. For example:</p>
+<pre><span class="code ">[
+  {rabbitmq_mqtt, [{ssl_cert_login, true}]}
+].
+</span></pre>
+<p>By default this will set the username to an RFC4514-ish string form of
+the certificate's subject's Distinguished Name, similar to that
+produced by OpenSSL's "-nameopt RFC2253" option.</p>
+<p>To use the Common Name instead, add:</p>
+<pre><span class="code ">{rabbit, [{ssl_cert_login_from, common_name}]}
+</span></pre>
+<p>to your configuration.</p>
+<p>Note that:</p>
+<ul>
+<li>The authenticated user must exist in the configured authentication / authorisation backend(s).</li>
+<li>Clients <strong>must not</strong> supply username and password.</li>
+</ul>
+<p>You can optionally specify a virtual host for a client certificate by using the <span class="code ">mqtt_default_vhosts</span>
+<a href="/parameters.html">global runtime parameter</a>. The value of this global parameter must contain a JSON document that
+maps certificates' subject's Distinguished Name to their target virtual host. Let's see how to
+map 2 certificates, <span class="code ">O=client,CN=guest</span> and <span class="code ">O=client,CN=rabbit</span>, to the <span class="code ">vhost1</span> and <span class="code ">vhost2</span>
+virtual hosts, respectively.</p>
+<p>Global parameters can be set up with <span class="code ">rabbitmqctl</span>:</p>
+<pre><span class="code ">rabbitmqctl set_global_parameter mqtt_default_vhosts \
+    '{"O=client,CN=guest": "vhost1", "O=client,CN=rabbit": "vhost2"}'
+</span></pre>
+<p>With <span class="code ">rabbitmqctl</span>, on Windows:</p>
+<pre><span class="code ">rabbitmqctl set_global_parameter mqtt_default_vhosts ^
+    "{""O=client,CN=guest"": ""vhost1"", ""O=client,CN=rabbit"": ""vhost2""}'
+</span></pre>
+<p>And with the HTTP API:</p>
+<pre><span class="code ">PUT /api/global-parameters/mqtt_default_vhosts
+{"value": {"O=client,CN=guest": "vhost1", "O=client,CN=rabbit": "vhost2"}}
+</span></pre>
+<p>Note that:</p>
+<ul>
+<li>If the virtual host for a certificate cannot be found (because the certificate
+subject's DN cannot be found in the <span class="code ">mqtt_default_vhosts</span> global parameter JSON
+document or if the global parameter isn't set at all), the virtual host specified
+by the <span class="code ">vhost</span> plugin config option will be used.</li>
+<li>The broker queries the <span class="code ">mqtt_default_vhosts</span> global parameter value at connection time.
+If the value changes, connected clients are not notified or disconnected. They need
+to reconnect to switch to a new virtual host.</li>
+<li>The certificate-to-vhost mapping with the <span class="code ">mqtt_default_vhosts</span> global parameter
+is considered more specific than the port-to-vhost mapping with the <span class="code ">mqtt_port_to_vhost_mapping</span>
+global parameter and so takes precedence over it.</li>
+</ul>
+<h3><a id="stickiness"></a> Session Stickiness (Clean and Non-clean Sessions) and Queue/Subscription TTL</h3>
+<p>The <span class="code ">subscription_ttl</span> option controls the lifetime of non-clean sessions. This
+option is interpreted in the same way as the <a href="http://www.rabbitmq.com/ttl.html#queue-ttl">queue TTL</a>
+parameter, so the value <span class="code ">86400000</span> means 24 hours. To disable the TTL feature, just set
+the <span class="code ">subscription_ttl</span>  to <span class="code ">undefined</span> in the configuration file:</p>
+<pre><span class="code ">[{rabbit,        [{tcp_listeners,    [5672]}]},
+ {rabbitmq_mqtt, [{default_user,     &lt;&lt;"guest"&gt;&gt;},
+                  {default_pass,     &lt;&lt;"guest"&gt;&gt;},
+                  {allow_anonymous,  true},
+                  {vhost,            &lt;&lt;"/"&gt;&gt;},
+                  {exchange,         &lt;&lt;"amq.topic"&gt;&gt;},
+                  {subscription_ttl, undefined},
+                  {prefetch,         10},
+                  ...
+].
+</span></pre>
+<p>Note that disabling queue TTL carries a risk: short-lived clients that don't use clean sessions
+can leave queues and messages behind, which will consume resources and require manual
+cleanup.</p>
+<p>The <span class="code ">prefetch</span> option controls the maximum number of unacknowledged messages that
+will be delivered. This option is interpreted in the same way as the <a href="http://www.rabbitmq.com/amqp-0-9-1-reference.html#basic.qos.prefetch-count">AMQP 0-9-1 prefetch-count</a>
+field, so a value of <span class="code ">0</span> means "no limit".</p>
+<h3>Custom Exchanges</h3>
+<p>The <span class="code ">exchange</span> option determines which exchange messages from MQTT clients are published
+to. If a non-default exchange is chosen then it must be created before clients
+publish any messages. The exchange is expected to be a topic exchange.</p>
+<h2><a id="retained"></a> Retained Messages and Stores</h2>
+<p>The plugin supports retained messages. Message store implementation is pluggable
+and the plugin ships with two implementation out of the box:</p>
+<ul>
+<li>ETS-based (in memory), implemented in the <span class="code ">rabbit_mqtt_retained_msg_store_ets</span> module</li>
+<li>DETS-based (on disk), implemented in the <span class="code ">rabbit_mqtt_retained_msg_store_dets</span></li>
+</ul>
+<p>Both implementations have limitations and trade-offs.
+With the first one, maximum number of messages that can be retained is limited by RAM.
+With the second one, there is a limit of 2 GB per vhost. Both are node-local
+(messages retained on one broker node are not replicated to other nodes in the cluster).</p>
+<p>To configure the store, use <span class="code ">rabbitmq_mqtt.retained_message_store</span> configuration key:</p>
+<pre><span class="code ">[{rabbitmq_mqtt, [{default_user,     &lt;&lt;"guest"&gt;&gt;},
+                  {default_pass,     &lt;&lt;"guest"&gt;&gt;},
+                  {allow_anonymous,  true},
+                  {vhost,            &lt;&lt;"/"&gt;&gt;},
+                  {exchange,         &lt;&lt;"amq.topic"&gt;&gt;},
+                  {subscription_ttl, 1800000},
+                  {prefetch,         10},
+                  %% use DETS (disk-based) store for retained messages
+                  {retained_message_store, rabbit_mqtt_retained_msg_store_dets},
+                  %% only used by DETS store
+                  {retained_message_store_dets_sync_interval, 2000},
+                  {ssl_listeners,    []},
+                  {tcp_listeners,    [1883]}]}
+].
+</span></pre>
+<p>The value must be a module that implements the store:</p>
+<ul>
+<li><span class="code ">rabbit_mqtt_retained_msg_store_ets</span> for RAM-based</li>
+<li><span class="code ">rabbit_mqtt_retained_msg_store_dets</span> for disk-based</li>
+</ul>
+<p>These implementations are suitable for development but sometimes won't be for production needs.
+MQTT 3.1 specification does not define consistency or replication requirements for retained
+message stores, therefore RabbitMQ allows for custom ones to meet the consistency and
+availability needs of a particular environment. For example, stores based on <a href="http://basho.com/riak/">Riak</a>
+and <a href="http://cassandra.apache.org/">Cassandra</a> would be suitable for most production environments as
+those data stores provide <a href="https://github.com/basho/basho_docs/blob/master/content/riak/kv/2.2.3/using/reference/strong-consistency.md">tunable consistency</a>.</p>
+<p>Message stores must implement the <span class="code ">rabbit_mqtt_retained_msg_store</span> behaviour.</p>
+<h2><a id="limitations"></a> Limitations</h2>
+<h3>Overlapping Subscriptions</h3>
+<p>Overlapping subscriptions from the same client
+(e.g. <span class="code ">/sports/football/epl/#</span> and <span class="code ">/sports/football/#</span>) can result in
+duplicate messages being delivered. Applications
+need to account for this.</p>
+<h3>Retained Message Stores</h3>
+<p>See Retained Messages above. Different retained message stores have
+different benefits, trade-offs, and limitations.</p></div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/clients.html">Client Documentation</a></li>
+     <li><a href="/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/management.html">Management plugin</a></li>
+       <li><a href="/federation.html">Federation plugin</a></li>
+       <li><a href="/shovel.html">Shovel plugin</a></li>
+       <li><a href="/stomp.html">STOMP plugin</a></li>
+       <li><a href="/web-stomp.html">STOMP-over-WebSockets</a></li>
+       <li><a href="/mqtt.html" class="selected">MQTT plugin</a></li>
+       <li><a href="/web-mqtt.html">MQTT-over-WebSockets</a></li>
+       <li><a href="/ldap.html">LDAP plugin</a></li>
+       <li><a href="/web-dispatch.html">Configuring HTTP-based (Web) plugins</a></li>
+       <li><a href="/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/news.html">News</a></li>
+     <li><a href="/protocol.html">Protocol</a></li>
+     <li><a href="/extensions.html">Our Extensions</a></li>
+     <li><a href="/build.html">Building</a></li>
+     
+       <li><a href="/previous.html">Previous Releases</a></li>
+     
+     <li><a href="/mpl.html">License</a></li>
+   </ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

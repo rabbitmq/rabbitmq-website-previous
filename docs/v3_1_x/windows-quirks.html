@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_1_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_1_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_1_x/favicon.ico" /><link rel="stylesheet" href="/v3_1_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_1_x/js/site.js"></script><script type="text/javascript" src="/v3_1_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Windows Quirks</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_1_x/"><img src="/v3_1_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_1_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_1_x/download.html">Installation</a></li><li><a href="/v3_1_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_1_x/getstarted.html">Tutorials</a></li><li><a href="/v3_1_x/services.html">Services</a></li><li><a href="/v3_1_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Windows Quirks</h1>
+    <p>
+      We aim to make RabbitMQ a first-class citizen on
+      Windows. However, sometimes there are circumstances beyond our
+      control that can introduce quirky behaviour. This page documents
+      them.
+    </p>
+
+    <h3>Cannot install to a path with non-ASCII characters</h3>
+    <p>
+      RabbitMQ will fail to start when installed to a path with
+      non-ASCII characters in it. This is because we need to pass the
+      location of the compiled Erlang files to the Erlang VM. It
+      expects input in UTF-8, but the console will typically use some
+      other encoding.
+    </p>
+    <strong>Workarounds:</strong>
+    <ul>
+      <li>
+        Install to a path containing only ASCII characters <em>or</em>
+      </li>
+      <li>
+        Edit the file <span class="code ">rabbitmq-server.bat</span> and change the
+        line "<span class="code ">set TDP0=%~dp0</span>" to "<span class="code ">set
+        TDP0=%~dps0</span>". This will use short paths (the
+        infamous <span class="code ">C:\PROGRA~1</span>) everywhere.
+      </li>
+    </ul>
+
+    <h3>rabbitmqctl shows / parses non-ASCII characters incorrectly</h3>
+    <p>
+      Similarly, <span class="code ">rabbitmqctl</span> will expect command line
+      parameters to be encoded in UTF-8, and display strings as
+      UTF-8. The console will instead provide and expect some
+      country-specific encoding.
+    </p>
+    <strong>Workarounds:</strong>
+    <ul>
+      <li>
+        On recent versions of Windows, issue the command "<span class="code ">chcp
+        65001</span>" before using <span class="code ">rabbitmqctl</span> to force
+        the console to use UTF-8. (Beware: on older versions
+        including Windows XP this will cause the console to silently
+        fail to run any batch file at all!) <em>or</em>
+      </li>
+      <li>
+        Avoid using non-ASCII characters in object names <em>or</em>
+      </li>
+      <li>
+        Use the <a href="management.html">management plugin</a> instead of
+        <span class="code ">rabbitmqctl</span>.
+      </li>
+    </ul>
+
+    <h3>Installing as a non-administrator user leaves .erlang.cookie
+    in the wrong place</h3>
+    <p>
+      This makes it impossible to use <span class="code ">rabbitmqctl</span>.
+    </p>
+    <strong>Workarounds:</strong>
+    <ul>
+      <li>
+        Run the installer as an administrator <em>or</em>
+      </li>
+      <li>
+        Copy the file <span class="code ">.erlang.cookie</span> manually
+        from <span class="code ">%SystemRoot%</span> to
+        <span class="code ">%HOMEDRIVE%</span><span class="code ">%HOMEPATH%</span>.
+      </li>
+    </ul>
+    <h3>Shutting down Windows</h3>
+    <p>
+      It is necessary to take precautions when shutting down Windows
+      and using versions of Erlang prior to R15B02. Due to limitations
+      in older versions of the underlying Erlang VM, the broker will
+      not go through a controlled shutdown sequence when Windows
+      shuts down. If RabbitMQ is installed as a service using an older
+      version of Erlang then you must stop the service manually before
+      shutting down Windows. Failure to do so may cause the broker to
+      spend longer on recovery when started subsequently. The use of
+      Erlang R15B02 or later is recommended to avoid this problem.
+    </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_1_x/features.html">Features</a></li>
+     <li><a href="/v3_1_x/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_1_x/configure.html">Configuration</a></li>
+       <li><a href="/v3_1_x/ssl.html">SSL Support</a></li>
+       <li><a href="/v3_1_x/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_1_x/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_1_x/clustering.html">Clustering</a></li>
+       <li><a href="/v3_1_x/ha.html">High Availability</a></li>
+       <li><a href="/v3_1_x/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_1_x/access-control.html">Access Control</a></li>
+       <li><a href="/v3_1_x/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_1_x/memory.html">Flow Control</a></li>
+       <li><a href="/v3_1_x/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_1_x/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_1_x/manpages.html">Manual Pages</a></li>
+       <li><a href="/v3_1_x/windows-quirks.html" class="selected">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_1_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_1_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_1_x/news.html">News</a></li>
+     <li><a href="/v3_1_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_1_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_1_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_1_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_1_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_1_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 GoPivotal, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

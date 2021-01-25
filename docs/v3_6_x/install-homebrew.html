@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Installing on Homebrew</title>
+    
+  </head>
+  <body id="install-homebrew"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Installing on Homebrew</h1>
+    <p>
+      <a href="https://brew.sh/">Homebrew</a> is a popular package manager for MacOS.
+    </p>
+    <p>
+      <a href="https://github.com/Homebrew/homebrew-core/blob/master/Formula/rabbitmq.rb">RabbitMQ formula</a> is available from
+      <a href="https://brew.sh/">Homebrew</a>'s core tap (out of the box).
+      The formula will also install a reasonably recent Erlang/OTP version
+      as a dependency.
+    </p>
+    <h3>Install the Server</h3>
+    <p>
+      Before installing make sure you have the latest brews:
+      <pre>brew update</pre>
+      Then, install RabbitMQ server with:
+      <pre>brew install rabbitmq</pre>
+    </p>
+    <h3>Run RabbitMQ Server</h3>
+    <p>
+      The RabbitMQ server scripts are installed into <span class="code ">/usr/local/sbin</span>.
+      This is not automatically added to your path, so you may wish to add<br />
+      <span class="code ">PATH=$PATH:/usr/local/sbin</span> to your <span class="code ">.bash_profile</span>
+      or <span class="code ">.profile</span>.
+      The server can then be started with <span class="code ">rabbitmq-server</span>.
+    </p>
+    <p>
+      All scripts run under your own user account. Sudo is not required.
+    </p>
+
+    <div class="docSection"><a name="default-user-access" id="default-user-access"></a>
+  <h2 class="docHeading">Default user access</h2>
+  <p xmlns="">
+    The broker creates a user <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> with password
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span>. Unconfigured clients will in general use these
+    credentials. <strong>By default, these credentials can only be
+    used when connecting to the broker as localhost</strong> so you
+    will need to take action before connecting from any other
+    machine.
+  </p>
+  <p xmlns="">
+    See the documentation on <a href="access-control.html">access
+    control</a> for information on how to create more users, delete
+    the <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> user, or allow remote access to the
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> user.
+  </p>
+</div>
+    <div class="docSection"><a name="osx-max-open-files-limit" id="osx-max-open-files-limit"></a>
+    <h2 class="docHeading">Controlling System Limits on OS X</h2>
+    <div class="docSubsection"><a name="max-open-files-intro" id="max-open-files-intro"></a>
+  <p xmlns="">
+    RabbitMQ installations running production workloads may need system
+    limits and kernel parameters tuning in order to handle a decent number of
+    concurrent connections and queues. The main setting that needs adjustment
+    is the max number of open files, also known as <span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit -n</span>.
+    The default value on many operating systems is too low for a messaging
+    broker (eg. 1024 on several Linux distributions). We recommend allowing
+    for at least 65536 file descriptors for user <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmq</span> in
+    production environments. 4096 should be sufficient for most development
+    workloads.
+  </p>
+</div>
+
+    <p xmlns="">
+      There are two limits in play: the maximum number of open files the OS kernel
+      allows (<span xmlns="http://www.w3.org/1999/xhtml" class="code ">kern.maxfilesperproc</span>) and the per-user limit (<span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit -n</span>).
+      The former must be higher than the latter.
+    </p>
+    <p xmlns="">
+      To adjust the per-user limit for RabbitMQ, there are several options:
+
+      <ul>
+        <li>
+          Invoke <span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit -S -n 4096</span> before starting RabbitMQ in foreground.
+        </li>
+        <li>
+          Edit the <a href="http://www.rabbitmq.com/configure.html">rabbitmq-env.conf</a> to
+          invoke <span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit</span> before the service is started.
+        </li>
+        <li>
+          <a href="https://github.com/basho/basho_docs/blob/master/content/riak/kv/2.2.3/using/performance/open-files-limit.md#mac-os-x-el-capitan">Configure max open files limit</a> via <span xmlns="http://www.w3.org/1999/xhtml" class="code ">launchctl limit</span>
+        <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/etc/launchd.conf</span>.
+        </li>
+      </ul>
+    </p>
+    <p xmlns="">
+      Note that limits cannot be changed for running OS processes.
+    </p>
+    <p xmlns="">
+      For more information about controlling
+      <span xmlns="http://www.w3.org/1999/xhtml" class="code ">kern.maxfilesperproc</span> with <span xmlns="http://www.w3.org/1999/xhtml" class="code ">sysctl</span>,
+      please refer to <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/sysctl.8.html">sysctl(8)</a>
+      page in Apple documentation.
+    </p>
+
+    <div class="docSubsection"><a name="verifying-limits" id="verifying-limits"></a>
+  <h3 class="docHeading">Verifying the Limit</h3>
+  <p xmlns="">
+    <a href="management.html">RabbitMQ management UI</a> displays the number of file descriptors available
+    for it to use on the Overview tab.
+<pre class="sourcecode">rabbitmqctl status</pre>
+    includes the same value.
+  </p>
+  <p xmlns="">
+    The following command
+
+<pre class="sourcecode">
+launchctl limit
+</pre>
+
+    can be used to display effective limits for the current user.
+  </p>
+</div>
+    <div class="docSubsection"><a name="chef-puppet-bosh" id="chef-puppet-bosh"></a>
+  <h3 class="docHeading">Configuration Management Tools</h3>
+  <p xmlns="">
+    Configuration management tools (e.g. Chef, Puppet, BOSH) provide assistance
+    with system limit tuning. Our <a href="devtools.html#devops-tools">developer tools</a> guide
+    lists relevant modules and projects.
+  </p>
+</div>
+</div>
+
+    <p>
+      See the <a href="install-generic-unix.html">Generic Unix or Linux</a> section for further information.
+    </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+   
+     <li><a href="/install-windows.html">Install: Windows</a></li>
+     <li><a href="/install-debian.html">Install: Debian / Ubuntu</a></li>
+     <li><a href="/install-rpm.html">Install: RPM-based Linux</a></li>
+     <li><a href="/install-standalone-mac.html">Install: Mac OS X</a></li>
+     <li><a href="/install-homebrew.html" class="selected">Install: Homebrew</a></li>
+     <li><a href="/install-windows-manual.html">Install: Windows (manual)</a></li>
+     <li><a href="/install-generic-unix.html">Install: Generic Unix</a></li>
+     <li><a href="/install-solaris.html">Install: Solaris</a></li>
+     <li class="gap-after"><a href="/ec2.html">Install: EC2</a></li>
+     <li><a href="/platforms.html">Supported Platforms</a></li>
+     <li><a href="/changelog.html">Changelog</a></li>
+     <li><a href="/which-erlang.html">Erlang Versions</a></li>
+     <li class="gap-after"><a href="/signatures.html">Signed Packages</a></li>
+     <li><a href="/java-client.html">Java Client Downloads</a></li>
+     <li><a href="/dotnet.html">.NET Client Downloads</a></li>
+     <li><a href="/erlang-client.html">Erlang Client Downloads</a></li>
+     <li class="gap-after"><a href="/community-plugins.html">Community Plugins</a></li>
+     <li><a href="/snapshots.html">Snapshots</a></li>
+     
+   
+   </ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

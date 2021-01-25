@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_0_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_0_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_0_x/favicon.ico" /><link rel="stylesheet" href="/v3_0_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_0_x/js/site.js"></script><script type="text/javascript" src="/v3_0_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Management Command Line Tool </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_0_x/"><img src="/v3_0_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v3_0_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_0_x/download.html">Installation</a></li><li><a href="/v3_0_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_0_x/getstarted.html">Tutorials</a></li><li><a href="/v3_0_x/services.html">Services</a></li><li><a href="/v3_0_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Management Command Line Tool </h1>
+<p>The <a href="/v3_0_x/management.html">management plugin</a> ships with a command line
+tool <strong>rabbitmqadmin</strong> which can perform the same actions as the
+web-based UI, and which may be more convenient for use when
+scripting. Note that rabbitmqadmin is just a specialised HTTP client;
+if you are contemplating invoking rabbitmqadmin from your own program
+you may want to consider using the HTTP API directly.</p>
+<h2>Obtaining rabbitmqadmin</h2>
+<p>With the management plugin installed, browse to
+<span class="code ">http://server-name:15672/cli/</span> to download. You will need Python 2.x,
+2.6 or later (i.e. not Python 3).</p>
+<p>Alternatively, you can download the version of rabbitmqadmin which
+corresponds with the management plugin version 3.0.4
+<a href="http://hg.rabbitmq.com/rabbitmq-management/raw-file/rabbitmq_v3_0_4/bin/rabbitmqadmin">here</a>.</p>
+<h2>Getting started</h2>
+<p>Unix users will probably want to copy <span class="code ">rabbitmqadmin</span> to <span class="code ">/usr/local/bin</span>.</p>
+<p>Windows users will need to ensure Python is on their path, and invoke
+rabbitmqadmin as <span class="code ">python.exe rabbitmqadmin</span>.</p>
+<p>Invoke <span class="code ">rabbitmqadmin --help</span> for usage instructions. You can:</p>
+<ul>
+<li>list exchanges, queues, bindings, vhosts, users, permissions, connections and channels.</li>
+<li>show overview information.</li>
+<li>declare and delete exchanges, queues, bindings, vhosts, users and permissions.</li>
+<li>publish and get messages.</li>
+<li>close connections and purge queues.</li>
+<li>import and export configuration.</li>
+</ul>
+<h2>bash completion</h2>
+<p>rabbitmqadmin supports tab completion in <span class="code ">bash</span>. To print a bash
+completion script, invoke <span class="code ">rabbitmqadmin --bash-completion</span>.  This
+should be redirected to a file and <span class="code ">source</span>d.</p>
+<p>On Debian-derived
+systems, copy the file to <span class="code ">/etc/bash_completion.d</span> to make it
+available system-wide:</p>
+<pre><span class="code ">sudo sh -c 'rabbitmqadmin --bash-completion &gt; /etc/bash_completion.d/rabbitmqadmin'
+</span></pre>
+<h2>Examples</h2>
+<h3>Get a list of exchanges</h3>
+<pre><span class="code ">$ rabbitmqadmin -V test list exchanges
++-------------+---------+-------+---------+-------------+
+|    name     | durable | vhost |  type   | auto_delete |
++-------------+---------+-------+---------+-------------+
+|             | True    | test  | direct  | False       |
+| amq.direct  | True    | test  | direct  | False       |
+| amq.fanout  | True    | test  | fanout  | False       |
+| amq.headers | True    | test  | headers | False       |
+| amq.match   | True    | test  | headers | False       |
+| amq.topic   | True    | test  | topic   | False       |
++-------------+---------+-------+---------+-------------+
+</span></pre>
+<h3>Get a list of queues, with some columns specified</h3>
+<pre><span class="code ">$ rabbitmqadmin list queues vhost name node messages message_stats.publish_details.rate
++-------+----------------------------------+-------------------+----------+------------------------------------+
+| vhost |               name               |       node        | messages | message_stats.publish_details.rate |
++-------+----------------------------------+-------------------+----------+------------------------------------+
+| /     | amq.gen-UELtxwb8OGJ9XHlHJq0Jug== | rabbit@smacmullen | 0        | 100.985821591                      |
+| /     | test                             | rabbit@misstiny   | 5052     | 100.985821591                      |
++-------+----------------------------------+-------------------+----------+------------------------------------+
+</span></pre>
+<h3>Get a list of queues, with all the detail we can take</h3>
+<pre><span class="code ">$ rabbitmqadmin -f long -d 3 list queues
+
+--------------------------------------------------------------------------------
+
+                                       vhost: /
+                                        name: amq.gen-UELtxwb8OGJ9XHlHJq0Jug==
+                                 auto_delete: False
+    backing_queue_status.avg_ack_egress_rate: 100.944672225
+   backing_queue_status.avg_ack_ingress_rate: 100.944672225
+</span></pre>
+<p><em>and so on, and on...</em></p>
+<h3>Connect to another host as another user</h3>
+<pre><span class="code ">$ rabbitmqadmin -H myserver -u simon -p simon list vhosts
++------+
+| name |
++------+
+| /    |
++------+
+</span></pre>
+<h3>Declare an exchange</h3>
+<pre><span class="code ">$ rabbitmqadmin declare exchange name=my-new-exchange type=fanout
+exchange declared
+</span></pre>
+<h3>Declare a queue, with optional parameters</h3>
+<pre><span class="code ">$ rabbitmqadmin declare queue name=my-new-queue durable=false
+queue declared
+</span></pre>
+<h3>Publish a message</h3>
+<pre><span class="code ">$ rabbitmqadmin publish exchange=amq.default routing_key=test payload="hello, world"
+Message published
+</span></pre>
+<h3>And get it back</h3>
+<pre><span class="code ">$ rabbitmqadmin get queue=test requeue=false
++-------------+----------+---------------+--------------+------------------+-------------+
+| routing_key | exchange | message_count |   payload    | payload_encoding | redelivered |
++-------------+----------+---------------+--------------+------------------+-------------+
+| test        |          | 0             | hello, world | string           | False       |
++-------------+----------+---------------+--------------+------------------+-------------+
+</span></pre>
+<h3>Export configuration</h3>
+<pre><span class="code ">$ rabbitmqadmin export rabbit.config
+Exported configuration for localhost to "rabbit.config"
+</span></pre>
+<h3>Import configuration, quietly</h3>
+<pre><span class="code ">$ rabbitmqadmin -q import rabbit.config
+</span></pre>
+<h3>Close all connections</h3>
+<pre><span class="code ">$ rabbitmqadmin -f tsv -q list connections name | while read conn ; do rabbitmqadmin -q close connection name=${conn} ; done
+</span></pre></div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_0_x/features.html">Features</a></li>
+     <li><a href="/v3_0_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_0_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_0_x/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_0_x/management.html" class="selected">Management plugin</a><ul>
+         <li><a href="/v3_0_x/management-cli.html" class="selected">Management CLI</a></li>
+       </ul></li>
+       <li><a href="/v3_0_x/federation.html">Federation plugin</a></li>
+       <li><a href="/v3_0_x/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v3_0_x/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_0_x/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_0_x/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_0_x/plugin-development.html">Plugin development</a></li>
+     </ul></li>
+     <li><a href="/v3_0_x/news.html">News</a></li>
+     <li><a href="/v3_0_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_0_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_0_x/build.html">Building</a></li>
+     <li><a href="/v3_0_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_0_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_0_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

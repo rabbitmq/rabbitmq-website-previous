@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Queue Length Limit</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Queue Length Limit</h1>
+    <p>
+      The maximum length of a queue can be limited to a set number of
+      messages, or a set number of bytes (the total of all message
+      body lengths, ignoring message properties and any overheads), or
+      both.
+    </p>
+
+    <p>
+      For any given queue, the maximum length (of either type) can be
+      defined by clients using the queue's arguments, or in the server
+      using <a href="parameters.html#policies">policies</a>. In the
+      case where both policy and arguments specify a maximum length,
+      the minimum of the two values is applied.
+    </p>
+
+    <p>
+      In all cases the number of <i>ready</i> messages is used;
+      unacknowledged messages do not count towards the limit. The
+      fields <span class="code ">messages_ready</span> and
+      <span class="code ">message_bytes_ready</span> from <span class="code ">rabbitmqctl
+      list_queues</span> and the management API show the values that
+      would be limited.
+    </p>
+
+    <p>
+      Messages will be dropped or dead-lettered from the front of the
+      queue to make room for new messages once the limit is reached.
+    </p>
+
+    <h3>Configuration using arguments</h3>
+    <p>
+      Maximum number of messages can be set by supplying the
+      <span class="code ">x-max-length</span> queue declaration argument with a
+      non-negative integer value.
+    </p>
+    <p>
+      Maximum length in bytes can be set by supplying the
+      <span class="code ">x-max-length-bytes</span> queue declaration argument with a
+      non-negative integer value.
+    </p>
+    <p>
+      If both arguments are set then both will apply; whichever limit
+      is hit first will be enforced.
+    </p>
+    <p>
+      This example in Java declares a queue with a maximum length
+      of 10 messages:
+    </p>
+    <pre class="sourcecode">
+Map&lt;String, Object&gt; args = new HashMap&lt;String, Object&gt;();
+args.put("x-max-length", 10);
+channel.queueDeclare("myqueue", false, false, false, args);</pre>
+
+      <h3>Configuration using policy</h3>
+
+      <p>
+        To specify a maximum length using policy, add the key
+        <span class="code ">max-length</span> and / or <span class="code ">max-length-bytes</span>
+        to a policy definition. For example:
+      </p>
+
+      <table>
+        <tr>
+          <th>rabbitmqctl</th>
+          <td>
+            <pre>rabbitmqctl set_policy Ten "^one-meg$" '{"max-length-bytes":1000000}' --apply-to queues</pre>
+          </td>
+        </tr>
+        <tr>
+          <th>rabbitmqctl (Windows)</th>
+          <td>
+            <pre>rabbitmqctl set_policy Ten "^one-meg$" "{""max-length-bytes"":1000000}" --apply-to queues</pre>
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        This ensures the queue called <span class="code ">one-meg</span> can contain
+        no more than 1MB of message bodies.
+      </p>
+
+      <p>
+        Policies can also be defined using the management plugin, see
+        the <a href="parameters.html#policies">policy
+        documentation</a> for more details.
+      </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html">Plugins</a></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_5_7/confirms.html">Confirms</a></li>
+       <li><a href="/v3_5_7/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_5_7/consumer-prefetch.html">Consumer Prefetch</a></li>
+       <li><a href="/v3_5_7/consumer-priority.html">Consumer Priorities</a></li>
+       <li><a href="/v3_5_7/direct-reply-to.html">Direct reply-to</a></li>
+       <li><a href="/v3_5_7/connection-blocked.html">Blocked Connections</a></li>
+       <li><a href="/v3_5_7/nack.html">basic.nack</a></li>
+       <li><a href="/v3_5_7/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_5_7/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_5_7/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_5_7/ttl.html">TTL</a></li>
+       <li><a href="/v3_5_7/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_5_7/maxlength.html" class="selected">Length Limit</a></li>
+       <li><a href="/v3_5_7/priority.html">Priority Queues</a></li>
+       <li><a href="/v3_5_7/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_5_7/auth-notification.html">Auth Failure</a></li>
+       <li><a href="/v3_5_7/spec-differences.html">Spec Differences</a></li>
+     </ul></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

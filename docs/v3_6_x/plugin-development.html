@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Plugin Development Guide</title>
+    
+  </head>
+  <body id="plugin-development"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Plugin Development Guide</h1>
+      <p class="intro">
+        This is the RabbitMQ Server Plugin Development Guide. It is expected that
+        before reading this guide, the reader has a basic understanding of the RabbitMQ
+        plugin mechanism. Readers are also expected to have a basic
+        understanding of Erlang OTP
+        <a href="http://www.erlang.org/doc/system_principles/users_guide.html">system</a> and
+        <a href="http://www.erlang.org/doc/design_principles/users_guide.html">design</a> principles.
+      </p>
+
+      <div class="docSection"><a name="why" id="why"></a>
+        <h2 class="docHeading">Why Write A Plugin?</h2>
+
+        <p>
+          Writing a RabbitMQ plugin provides a number of appealing possibilities:
+        </p>
+        <ul>
+          <li>
+            Enable your application to access internal RabbitMQ functionality that is not exposed
+            via the AMQP interface.
+          </li>
+          <li>
+            Running in the same Erlang VM as the broker may increase performance for certain applications.
+          </li>
+          <li>
+            Plugins provide an easy deployment model, since they allow for a single "RabbitMQ Appliance"
+            to be built that acts in a self-contained manner. This can be useful both for easing production
+            deployments, and for producing all-in-one infrastructure for use during development.
+          </li>
+        </ul>
+      </div>
+
+      <div class="docSection"><a name="why-not" id="why-not"></a>
+        <h2 class="docHeading">Why To Not Write A Plugin</h2>
+
+        <p>
+          As with any plugin mechanism, consideration should be given when developing functionality as to whether
+          embedding it as a plugin is the most appropriate path to take. Some reasons that you might not want to
+          develop your functionality as a plugin:
+        </p>
+
+        <ul>
+          <li>
+            Depending on undocumented internal Rabbit APIs can result in your application requiring changes when
+            RabbitMQ is updated. If you can do what you need to do without using RabbitMQ internals, then your
+            application will be far more compatible in the future.
+          </li>
+          <li>
+            As mentioned in the Admin Guide, a poorly written plugin can result in the entire broker crashing!
+          </li>
+        </ul>
+      </div>
+
+      <div class="docSection"><a name="getting-started" id="getting-started"></a>
+        <h2 class="docHeading">Getting Started</h2>
+
+        <p>
+          To develop a RabbitMQ plugin, first make sure the following
+          requirements are met:
+        </p>
+        <ul>
+          <li>
+            Ensure that you have a working installation of <a href="http://git-scm.com/">Git</a>.
+          </li>
+          <li>
+            Ensure that the dependencies detailed in the <a href="build-server.html#prerequisites">Server Build</a>
+            documentation are installed and functional.
+          </li>
+        </ul>
+
+        <p>
+          <a href="http://erlang.mk">Erlang.mk</a> is used to
+          build RabbitMQ and its plugins. The easiest way to start on
+          a new plugin is probably to copy an existing plugin such as
+          <tt>rabbitmq-metronome</tt>, <a href="#plugin-hello-world">used
+          as an example below</a>.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="installing-plugins-during-development" id="installing-plugins-during-development"></a>
+        <h2 class="docHeading">Activating Plugins During Development</h2>
+
+        <p>
+          To test your plugin while you're working on it, you can start
+          a broker with your plugin enabled:
+          <pre class="sourcecode bash">make run-broker</pre>
+        </p>
+      </div>
+
+      <div class="docSection"><a name="plugin-quality-tips" id="plugin-quality-tips"></a>
+        <h2 class="docHeading">Plugin Quality Tips</h2>
+
+        <p>
+          As highlighted in the Administration Guide, badly-written plugins can pose a risk to the stability of the
+          broker. The following tips aim to provide a series of best-practices for ensuring that your plugin
+          can safely co-exist with Rabbit.
+        </p>
+
+        <ul>
+          <li>
+            Always install a Supervisor above your application. You should never start your application directly,
+            instead opting to create a (possibly quite trivial) supervisor that will prevent the Erlang VM from
+            shutting down due to a crashed top-level application.
+          </li>
+        </ul>
+      </div>
+
+      <div class="docSection"><a name="plugin-hello-world" id="plugin-hello-world"></a>
+        <h2 class="docHeading">Example Plugin: Metronome</h2>
+
+        <p>
+          Seeing as no development guide would be complete without a Hello World example, the following tries to
+          provide the basics of how your would build your very own RabbitMQ plugin. The following example details
+          how you might build a simple plugin that acts like a metronome. Every second, it fires a message that has
+          a routing key in the form yyyy.MM.dd.dow.hh.mm.ss to a topic exchange called "metronome". Applications
+          can attach queues to this exchange with various routing keys in order to be invoked at regular intervals. For
+          example, to receive a message every second, a binding of "*.*.*.*.*.*.*" could be applied. To recieve
+          a message every minute, a binding of "*.*.*.*.*.*.00" could be applied instead.
+        </p>
+        <p>
+          The <a href="https://github.com/rabbitmq/rabbitmq-metronome">rabbitmq-metronome</a> repository on GitHub
+          contains a copy of the code for this plugin.
+        </p>
+        <p>
+          The following table should explain the purpose of the various files in the repository.
+        </p>
+        <table>
+          <tr>
+            <th>Filename</th>
+            <th>Purpose</th>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/Makefile"><span class="code ">Makefile</span></a></td>
+            <td>
+              This top-level Makefile defines the name
+              of your plugin and its dependencies. The
+              name must match the Erlang application name.
+              Dependencies are declared using erlang.mk's
+              variables. Just after that, the Makefile includes
+              <tt>rabbitmq-components.mk</tt> and <tt>erlang.mk</tt>,
+              as well as <tt>rabbitmq-plugins.mk</tt> using erlang.mk
+              plugins facility. See below for a description of those
+              files.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/erlang.mk"><span class="code ">erlang.mk</span></a></td>
+            <td>
+              A local copy of <tt>erlang.mk</tt>. This is not a vanilla
+              copy because RabbitMQ relies on a few modifications
+              which have not been merged upstream at the time of
+              this writing. That's why <tt>ERLANG_MK_REPO</tt> and
+              <tt>ERLANG_MK_COMMIT</tt> are overridden for now.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/build.config"><span class="code ">build.config</span></a></td>
+            <td>
+              This file configures which features of erlang.mk should be
+              enabled. In most of RabbitMQ's plugins, EUnit is disabled,
+              because they depend on a running broker. Our erlang.mk
+              extensions take care of starting a node and run the EUnit
+              tests when you type <tt>make tests</tt>.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/rabbitmq-components.mk"><span class="code ">rabbitmq-components.mk</span></a></td>
+            <td>
+              A local copy of <tt>rabbitmq-components.mk</tt>. The
+              original file is in <tt>rabbitmq-common</tt> which your
+              plugin will depend on automatically. It contains other
+              erlang.mk extensions and helpers which must be defined
+              before <tt>erlang.mk</tt> inclusion. This file must be
+              kept up-to-date w.r.t. <tt>rabbitmq-common</tt>: when it
+              is out-of-date, you will get the following error:
+              <pre>error: rabbitmq-components.mk must be updated!</pre>
+              In this case, just run the following command to update
+              your copy:
+              <pre>make rabbitmq-components-mk</pre>
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/src/rabbitmq_metronome.app.src"><span class="code ">src/rabbitmq_metronome.app.src</span></a></td>
+            <td>
+              This file declares the dependencies required by the plugin
+              (<span class="code ">rabbit</span> and <span class="code ">amqp_client</span>). These
+              applications will be available and started before starting
+              the plugin. Note that the real <tt>.app</tt> file is
+              generated from this <tt>.app.src</tt>; there is no need to
+              fill in the list of modules. You can let the <tt>vsn</tt>
+              field empty: it will inherit RabbitMQ's version.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/src/rabbit_metronome.erl"><span class="code ">src/rabbit_metronome.erl</span></a></td>
+            <td>
+              Implementation of the Erlang "application" behaviour. Provides a means for the Erlang VM to start and
+              stop the plugin.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/src/rabbit_metronome_sup.erl"><span class="code ">src/rabbit_metronome_sup.erl</span></a></td>
+            <td>
+              Implementation of the Erlang "supervisor" behaviour. Monitors the worker process and restarts it if
+              it crashes.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/src/rabbit_metronome_worker.erl"><span class="code ">src/rabbit_metronome_worker.erl</span></a></td>
+            <td>
+              The core of the plugin. The worker will connect internally to the broker, then create a task that
+              will be triggered every second.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/rabbitmq/rabbitmq-metronome/blob/master/test/src/rabbit_metronome_tests.erl"><span class="code ">test/rabbit_metronome_tests.erl</span></a></td>
+            <td>
+              Automated tests for the plugin.
+            </td>
+          </tr>
+        </table>
+
+        <ul>
+          <li>
+            Run make to build your application:
+            <pre class="sourcecode bash">make</pre>
+          </li>
+          <li>
+            Start up your Rabbit broker:
+            <pre class="sourcecode bash">make run-broker</pre>
+          </li>
+          <li>
+            To ensure that your new plugin is up and running, run the following command:
+            <pre class="sourcecode bash">./deps/rabbit/scripts/rabbitmqctl status</pre>
+            If your plugin has loaded successfully, you should see an entry in the returned list that looks
+            like: <pre class="sourcecode erlang">{rabbitmq_metronome,"Embedded Rabbit Metronome",[]}</pre>
+          </li>
+          <li>
+            You can run the automated tests by issuing:
+            <pre class="sourcecode bash">make tests</pre>
+          </li>
+          <li>
+            Finally, you can produce a <span class="code ">.ez</span> file, suitable for distribution with:
+            <pre class="sourcecode bash">make dist</pre>
+            The file appears in the <tt>plugins</tt> subdirectory.
+          </li>
+        </ul>
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/clients.html">Client Documentation</a></li>
+     <li><a href="/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/management.html">Management plugin</a></li>
+       <li><a href="/federation.html">Federation plugin</a></li>
+       <li><a href="/shovel.html">Shovel plugin</a></li>
+       <li><a href="/stomp.html">STOMP plugin</a></li>
+       <li><a href="/web-stomp.html">STOMP-over-WebSockets</a></li>
+       <li><a href="/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/web-mqtt.html">MQTT-over-WebSockets</a></li>
+       <li><a href="/ldap.html">LDAP plugin</a></li>
+       <li><a href="/web-dispatch.html">Configuring HTTP-based (Web) plugins</a></li>
+       <li><a href="/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/plugin-development.html" class="selected">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/news.html">News</a></li>
+     <li><a href="/protocol.html">Protocol</a></li>
+     <li><a href="/extensions.html">Our Extensions</a></li>
+     <li><a href="/build.html">Building</a></li>
+     
+       <li><a href="/previous.html">Previous Releases</a></li>
+     
+     <li><a href="/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#why">Why Write A Plugin?</a></li><li><a href="#why-not">Why To Not Write A Plugin</a></li><li><a href="#getting-started">Getting Started</a></li><li><a href="#installing-plugins-during-development">Activating Plugins During Development</a></li><li><a href="#plugin-quality-tips">Plugin Quality Tips</a></li><li><a href="#plugin-hello-world">Example Plugin: Metronome</a></li></ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

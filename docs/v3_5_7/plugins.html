@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Plugins</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html">Installation</a></li><li><a href="/v3_5_7/documentation.html" class="selected">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Plugins</h1>
+      <div class="docSection"><a name="overview" id="overview"></a>
+        <p>
+          RabbitMQ supports a variety of plugins. This page documents
+          the plugins that ship with RabbitMQ 3.5.7.
+        </p>
+        <p>
+          To enable plugins, use
+          the <a href="man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a>
+          tool:
+        </p>
+        <pre class="example">rabbitmq-plugins enable <i>plugin-name</i></pre>
+        <p>And to disable plugins again, use:</p>
+        <pre class="example">rabbitmq-plugins disable <i>plugin-name</i></pre>
+        <p>You can see a list of which plugins are enabled with:</p>
+        <pre class="example">rabbitmq-plugins list</pre>
+        <p>
+          The <span class="code ">rabbitmq-plugins</span> comand will enable or
+          disable plugins by updating the plugin configuration
+          file. It will then contact the running server to tell it to
+          start or stop plugins as needed. You can use the
+          <span class="code ">-n</span> option to specify a different node, or use
+          <span class="code ">--offline</span> to only change the file.
+        </p>
+        <p>
+          For more information on <span class="code ">rabbitmq-plugins</span>,
+          consult <a href="man/rabbitmq-plugins.1.man.html">the manual
+          page</a>.
+        </p>
+
+        <p>
+          In addition to the plugins bundled with the server, we also
+          offer binary downloads of plugins which have been
+          contributed by authors in the community. See the <a href="community-plugins.html">community plugins page</a> for
+          more detail on which plugins are available and how to
+          install them.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="maintained" id="maintained"></a>
+        <h2 class="docHeading">Supported Plugins</h2>
+        <table class="plugins">
+          <tr><th>rabbitmq_auth_backend_ldap</th></tr><tr><td>
+            Authentication / authorisation plugin using an external
+            LDAP server.
+            <ul>
+              <li><a href="ldap.html">Documentation for the LDAP
+              plugin</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_auth_mechanism_ssl</th></tr><tr><td>
+            Authentication mechanism plugin using SASL EXTERNAL to authenticate
+            using SSL client certificates.
+            <ul>
+              <li><a href="http://hg.rabbitmq.com/rabbitmq-auth-mechanism-ssl/file/rabbitmq_v3_5_7/README">README for this plugin</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_consistent_hash_exchange</th></tr><tr><td>
+            Consistent hash exchange type.
+            <ul>
+              <li><a href="http://hg.rabbitmq.com/rabbitmq-consistent-hash-exchange/file/rabbitmq_v3_5_7/README.md">README for this plugin</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_federation</th></tr><tr><td>
+            Scalable messaging across WANs and administrative
+            domains.
+            <ul>
+              <li><a href="federation.html">Documentation for the
+              federation plugin</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_federation_management</th></tr><tr><td>
+            Shows federation status in the management API and UI. Only
+            of use when using rabbitmq_federation in conjunction with
+            <span class="code ">rabbitmq_management</span>. In a heterogenous cluster this
+            should be installed on the same nodes as rabbitmq_management.
+          </td></tr>
+
+          <tr><th>rabbitmq_management</th></tr><tr><td>
+            A management / monitoring API over HTTP, along with a
+            browser-based UI.
+            <ul>
+              <li><a href="management.html">Documentation for the
+              management plugin</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_management_agent</th></tr><tr><td>
+            When installing the management plugin on <em>some</em>
+            of the nodes in a cluster, you must install
+            <span class="code ">rabbitmq_management_agent</span>
+            on <em>all</em> of the nodes in the cluster. You can install the
+            full management plugin on as many of the nodes as you
+            want.
+          </td></tr>
+
+          <tr><th>rabbitmq_mqtt</th></tr><tr><td>
+            An adapter implementing the MQTT 3.1 protocol.
+            <ul>
+              <li><a href="mqtt.html">Documentation for the MQTT plugin</a></li>
+              <li><a href="http://www.rabbitmq.com/blog/2012/09/12/mqtt-adapter/">Blog post on the plugin</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_shovel</th></tr><tr><td>
+            A plug-in for RabbitMQ that shovels messages from a queue on
+            one broker to an exchange on another broker.
+            <ul>
+              <li><a href="shovel.html">Documentation for the shovel plugin</a></li>
+              <li><a href="https://github.com/rabbitinaction/sourcecode/blob/master/configs/rabbitmq/rabbitmq.config.shovel">A working Shovel configuration</a></li>
+            </ul>
+          </td></tr>
+
+          <tr><th>rabbitmq_shovel_management</th></tr><tr><td>
+            Shows shovel status in the management API and UI. See the
+            plugin <a href="http://hg.rabbitmq.com/rabbitmq-shovel-management/file/rabbitmq_v3_5_7/README">README for this plugin</a>.
+            Only of use when using <span class="code ">rabbitmq_shovel</span> in
+            conjunction with <span class="code ">rabbitmq_management</span>. In a
+            heterogenous cluster this should be installed on the same
+            nodes as <span class="code ">rabbitmq_management</span>.
+          </td></tr>
+
+          <tr><th>rabbitmq_stomp</th></tr><tr><td>
+            A gateway for exposing AMQP functionality via
+            the <a href="http://stomp.github.com">STOMP protocol</a>.
+            <ul>
+              <li><a href="stomp.html">Documentation for the STOMP plugin</a><br /></li>
+              <li><a href="http://stomp.github.com/implementations.html">Details on clients and servers supporting STOMP</a></li>
+            </ul>
+          </td></tr>
+        </table>
+      </div>
+
+      <div class="docSection"><a name="experimental" id="experimental"></a>
+        <h2 class="docHeading">Experimental Plugins</h2>
+        <p>
+          Currently, all plugins below are <em>experimental</em>. This
+          means we make no claims about their fitness for purpose or
+          stability, though they are in general under active
+          development.
+        </p>
+
+        <table class="plugins">
+          <tr><th>rabbitmq_management_visualiser</th></tr><tr><td>
+            Broker topology visualiser plugin which is itself a plugin
+            to the management plugin. Adds a <i>Visualiser</i> tab to
+            the management web interface, which then flexibly and
+            interactively displays channels, queues and exchanges, and
+            the links between them.
+          </td></tr>
+
+          <tr><th>rabbitmq_tracing</th></tr><tr><td>
+            Adds message tracing to the management plugin. Logs
+            messages from the <a href="firehose.html">firehose</a> in
+            a couple of formats.
+          </td></tr>
+
+          <tr><th>rabbitmq_web_stomp</th></tr><tr><td>
+            A bridge exposing <span class="code ">rabbitmq_stomp</span> to web
+            browsers using WebSockets, using the WebSockets emulation
+            / compatibility
+            layer <a href="http://sockjs.org">SockJS</a>.
+            <ul>
+              <li><a href="web-stomp.html">Documentation for the
+              web-stomp plugin</a></li>
+            </ul>
+           </td></tr>
+
+          <tr><th>rabbitmq_web_stomp_examples</th></tr><tr><td>
+            Adds some basic examples to
+            <span class="code ">rabbitmq_web_stomp</span>: a simple "echo" service
+            and a basic canvas-based collaboration tool.
+          </td></tr>
+
+          <tr><th>rabbitmq_amqp1_0</th></tr><tr><td>
+            An implementation of the AMQP 1.0 protocol.
+            <ul>
+              <li><a href="http://hg.rabbitmq.com/rabbitmq-amqp1.0/file/rabbitmq_v3_5_7/README.md">README for this plugin</a></li>
+            </ul>
+          </td></tr>
+        </table>
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_5_7/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_5_7/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_5_7/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_5_7/management.html">Management plugin</a></li>
+       <li><a href="/v3_5_7/federation.html">Federation plugin</a></li>
+       <li><a href="/v3_5_7/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v3_5_7/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_5_7/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_5_7/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_5_7/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_5_7/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/v3_5_7/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_5_7/news.html">News</a></li>
+     <li><a href="/v3_5_7/protocol.html">Protocol</a></li>
+     <li><a href="/v3_5_7/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_5_7/build.html">Building</a></li>
+     
+     <li><a href="/v3_5_7/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#overview"></a></li><li><a href="#maintained">Supported Plugins</a></li><li><a href="#experimental">Experimental Plugins</a></li></ul></div><div id="related-links"><h4>Related Links</h4><ul><li><a href="/v3_5_7/community-plugins.html">Community Plugins</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_0_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_0_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_0_x/favicon.ico" /><link rel="stylesheet" href="/v3_0_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_0_x/js/site.js"></script><script type="text/javascript" src="/v3_0_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Java AMQP Client Library Build Instructions</title>
+  	
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_0_x/"><img src="/v3_0_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v3_0_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_0_x/download.html">Installation</a></li><li><a href="/v3_0_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_0_x/getstarted.html">Tutorials</a></li><li><a href="/v3_0_x/services.html">Services</a></li><li><a href="/v3_0_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Java AMQP Client Library Build Instructions</h1>
+      <p class="intro">
+	This section describes the process for obtaining a copy of the
+	RabbitMQ Java AMQP client source code, as well as instructions for building the
+	Java client from source.
+      </p>
+
+      <div class="docSection"><a name="obtaining" id="obtaining"></a>
+	<h2 class="docHeading">Obtaining the source</h2>
+
+	<br />
+	<ul>
+	  <li>
+	    Either download a released source code distribution from
+	    the <a href="java-client.html">download page</a>, or
+	  </li>
+
+	  <li>Check the code out directly from <a href="mercurial.html">our mercurial repositories</a>:
+	    <pre class="sourcecode">$ hg clone http://hg.rabbitmq.com/rabbitmq-codegen
+$ hg clone http://hg.rabbitmq.com/rabbitmq-java-client
+$ cd rabbitmq-java-client
+$ ant dist</pre>
+	  </li>
+	</ul>
+
+	<p>
+	  If you choose to check the code out using mercurial, be
+	  aware that the code-generation module is a dependency of
+	  the Java client library. If you're  working with a released
+	  source code distribution, though, the code-generation module is included.
+	</p>
+      </div>
+
+      <div class="docSection"><a name="prerequisites" id="prerequisites"></a>
+	<h2 class="docHeading">Required Libraries and Tools</h2>
+
+	<p>
+	  In order to build RabbitMQ Java AMQP client library, you will need a few tools.
+	</p>
+
+	<p>
+	  The Java client libraries requires a recent version of <a href="http://www.python.org/download/">Python</a>  and
+	  <a href="http://pypi.python.org/pypi/simplejson">simplejson.py</a>
+	  (an implementation of a <a href="http://json.org">JSON</a>
+	  reader and writer in Python), for generating AMQP framing code.
+          simplejson.py is included as a standard json library in the Python
+          core since 2.6 release. 
+	</p>
+
+	<p>
+	  Additionally, for building the Java client libraries, you will need
+	</p>
+
+	<ul class="compact">
+	  <li>
+	    a <a href="http://java.sun.com/javase/downloads/index.jsp">Java
+	    compiler</a>, for Java language version 1.5 or newer
+	  </li>
+
+	  <li>
+	    <a href="http://ant.apache.org/">Ant</a>, version 1.6 or
+	    newer, including the optional <span class="code ">ant-trax.jar</span>
+	    (if you download ant from the above then this is included;
+	    if you are using the <span class="code ">ant</span> Debian/Ubuntu package then
+	    you also need to install the <span class="code ">ant-optional</span>
+	    package).
+	  </li>
+	</ul>
+
+      </div>
+
+	<div class="docSection"><a name="building-java-client" id="building-java-client"></a>
+	  <h2 class="docHeading">Building the Java client libraries</h2>
+
+	  <p>
+	    Ensure <span class="code ">JAVA_HOME</span> is correctly set. Change to
+	    the <span class="code ">rabbitmq-java-client</span> directory and type
+	    <span class="code ">ant</span>.
+	  </p>
+
+	  <p>
+	    Other interesting <span class="code ">build.xml</span> targets include
+	  </p>
+
+	  <p>
+	    <dl>
+	      <dt>build</dt>
+	      <dd>
+		    The default target. Builds the client library classes
+		    into <span class="code ">build/classes</span>.
+	      </dd>
+
+	      <dt>clean</dt>
+	      <dd>
+	        Removes the entire <span class="code ">build</span> directory,
+	        including compiled classes, built jar files, and any
+	        distributions placed under <span class="code ">build/dist</span>.
+	      </dd>
+
+	      <dt>jar</dt>
+	      <dd>
+	        Builds a jar file from the client library classes into
+	        <span class="code ">build/lib</span>.
+	      </dd>
+
+	      <dt>dist</dt>
+	      <dd>
+	        Constructs a directory, by default <span class="code ">build/dist</span>,
+	        containing the RabbitMQ Java AMQP client jar files as well
+	        as all the libraries the AMQP client depends on from
+	        <span class="code ">lib</span>. The distribution output directory can be
+	        overridden by setting the Ant property <span class="code ">dist.out</span>
+	        to a new location:
+	        <p>
+	          <span class="code ">ant -Ddist.out=/some/place/to/put/a/distribution dist</span>
+	        </p>
+	      </dd>
+	    </dl>
+	  </p>
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_0_x/features.html">Features</a></li>
+     <li><a href="/v3_0_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_0_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_0_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_0_x/news.html">News</a></li>
+     <li><a href="/v3_0_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_0_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_0_x/build.html" class="selected">Building</a><ul>
+       <li><a href="/v3_0_x/build-server.html">Building the Server</a></li>
+       <li><a href="/v3_0_x/build-java-client.html" class="selected">Building the Java Client</a></li>
+       <li><a href="/v3_0_x/build-dotnet-client.html">Building the .NET Client</a></li>
+       <li><a href="/v3_0_x/build-erlang-client.html">Building the Erlang Client</a></li>
+       <li><a href="/v3_0_x/mercurial.html">Our use of Mercurial</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_0_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_0_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_0_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

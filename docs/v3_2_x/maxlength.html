@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_2_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_2_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_2_x/favicon.ico" /><link rel="stylesheet" href="/v3_2_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_2_x/js/site.js"></script><script type="text/javascript" src="/v3_2_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Queue Length Limit</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_2_x/"><img src="/v3_2_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_2_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_2_x/features.html">Features</a></li><li><a href="/v3_2_x/download.html">Installation</a></li><li><a href="/v3_2_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_2_x/getstarted.html">Tutorials</a></li><li><a href="/v3_2_x/services.html">Services</a></li><li><a href="/v3_2_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Queue Length Limit</h1>
+    <p>
+      The maximum length of a queue can be limited to a set number
+      of messages.
+    </p>
+
+    <p>
+      For any given queue, the maximum length can be defined by
+      clients using the queue's arguments, or in the server using <a href="parameters.html#policies">policies</a>. In the case where
+      both policy and arguments specify a maximum length, the minimum
+      of the two values is applied.
+    </p>
+
+    <h3>Configuration using arguments</h3>
+    <p>
+      Maximum length can be set by supplying the
+      <span class="code ">x-max-length</span> queue declaration argument with a
+      non-negative integer value. Queue length is a measure that takes
+      into account ready messages, ignoring unacknowledged messages
+      and message size. Messages will be dropped or dead-lettered from
+      the front of the queue to make room for new messages once the
+      limit is reached.
+    </p>
+    <p>
+      This example in Java declares a queue with a maximum length
+      of 10 messages:
+    </p>
+    <pre class="sourcecode">
+Map&lt;String, Object&gt; args = new HashMap&lt;String, Object&gt;();
+args.put("x-max-length", 10);
+channel.queueDeclare("myqueue", false, false, false, args);</pre>
+
+      <h3>Configuration using policy</h3>
+
+      <p>
+        To specify a maximum length using policy, add the key
+        "max-length" to a policy definition. For example:
+      </p>
+
+      <table>
+        <tr>
+          <th>rabbitmqctl</th>
+          <td>
+            <pre>rabbitmqctl set_policy Ten "^short$" '{"max-length":10}' --apply-to queues</pre>
+          </td>
+        </tr>
+        <tr>
+          <th>rabbitmqctl (Windows)</th>
+          <td>
+            <pre>rabbitmqctl set_policy Ten "^short$" "{""max-length"":10}" --apply-to queues</pre>
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        This applies a maximum length of 10 to the queue called <span class="code ">short</span>.
+      </p>
+
+      <p>
+        Policies can also be defined using the management plugin, see
+        the <a href="parameters.html#policies">policy
+        documentation</a> for more details.
+      </p>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_2_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_2_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_2_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_2_x/news.html">News</a></li>
+     <li><a href="/v3_2_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_2_x/extensions.html" class="selected">Our Extensions</a><ul>
+       <li><a href="/v3_2_x/confirms.html">Confirms</a></li>
+       <li><a href="/v3_2_x/consumer-cancel.html">Consumer Cancel</a></li>
+       <li><a href="/v3_2_x/consumer-priority.html">Consumer Priorities</a></li>
+       <li><a href="/v3_2_x/connection-blocked.html">Blocked Connections</a></li>
+       <li><a href="/v3_2_x/nack.html">basic.nack</a></li>
+       <li><a href="/v3_2_x/e2e.html">e2e bindings</a></li>
+       <li><a href="/v3_2_x/ae.html">Alternate Exchanges</a></li>
+       <li><a href="/v3_2_x/sender-selected.html">Sender Routing</a></li>
+       <li><a href="/v3_2_x/ttl.html">TTL</a></li>
+       <li><a href="/v3_2_x/dlx.html">Dead Lettering</a></li>
+       <li><a href="/v3_2_x/maxlength.html" class="selected">Length Limit</a></li>
+       <li><a href="/v3_2_x/validated-user-id.html">Validated User ID</a></li>
+       <li><a href="/v3_2_x/auth-notification.html">Auth Failure</a></li>
+       <li><a href="/v3_2_x/undeprecated.html">Undeprecation</a></li>
+     </ul></li>
+     <li><a href="/v3_2_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_2_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_2_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_2_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

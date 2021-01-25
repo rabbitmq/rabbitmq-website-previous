@@ -1,0 +1,555 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - RabbitMQ tutorial - "Hello world!" </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html">Installation</a></li><li><a href="/v3_4_x/documentation.html">Documentation</a></li><li><a href="/v3_4_x/getstarted.html" class="selected">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div>
+<div id="sidebar" class="tutorial-one">
+   <ul id="tutorials" xml:base="site/tutorials/tutorials-menu.xml.inc">
+
+        <li id="tutorial-one">
+          <h2><span class="tute-num">1</span> <a href="/v3_4_x/tutorials/tutorial-one-python.html">"Hello World!"</a></h2>
+          <p>
+            The simplest thing that does <em>something</em>
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-one.png" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-one-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-one-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-two">
+          <h2><span class="tute-num">2</span> <a href="/v3_4_x/tutorials/tutorial-two-python.html">Work queues</a></h2>
+          <p>
+            Distributing tasks among workers
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-two.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-two-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-two-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-three">
+          <h2><span class="tute-num">3</span> <a href="/v3_4_x/tutorials/tutorial-three-python.html">Publish/Subscribe</a></h2>
+          <p>
+            Sending messages to many consumers at once
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-three.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-three-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-three-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-four">
+          <h2><span class="tute-num">4</span> <a href="/v3_4_x/tutorials/tutorial-four-python.html">Routing</a></h2>
+          <p>
+            Receiving messages selectively
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-four.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-four-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-four-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-five">
+          <h2><span class="tute-num">5</span> <a href="/v3_4_x/tutorials/tutorial-five-python.html">Topics</a></h2>
+          <p>
+            Receiving messages based on a pattern
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-five.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-five-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-five-dotnet.html">C#</a>
+          </p>
+        </li>
+
+        <li id="tutorial-six">
+          <h2><span class="tute-num">6</span> <a href="/v3_4_x/tutorials/tutorial-six-python.html">RPC</a></h2>
+          <p>
+            Remote procedure call implementation
+          </p>
+          <p><img src="/v3_4_x/img/tutorials/python-six.png" height="50" width="180" /></p>
+          <p>
+          <a href="/v3_4_x/tutorials/tutorial-six-python.html">Python</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-java.html">Java</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-ruby.html">Ruby</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-php.html">PHP</a>
+          |
+          <a href="/v3_4_x/tutorials/tutorial-six-dotnet.html">C#</a>
+          </p>
+        </li>
+      </ul>
+</div>
+
+<div id="tutorial"><h2>Introduction</h2>
+<p><div class="aside" xml:base="site/tutorials/tutorials-help.xml.inc">
+    <h3>Prerequisites</h3>
+    <p>
+      This tutorial assumes RabbitMQ is <a href="/v3_4_x/download.html">installed</a> and running
+      on <span class="code ">localhost</span> on standard port (<span class="code ">5672</span>). In case you use
+      a different host, port or credentials, connections settings would require adjusting.
+    </p>
+
+    <h3>Where to get help</h3>
+    <p>
+        If you're having trouble going through this tutorial you can
+        <a href="https://groups.google.com/forum/#!forum/rabbitmq-users">contact us</a> through the mailing list.
+    </p>
+  </div></p>
+<p>RabbitMQ is a message broker. The principal idea is pretty simple: it accepts
+and forwards messages. You can think about it as a post office: when you send
+mail to the post box you're pretty sure that Mr. Postman will eventually
+deliver the mail to your recipient. Using this metaphor RabbitMQ is a post box,
+a post office and a postman.</p>
+<p>The major difference between RabbitMQ and the post office is the fact that it
+doesn't deal with paper, instead it accepts, stores and forwards binary
+blobs of data ‒ <em>messages</em>.</p>
+<p>RabbitMQ, and messaging in general, uses some jargon.</p>
+<ul>
+<li>
+<p><em>Producing</em> means nothing more than sending. A program that sends messages
+   is a <em>producer</em>. We'll draw it like that, with "P":
+   <div class="diagram">
+     <img src="/v3_4_x/img/tutorials/producer.png" height="50" />
+     <div class="diagram_source">
+     digraph {
+       bgcolor=transparent;
+       truecolor=true;
+       rankdir=LR;
+       node [style="filled"];
+       //
+       P1 [label="P", fillcolor="#00ffff"];
+     }
+     </div>
+   </div></p>
+</li>
+<li>
+<p><em>A queue</em> is the name for a mailbox. It lives inside
+   RabbitMQ. Although messages flow through RabbitMQ and your
+   applications, they can be stored only inside a <em>queue</em>. A <em>queue</em>
+   is not bound by any limits, it can store as many messages as you
+   like ‒ it's essentially an infinite buffer. Many <em>producers</em> can send
+   messages that go to one queue, many <em>consumers</em> can try to
+   receive data from one <em>queue</em>. A queue will be drawn as like that, with
+   its name above it:
+   <div class="diagram">
+     <img src="/v3_4_x/img/tutorials/queue.png" height="90" />
+     <div class="diagram_source">
+     digraph {
+       bgcolor=transparent;
+       truecolor=true;
+       rankdir=LR;
+       node [style="filled"];
+       //
+       subgraph cluster_Q1 {
+         label="queue_name";
+         color=transparent;
+         Q1 [label="{||||}", fillcolor="red", shape="record"];
+       };
+     }
+     </div>
+   </div></p>
+</li>
+<li>
+<p><em>Consuming</em> has a similar meaning to receiving. A <em>consumer</em> is a program
+   that mostly waits to receive messages. On our drawings it's shown with "C":
+   <div class="diagram">
+     <img src="/v3_4_x/img/tutorials/consumer.png" height="50" />
+     <div class="diagram_source">
+     digraph {
+       bgcolor=transparent;
+       truecolor=true;
+       rankdir=LR;
+       node [style="filled"];
+       //
+       C1 [label="C", fillcolor="#33ccff"];
+     }
+     </div>
+   </div></p>
+</li>
+</ul>
+<p>Note that the producer, consumer, and broker do not have to reside on
+the same machine; indeed in most applications they don't.</p>
+<h2>Hello World!</h2>
+<h3>(using the pika 0.9.8 Python client)</h3>
+<p>Our "Hello world" won't be too complex ‒ let's send a message, receive
+it and print it on the screen. To do so we need two programs: one that
+sends a message and one that receives and prints it.</p>
+<p>Our overall design will look like:</p>
+<div class="diagram">
+  <img src="/v3_4_x/img/tutorials/python-one-overall.png" height="100" />
+  <div class="diagram_source">
+digraph G {
+      bgcolor=transparent;
+      truecolor=true;
+      rankdir=LR;
+      node [style="filled"];
+      //
+      P1 [label="P", fillcolor="#00ffff"];
+      subgraph cluster_Q1 {
+        label="hello";
+    color=transparent;
+        Q1 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      C1 [label="C", fillcolor="#33ccff"];
+      //
+      P1 -&gt; Q1 -&gt; C1;
+}
+</div>
+</div>
+
+<p>Producer sends messages to the "hello" queue. The consumer receives
+messages from that queue.</p>
+<blockquote>
+<h4>RabbitMQ libraries</h4>
+<p>RabbitMQ speaks a protocol called AMQP. To use Rabbit you'll need a library
+that understands the same protocol as Rabbit. There is a choice of libraries
+for almost every programming language. For python it's no different and there
+are a bunch of libraries to choose from:</p>
+<ul>
+<li><a href="http://barryp.org/software/py-amqplib/">py-amqplib</a></li>
+<li><a href="https://launchpad.net/txamqp">txAMQP</a></li>
+<li><a href="http://github.com/pika/pika">pika</a></li>
+</ul>
+<p>In this tutorial series we're going to use <span class="code ">pika</span>. To install it
+you can use the <a href="http://pip.openplans.org/"><span class="code ">pip</span></a> package management tool:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo pip install <span class="nv">pika</span><span class="o">==</span>0.9.8
+</pre></div>
+
+
+<p>The installation depends on <span class="code ">pip</span> and <span class="code ">git-core</span> packages, you may
+need to install them first.</p>
+<ul>
+<li>
+<p>On Ubuntu:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo apt-get install python-pip git-core
+</pre></div>
+
+
+</li>
+<li>
+<p>On Debian:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo apt-get install python-setuptools git-core
+<span class="nv">$ </span>sudo easy_install pip
+</pre></div>
+
+
+</li>
+<li>
+<p>On Windows:
+To install easy_install, run the MS Windows Installer for <a href="http://pypi.python.org/pypi/setuptools"><span class="code ">setuptools</span></a></p>
+<div class="highlight"><pre>&gt; easy_install pip
+&gt; pip install <span class="nv">pika</span><span class="o">==</span>0.9.8
+</pre></div>
+
+
+</li>
+</ul>
+</blockquote>
+<h3>Sending</h3>
+<div class="diagram">
+  <img src="/v3_4_x/img/tutorials/sending.png" height="100" />
+  <div class="diagram_source">
+  digraph {
+      bgcolor=transparent;
+      truecolor=true;
+      rankdir=LR;
+      node [style="filled"];
+      //
+      P1 [label="P", fillcolor="#00ffff"];
+      subgraph cluster_Q1 {
+        label="hello";
+        color=transparent;
+        Q1 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      //
+      P1 -&gt; Q1;
+  }
+  </div>
+</div>
+
+<p>Our first program <span class="code ">send.py</span> will send a single message to the queue.
+The first thing we need to do is to establish a connection with
+RabbitMQ server.</p>
+<div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">pika</span>
+
+<span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">ConnectionParameters</span><span class="p">(</span>
+               <span class="s">'localhost'</span><span class="p">))</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">channel</span><span class="p">()</span>
+</pre></div>
+
+
+<p>We're connected now, to a broker on the local machine - hence the
+<em>localhost</em>. If we wanted to connect to a broker on a different
+machine we'd simply specify its name or IP address here.</p>
+<p>Next, before sending we need to make sure the recipient queue
+exists. If we send a message to non-existing location, RabbitMQ will
+just trash the message. Let's create a queue to which the message will
+be delivered, let's name it <em>hello</em>:</p>
+<div class="highlight"><pre><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="s">'hello'</span><span class="p">)</span>
+</pre></div>
+
+
+<p>At that point we're ready to send a message. Our first message will
+just contain a string <em>Hello World!</em> and we want to send it to our
+<em>hello</em> queue.</p>
+<p>In RabbitMQ a message can never be sent directly to the queue, it always
+needs to go through an <em>exchange</em>. But let's not get dragged down by the
+details ‒ you can read more about <em>exchanges</em> in <a href="tutorial-three-python.html">the third part of this
+tutorial</a>. All we need to know now is how to use a default exchange
+identified by an empty string. This exchange is special ‒ it
+allows us to specify exactly to which queue the message should go.
+The queue name needs to be specified in the <span class="code ">routing_key</span> parameter:</p>
+<div class="highlight"><pre><span class="n">channel</span><span class="o">.</span><span class="n">basic_publish</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="s">''</span><span class="p">,</span>
+                      <span class="n">routing_key</span><span class="o">=</span><span class="s">'hello'</span><span class="p">,</span>
+                      <span class="n">body</span><span class="o">=</span><span class="s">'Hello World!'</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">" [x] Sent 'Hello World!'"</span>
+</pre></div>
+
+
+<p>Before exiting the program we need to make sure the network buffers
+were flushed and our message was actually delivered to RabbitMQ. We
+can do it by gently closing the connection.</p>
+<div class="highlight"><pre><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+
+<blockquote>
+<h4>Sending doesn't work!</h4>
+<p>If this is your first time using RabbitMQ and you don't see the "Sent"
+message then you may be left scratching your head wondering what could
+be wrong. Maybe the broker was started without enough free disk space
+(by default it needs at least 1Gb free) and is therefore refusing to
+accept messages. Check the broker logfile to confirm and reduce the
+limit if necessary. The <a href="http://www.rabbitmq.com/configure.html#config-items">configuration
+file documentation</a> will show you how to set <span class="code ">disk_free_limit</span>.</p>
+</blockquote>
+<h3>Receiving</h3>
+<div class="diagram">
+  <img src="/v3_4_x/img/tutorials/receiving.png" height="100" />
+  <div class="diagram_source">
+  digraph {
+      bgcolor=transparent;
+      truecolor=true;
+      rankdir=LR;
+      node [style="filled"];
+      //
+      subgraph cluster_Q1 {
+        label="hello";
+    color=transparent;
+    Q1 [label="{||||}", fillcolor="red", shape="record"];
+      };
+      C1 [label="C", fillcolor="#33ccff"];
+      //
+      Q1 -&gt; C1;
+  }
+  </div>
+</div>
+
+<p>Our second program <span class="code ">receive.py</span> will receive messages from the queue and print
+them on the screen.</p>
+<p>Again, first we need to connect to RabbitMQ server. The code
+responsible for connecting to Rabbit is the same as previously.</p>
+<p>The next step, just like before, is to make sure that the queue
+exists. Creating a queue using <span class="code ">queue_declare</span> is idempotent ‒ we
+can run the command as many times as we like, and only one will be
+created.</p>
+<div class="highlight"><pre><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="s">'hello'</span><span class="p">)</span>
+</pre></div>
+
+
+<p>You may ask why we declare the queue again ‒ we have already declared it
+in our previous code. We could avoid that if we were sure
+that the queue already exists. For example if <span class="code ">send.py</span> program was
+run before. But we're not yet sure which
+program to run first. In such cases it's a good practice to repeat
+declaring the queue in both programs.</p>
+<blockquote>
+<h4>Listing queues</h4>
+<p>You may wish to see what queues RabbitMQ has and how many
+messages are in them. You can do it (as a privileged user) using the <span class="code ">rabbitmqctl</span> tool:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo rabbitmqctl list_queues
+Listing queues ...
+hello    0
+...done.
+</pre></div>
+
+
+<p>(omit sudo on Windows)</p>
+</blockquote>
+<p>Receiving messages from the queue is more complex. It works by subscribing
+a <span class="code ">callback</span> function to a queue. Whenever we receive
+a message, this <span class="code ">callback</span> function is called by the Pika library.
+In our case this function will print on the screen the contents of
+the message.</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">" [x] Received </span><span class="si">%r</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">body</span><span class="p">,)</span>
+</pre></div>
+
+
+<p>Next, we need to tell RabbitMQ that this particular callback function should
+receive messages from our <em>hello</em> queue:</p>
+<div class="highlight"><pre><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span>
+                      <span class="n">queue</span><span class="o">=</span><span class="s">'hello'</span><span class="p">,</span>
+                      <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+
+<p>For that command to succeed we must be sure that a queue which we want
+to subscribe to exists. Fortunately we're confident about that ‒ we've
+created a queue above ‒ using <span class="code ">queue_declare</span>.</p>
+<p>The <span class="code ">no_ack</span> parameter will be described <a href="tutorial-two-python.html">later on</a>.</p>
+<p>And finally, we enter a never-ending loop that waits for data and runs callbacks
+whenever necessary.</p>
+<div class="highlight"><pre><span class="k">print</span> <span class="s">' [*] Waiting for messages. To exit press CTRL+C'</span>
+<span class="n">channel</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span>
+</pre></div>
+
+
+<h3>Putting it all together</h3>
+<p>Full code for <span class="code ">send.py</span>:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">pika</span>
+
+<span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">ConnectionParameters</span><span class="p">(</span>
+        <span class="n">host</span><span class="o">=</span><span class="s">'localhost'</span><span class="p">))</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">channel</span><span class="p">()</span>
+
+<span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="s">'hello'</span><span class="p">)</span>
+
+<span class="n">channel</span><span class="o">.</span><span class="n">basic_publish</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="s">''</span><span class="p">,</span>
+                      <span class="n">routing_key</span><span class="o">=</span><span class="s">'hello'</span><span class="p">,</span>
+                      <span class="n">body</span><span class="o">=</span><span class="s">'Hello World!'</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">" [x] Sent 'Hello World!'"</span>
+<span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</td></tr></table>
+
+<p><a href="http://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/send.py">(send.py source)</a></p>
+<p>Full <span class="code ">receive.py</span> code:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">pika</span>
+
+<span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">ConnectionParameters</span><span class="p">(</span>
+        <span class="n">host</span><span class="o">=</span><span class="s">'localhost'</span><span class="p">))</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">channel</span><span class="p">()</span>
+
+<span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="s">'hello'</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s">' [*] Waiting for messages. To exit press CTRL+C'</span>
+
+<span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">" [x] Received </span><span class="si">%r</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">body</span><span class="p">,)</span>
+
+<span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span>
+                      <span class="n">queue</span><span class="o">=</span><span class="s">'hello'</span><span class="p">,</span>
+                      <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">channel</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span>
+</pre></div>
+</td></tr></table>
+
+<p><a href="http://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/receive.py">(receive.py source)</a></p>
+<p>Now we can try out our programs in a terminal. First, let's send a
+message using our <span class="code ">send.py</span> program:</p>
+<div class="highlight"><pre> <span class="nv">$ </span>python send.py
+ <span class="o">[</span>x<span class="o">]</span> Sent <span class="s1">'Hello World!'</span>
+</pre></div>
+
+
+<p>The producer program <span class="code ">send.py</span> will stop after every run. Let's receive it:</p>
+<div class="highlight"><pre> <span class="nv">$ </span>python receive.py
+ <span class="o">[</span>*<span class="o">]</span> Waiting <span class="k">for </span>messages. To <span class="nb">exit </span>press CTRL+C
+ <span class="o">[</span>x<span class="o">]</span> Received <span class="s1">'Hello World!'</span>
+</pre></div>
+
+
+<p>Hurray! We were able to send our first message through RabbitMQ. As you might
+have noticed, the <span class="code ">receive.py</span> program doesn't exit. It will stay ready to
+receive further messages, and may be interrupted with Ctrl-C.</p>
+<p>Try to run <span class="code ">send.py</span> again in a new terminal.</p>
+<p>We've learned how to send and receive a message from a named
+queue. It's time to move on to <a href="tutorial-two-python.html">part 2</a>
+and build a simple <em>work queue</em>.</p></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

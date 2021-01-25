@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_3_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_3_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_3_x/favicon.ico" /><link rel="stylesheet" href="/v3_3_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_3_x/js/site.js"></script><script type="text/javascript" src="/v3_3_x/js/ga-bootstrap.js"></script><title>RabbitMQ - rabbitmq-echopid.bat manual page</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_3_x/"><img src="/v3_3_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_3_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_3_x/features.html">Features</a></li><li><a href="/v3_3_x/download.html">Installation</a></li><li><a href="/v3_3_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_3_x/getstarted.html">Tutorials</a></li><li><a href="/v3_3_x/services.html">Services</a></li><li><a href="/v3_3_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>rabbitmq-echopid.bat manual page</h1>
+    <p>
+          This is the documentation for
+          <span class="code ">rabbitmq-echopid.bat</span>.
+        </p>
+    <p>
+         For more general documentation, please see the
+         <a href="../admin-guide.html">administrator's guide</a>.
+    </p>
+    <div xml:lang="en" class="refentry" title="rabbitmq-echopid.bat" lang="en">
+      <a id="idp14235864"></a>
+      <div class="titlepage"></div>
+      <div class="docSection"><a name="Name" id="Name"></a>
+        <h2 class="docHeading">Name</h2>
+        <p>rabbitmq-echopid.bat — return the process id of the Erlang runtime hosting RabbitMQ</p>
+      </div>
+      <div class="docSection"><a name="Synopsis" id="Synopsis"></a>
+        <h2 class="docHeading">Synopsis</h2>
+        <div class="cmdsynopsis" id="rabbitmq-echopid.bat">
+          <p><span class="code command">rabbitmq-echopid.bat</span>  {sname}</p>
+        </div>
+      </div>
+      <div class="docSection"><a name="Description" id="Description"></a>
+        <a id="idp14930632"></a>
+        <h2 class="docHeading">Description</h2>
+        <p>
+           RabbitMQ is an implementation of AMQP, the emerging
+           standard for high performance enterprise messaging. The
+           RabbitMQ server is a robust and scalable implementation of
+           an AMQP broker.
+        </p>
+        <p>
+          Running <span class="command"><strong>rabbitmq-echopid</strong></span> will attempt to
+          discover and echo the process id (PID) of the Erlang runtime
+          process (erl.exe) that is hosting RabbitMQ. To allow erl.exe
+          time to start up and load RabbitMQ, the script will wait for
+          ten seconds before timing out if a suitable PID cannot be
+          found.
+        </p>
+        <p>
+          If a PID is discovered, the script will echo it to stdout
+          before exiting with a ERRORLEVEL of 0. If no PID is
+          discovered before the timeout, nothing is written to stdout
+          and the script exits setting ERRORLEVEL to 1.
+        </p>
+        <p>
+          Note that this script only exists on Windows due to the need
+          to wait for erl.exe and possibly time-out. To obtain the PID
+          on Unix set RABBITMQ_PID_FILE before starting
+          rabbitmq-server and do not use "-detached".
+        </p>
+      </div>
+      <div class="docSection"><a name="Options" id="Options"></a>
+        <a id="idp14237064"></a>
+        <h2 class="docHeading">Options</h2>
+        <div class="variablelist">
+          <dl>
+            <dt>
+              <span class="term">
+                <div class="cmdsynopsis" id="">
+                  <p>{sname}</p>
+                </div>
+              </span>
+            </dt>
+            <dd>
+              <p class="usage">
+The short-name form of the RabbitMQ node name.
+            </p>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_3_x/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_3_x/configure.html">Configuration</a></li>
+       <li><a href="/v3_3_x/ssl.html">SSL Support</a></li>
+       <li><a href="/v3_3_x/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_3_x/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_3_x/clustering.html">Clustering</a></li>
+       <li><a href="/v3_3_x/ha.html">High Availability</a></li>
+       <li><a href="/v3_3_x/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_3_x/access-control.html">Access Control</a></li>
+       <li><a href="/v3_3_x/authentication.html">SASL Authentication</a></li>
+       <li><a href="/v3_3_x/alarms.html">Alarms</a></li>
+       <li><a href="/v3_3_x/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_3_x/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_3_x/manpages.html" class="selected">Manual Pages</a><ul>
+         <li><a href="/v3_3_x/man/rabbitmqctl.1.man.html">rabbitmqctl</a></li>
+         <li><a href="/v3_3_x/man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a></li>
+         <li><a href="/v3_3_x/man/rabbitmq-server.1.man.html">rabbitmq-server</a></li>
+         <li><a href="/v3_3_x/man/rabbitmq-service.man.html">rabbitmq-service</a></li>
+         <li><a href="/v3_3_x/man/rabbitmq-echopid.man.html" class="selected">rabbitmq-echopid</a></li>
+         <li><a href="/v3_3_x/man/rabbitmq-env.conf.5.man.html">rabbitmq-env.conf</a></li>
+       </ul></li>
+       <li><a href="/v3_3_x/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_3_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_3_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_3_x/news.html">News</a></li>
+     <li><a href="/v3_3_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_3_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_3_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_3_x/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#Name">Name</a></li><li><a href="#Synopsis">Synopsis</a></li><li><a href="#Description">Description</a></li><li><a href="#Options">Options</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_3_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_3_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

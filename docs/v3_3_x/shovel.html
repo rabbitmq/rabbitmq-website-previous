@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_3_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_3_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_3_x/favicon.ico" /><link rel="stylesheet" href="/v3_3_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_3_x/js/site.js"></script><script type="text/javascript" src="/v3_3_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Shovel plugin</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_3_x/"><img src="/v3_3_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_3_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_3_x/features.html">Features</a></li><li><a href="/v3_3_x/download.html">Installation</a></li><li><a href="/v3_3_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_3_x/getstarted.html">Tutorials</a></li><li><a href="/v3_3_x/services.html">Services</a></li><li><a href="/v3_3_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Shovel plugin</h1>
+    <p>
+      The <em>Shovel plugin</em> allows you to configure a number of
+      <em>shovel</em>s, which start automatically when the broker
+      starts.
+    </p>
+    <p>
+      The high level goal of a <em>shovel</em> is to reliably and
+      continually take messages from a queue (a <em>source</em>) in one
+      broker and publish them to exchanges in another broker (a
+      <em>destination</em>).
+    </p>
+    <p>
+      The source queue and destination exchanges can be on the same
+      broker or distinct brokers.
+    </p>
+    <p>
+      A shovel behaves like a well-written client application, which
+      connects to its source and destination, reads and writes messages,
+      and copes with connection failures.
+    </p>
+
+    <p>
+      The primary advantages of a shovel are:
+    </p>
+    <dl class="plain">
+      <dt><strong>Loose coupling</strong></dt>
+      <dd>
+        A shovel can move messages between brokers (or clusters) in
+        different administrative domains:
+        <ul class="plain">
+          <li>
+            they may have different users and virtual hosts;
+          </li>
+          <li>
+            they may run on different versions of RabbitMQ and Erlang.
+          </li>
+        </ul>
+      </dd>
+      <dt><strong>WAN-friendly</strong></dt>
+      <dd>
+        The Shovel plugin uses AMQP to communicate between brokers, and
+        is designed to tolerate intermittent connectivity without
+        message loss.
+      </dd>
+      <dt><strong>Highly tailorable</strong></dt>
+      <dd>
+        When a shovel connects (either to the source or the
+        destination) it can be configured to perform any number of
+        explicit methods. For example, the source queue need not exist
+        initially, and can be <em>declared</em> on connect.
+      </dd>
+    </dl>
+
+    <p>
+      A comparison between <em>clustering</em>, <em>federated
+      exchanges</em> and <em>shovels</em> is given on the
+      <a href="distributed.html">Distributed Messaging</a> page.
+    </p>
+
+    <div class="docSection"><a name="what-it-do" id="what-it-do"></a>
+      <h2 class="docHeading">What does it do?</h2>
+      <p>
+        The Shovel plugin defines (and runs) an Erlang client
+        application for each shovel.
+      </p>
+      <p>
+        In essence, a shovel is a simple pump. Each shovel:
+        <ul class="plain">
+          <li>
+            <strong><em>connects</em></strong> to the source broker and
+            the destination broker,
+          </li>
+          <li>
+            <strong><em>consumes</em></strong> messages from the queue,
+          </li>
+          <li>
+            <strong><em>re-publishes</em></strong> each message to the
+            destination broker (using, by default, the original exchange
+            name and routing_key).
+          </li>
+        </ul>
+      </p>
+      <p>
+        The shovel configuration allows each of these processes to be
+        tailored.
+      </p>
+      <dl class="plain">
+        <dt><strong><em>connects</em></strong></dt>
+        <dd>
+          <p>
+            After connection to a source or a destination broker a
+            series of configured AMQP <em>declarations</em> can be
+            issued. Queues, exchanges and bindings can be declared.
+          </p>
+        </dd>
+        <dd>
+          <p>
+            A shovel will attempt to reconnect to a broker if a failure
+            occurs and multiple brokers can be specified for the source and
+            destination so that another broker may be selected (at
+            random) to reconnect to. A reconnection delay can be
+            specified to avoid flooding the network with reconnection
+            attempts, or to prevent reconnection on failure altogether.
+          </p>
+          <p>
+            All configured <em>declarations</em> (for that source or
+            destination) are re-issued upon re-connect.
+          </p>
+        </dd>
+        <dt><strong><em>consumes</em></strong></dt>
+        <dd>
+          <p>
+            The shovel's consumer can acknowledge messages
+            automatically on receipt, after (re-)publication, or after
+            confirmation of its publication.
+          </p>
+        </dd>
+        <dt><strong><em>re-publishes</em></strong></dt>
+        <dd>
+          <p>
+            Both the publish method and the message properties can be
+            modified with explicit parameter values.
+          </p>
+        </dd>
+      </dl>
+    </div>
+
+    <div class="docSection"><a name="getting-started" id="getting-started"></a>
+      <h2 class="docHeading">Getting started</h2>
+      <p>
+        The <em>Shovel plugin</em> is included in the RabbitMQ
+        distribution. To enable it, use
+        <a href="man/rabbitmq-plugins.1.man.html">rabbitmq-plugins</a>:
+      </p>
+<pre class="example">
+  rabbitmq-plugins enable rabbitmq_shovel
+</pre>
+      <p>
+        You may also wish to enable the
+        <span class="code ">rabbitmq_shovel_management</span> plugin (see
+        <a href="#management-status">below</a>).
+      </p>
+
+      <p>
+        There is no requirement to run the shovel on the same broker
+        (or cluster) as its source or destination; the shovel can be
+        entirely separate.
+      </p>
+
+      <p>
+        There are two distinct ways to define
+        shovels: <a href="shovel-static.html">static shovels</a> and
+        <a href="shovel-dynamic.html">dynamic shovels</a>. The
+        differences are as follows:
+      </p>
+
+    <table>
+      <tr>
+        <th><a href="shovel-static.html">Static Shovels</a></th>
+        <th><a href="shovel-dynamic.html">Dynamic Shovels</a></th>
+      </tr>
+      <tr>
+        <td>
+          Defined in the broker <a href="configure.html">configuration file</a>.
+        </td>
+        <td>
+          Defined in the broker's <a href="parameters.html">parameters</a>.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Require a restart of the hosting broker to change.
+        </td>
+        <td>
+          Can be created and deleted at any time.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Slightly more general: any queues, exchanges or bindings can
+          be declared manually at startup.
+        </td>
+        <td>
+          Slightly more opinionated: the queues, exchanges and
+          bindings used by the shovel will be declared automatically.
+        </td>
+      </tr>
+    </table>
+
+    </div>
+
+    <div class="docSection"><a name="clustering" id="clustering"></a>
+      <h2 class="docHeading">Shovels between clusters</h2>
+      <p>
+        It's normally desirable to ensure that shovels are resilient
+        to failure of any node in the source or destination clusters,
+        or the cluster hosting the shovel.
+      </p>
+
+      <p>
+        You can ensure that shovels can fail over to different nodes
+        in the source or destination clusters by specifying multiple
+        source and/or destination URIs for each shovel.
+      </p>
+
+      <p>
+        Dynamic shovels are automatically defined on all nodes of the
+        hosting cluster on which the shovel plugin is enabled. Each
+        shovel will only start on one node (arbitrarily), but will
+        fail over to another node if that one goes down.
+      </p>
+
+      <p>
+        Static shovels should be defined in the configuration file for
+        all nodes of the hosting cluster on which the shovel plugin is
+        enabled. Again each shovel will only start on one node and
+        fail over when needed.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="status" id="status"></a>
+      <h2 class="docHeading">Monitoring shovels</h2>
+      <p>
+        There are two ways of discovering the status of shovels.
+      </p>
+      <div class="docSubsection"><a name="management-status" id="management-status"></a>
+        <h3 class="docHeading">Use shovel management</h3>
+        <p>
+          Shovel status can be reported on the
+          <a href="management.html">Management plugin</a> user interface
+          by enabling the <span class="code ">rabbitmq_shovel_management</span> plugin
+          wherever you have the management plugin enabled.
+        </p>
+        <p>
+          Information about configured shovels will automatically appear
+          in the management API and UI.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="direct-status" id="direct-status"></a>
+        <h3 class="docHeading">Direct query</h3>
+        <p>
+          Shovel status can be obtained by direct query of the Shovel
+          plugin app. Issue the following <span class="code ">rabbitmqctl</span>
+          command:
+        </p>
+<pre class="example">
+  $ rabbitmqctl eval 'rabbit_shovel_status:status().'
+</pre>
+        <p>
+          This calls the <span class="code ">status</span> method in a module of the
+          <span class="code ">rabbitmq_shovel</span> plugin, which will return an
+          Erlang list, with one element for each configured shovel.
+        </p>
+        <p>
+          Each element of the list is a tuple with four fields:
+          <span class="code ">{<em><strong>Name</strong></em>,
+          <em><strong>Type</strong></em>,
+          <em><strong>Status</strong></em>,
+          <em><strong>Timestamp</strong></em>}</span>.
+        </p>
+        <sl>
+          <li>
+            <span class="code "><strong><em>Name</em></strong></span>
+            is the shovel name,
+          </li>
+          <li>
+            <span class="code "><strong><em>Type</em></strong></span>
+            is either <span class="code ">static</span> or <span class="code ">dynamic</span>,
+          </li>
+          <li>
+            <span class="code "><strong><em>Status</em></strong></span>
+            is the current shovel state,
+          </li>
+          <li>
+            and <span class="code "><strong><em>Timestamp</em></strong></span> is the
+            time when the shovel <em>entered</em> this state.
+          </li>
+        </sl>
+        <p>
+          <span class="code "><strong><em>Timestamp</em></strong></span> is a local
+          calendar time of the form
+          <span class="code ">{{YYYY, MM, DD}, {HH, MM, SS}}</span>.
+        </p>
+        <p>
+          <span class="code "><strong><em>Status</em></strong></span> takes one of
+          three forms:
+        </p>
+        <ul>
+          <li>
+            The shovel is starting up, connecting and creating
+            resources:
+<pre class="example">
+  'starting'
+</pre>
+          </li>
+          <li>
+            The shovel is running normally:
+<pre class="example">
+  { 'running', {'source', <em>Source</em>},
+               {'destination', <em>Destination</em>}}:
+</pre>
+            <p>
+              where <span class="code "><em>Source</em></span> and
+              <span class="code "><em>Destination</em></span> terms give the
+              respective connection parameters.
+            </p>
+          </li>
+          <li>
+            The shovel has terminated:
+<pre class="example">
+  {'terminated', <em>Reason</em>}
+</pre>
+              <p>
+                where <span class="code "><em>Reason</em></span> is an Erlang term that
+                indicates the reason for the termination.
+              </p>
+            </li>
+          </ul>
+      </div>
+
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_3_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_3_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_3_x/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_3_x/management.html">Management plugin</a></li>
+       <li><a href="/v3_3_x/federation.html">Federation plugin</a></li>
+       <li><a href="/v3_3_x/shovel.html" class="selected">Shovel plugin</a><ul>
+         <li><a href="/v3_3_x/shovel-static.html">Static Shovels</a></li>
+         <li><a href="/v3_3_x/shovel-dynamic.html">Dynamic Shovels</a></li>
+         
+         
+       </ul></li>
+       <li><a href="/v3_3_x/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_3_x/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_3_x/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_3_x/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_3_x/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/v3_3_x/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_3_x/news.html">News</a></li>
+     <li><a href="/v3_3_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_3_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_3_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_3_x/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#what-it-do">What does it do?</a></li><li><a href="#getting-started">Getting started</a></li><li><a href="#clustering">Shovels between clusters</a></li><li><a href="#status">Monitoring shovels</a></li></ul></div><div id="related-links"><h4>Related Links</h4><ul><li><a href="/v3_3_x/uri-spec.html">AMQP URI Spec</a></li><li><a href="/v3_3_x/uri-query-parameters.html">AMQP URI Params</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_3_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_3_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

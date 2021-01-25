@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Configuring Dynamic Shovels</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html">Installation</a></li><li><a href="/v3_4_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Configuring Dynamic Shovels</h1>
+    <div class="docSection"><a name="configuration" id="configuration"></a>
+      <p>
+        Information about dynamic shovels is stored in the RabbitMQ database,
+        along with users, permissions, queues, etc. Every shovel is defined by
+        a corresponding named <a href="parameters.html">parameter</a>.
+      </p>
+      <p>
+        Parameters can be defined using <span class="code ">rabbitmqctl</span>, through the
+        management HTTP API, or (with
+        the <span class="code ">rabbitmq_shovel_management</span> plugin installed) through
+        the management plugin's web UI.
+      </p>
+
+      <div class="docSubsection"><a name="tutorial" id="tutorial"></a>
+        <h3 class="docHeading">A simple example</h3>
+
+        <p>
+          Here we will consume messages from the queue <i>my-queue</i> on the
+          local broker, and push them out to the queue <i>another-queue</i> on
+          a remote broker.
+        </p>
+
+        <table>
+        <tr>
+          <th>rabbitmqctl</th>
+          <td>
+            <span class="code ">rabbitmqctl set_parameter shovel my-shovel \<br />'{"src-uri": "amqp://", "src-queue": "my-queue", \<br />"dest-uri": "amqp://remote-server", "dest-queue": "another-queue"}'</span>
+          </td>
+        </tr>
+        <tr>
+          <th>rabbitmqctl (Windows)</th>
+          <td>
+            <span class="code ">rabbitmqctl set_parameter shovel my-shovel ^<br />"{""src-uri"":""amqp://"", ""src-queue"": ""my-queue"", ^<br />""dest-uri"": ""amqp://remote-server"", ""dest-queue"": ""another-queue""}"</span>
+          </td>
+        </tr>
+        <tr>
+          <th>HTTP API</th>
+          <td>
+            PUT <span class="code ">/api/parameters/shovel/%2f/my-shovel</span><br />
+            <pre>{"value":{"src-uri":  "amqp://",              "src-queue":  "my-queue",
+          "dest-uri": "amqp://remote-server", "dest-queue": "another-queue"}}</pre>
+          </td>
+        </tr>
+        <tr>
+          <th>Web UI</th>
+          <td>
+            Navigate to Admin &gt; Shovel Management &gt; Add a new shovel. Enter
+            "my-shovel" next to Name, "amqp://" and "my-queue" next to Source,
+            and "amqp://remote-server" and "another-queue" next Destination
+            Expiry. Click Add shovel.
+          </td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="docSection"><a name="configuration" id="configuration"></a>
+      <h2 class="docHeading">Configuration reference</h2>
+
+      <h4>Source</h4>
+
+      <dl>
+        <dt><span class="code ">src-uri</span></dt>
+        <dd>
+          <p>
+            The AMQP URI(s) for the source. Mandatory. See
+            the <a href="uri-spec.html">AMQP URI reference</a> for
+            information on how RabbitMQ treats AMQP URIs in general,
+            and the <a href="uri-query-parameters.html">query parameter
+              reference</a> for the Erlang client's extensions
+            (including those for SSL and SASL) which are available to
+            the shovel.
+          </p>
+          <p>
+            Note that this field can either be a string, or a list of
+            strings. If more than one string is provided, the shovel will
+            randomly pick <b>one</b> URI from the list. This can be used to
+            connect to a cluster and ensure the link will eventually
+            find another node in the event that one fails. It's probably not a
+            great idea to use multiple URIs that do <b>not</b> point to the
+            same cluster.
+          </p>
+        </dd>
+
+        <dt><span class="code ">src-queue</span></dt>
+        <dd>
+          <p>
+            The queue from which to consume. Either this
+            or <span class="code ">src-exchange</span> (but not both) must be set.
+          </p>
+          <p>
+            If the source queue does not exist on the source broker, it will
+            be declared as a durable queue with no arguments.
+          </p>
+        </dd>
+
+        <dt><span class="code ">src-exchange</span></dt>
+        <dd>
+          <p>
+            The exchange from which to consume. Either this
+            or <span class="code ">src-queue</span> (but not both) must be set.
+          </p>
+          <p>
+            The shovel will declare an exclusive queue and bind it to the
+            named exchange with <span class="code ">src-exchange-key</span> before consuming
+            from the queue.
+          </p>
+          <p>
+            If the source exchange does not exist on the source broker, it
+            will be not declared; the shovel will fail to start.
+          </p>
+        </dd>
+
+        <dt><span class="code ">src-exchange-key</span></dt>
+        <dd>
+          <p>
+            Routing key when using <span class="code ">src-exchange</span>
+          </p>
+        </dd>
+      </dl>
+
+      <h4>Destination</h4>
+
+      <dl>
+        <dt><span class="code ">dest-uri</span></dt>
+        <dd>
+          <p>
+            The AMQP URI(s) for the
+            destination. Mandatory. See <span class="code ">src-uri</span> above.
+          </p>
+        </dd>
+
+        <dt><span class="code ">dest-queue</span></dt>
+        <dd>
+          <p>
+            The queue to which messages should be published. Either this
+            or <span class="code ">dest-exchange</span> (but not both) may be set. If
+            neither is set then messages are republished with their original
+            exchange and routing key.
+          </p>
+          <p>
+            If the destination queue does not exist on the source broker, it
+            will be declared as a durable queue with no arguments.
+          </p>
+        </dd>
+
+        <dt><span class="code ">dest-exchange</span></dt>
+        <dd>
+          <p>
+            The exchange to which messages should be published. Either this
+            or <span class="code ">dest-queue</span> (but not both) may be set.
+          </p>
+          <p>
+            If the destination exchange does not exist on the source broker,
+            it will be not declared; the shovel will fail to start.
+          </p>
+        </dd>
+
+        <dt><span class="code ">dest-exchange-key</span></dt>
+        <dd>
+          <p>
+            Routing key when using <span class="code ">dest-exchange</span>. If this is not
+            set, the original message's routing key will be used.
+          </p>
+        </dd>
+      </dl>
+
+      <h4>Shovel</h4>
+
+      <dl>
+        <dt><span class="code ">prefetch-count</span></dt>
+        <dd>
+          The maximum number of unacknowledged messages copied over a shovel at
+          any one time. Default is <span class="code ">1000</span>.
+        </dd>
+        <dt><span class="code ">reconnect-delay</span></dt>
+        <dd>
+            The duration (in seconds) to wait before reconnecting to the
+            brokers after being disconnected at either end. Default is 1.
+        </dd>
+        <dt><span class="code ">publish-properties</span></dt>
+        <dd>
+           Properties to overwrite when shovelling messages. Setting
+           headers this way is not currently supported. Default is {}.
+        </dd>
+        <dt><span class="code ">add-forward-headers</span></dt>
+        <dd>
+          Whether to add <span class="code ">x-shovelled</span> headers to the
+          shovelled messages indicating where they have been shovelled
+          from and to. Default is false.
+        </dd>
+        <dt><span class="code ">ack-mode</span></dt>
+        <dd>
+          <p>
+            Determines how the shovel should acknowledge messages. If set
+            to <span class="code ">on-confirm</span> (the default), messages are
+            acknowledged to the source broker after they have been confirmed
+            by the destination. This handles network errors and broker
+            failures without losing messages, and is the slowest option.
+          </p>
+          <p>
+            If set to <span class="code ">on-publish</span>, messages are acknowledged to
+            the source broker after they have been published at the
+            destination. This handles network errors without losing messages,
+            but may lose messages in the event of broker failures.
+          </p>
+          <p>
+            If set to <span class="code ">no-ack</span>, message acknowledgements are not
+            used. This is the fastest option, but may lose messages in the
+            event of network or broker failures.
+          </p>
+        </dd>
+        <dt><span class="code ">delete-after</span></dt>
+        <dd>
+          <p>
+            Determines when (if ever) the shovel should delete
+            itself. This can be useful if the shovel is being treated
+            as more of a move operation - i.e. being used to move
+            messages from one queue to another on an ad hoc basis.
+          </p>
+          <p>
+            The default is <span class="code ">never</span>, meaning the
+            shovel should never delete itself.
+          </p>
+          <p>
+            If set to <span class="code ">queue-length</span> then the shovel will
+            measure the length of the source queue when starting up,
+            and delete itself after it has transfered that many
+            messages.
+          </p>
+          <p>
+            If set to an integer, then the shovel will transfer that
+            number of messages before deleting itself.
+          </p>
+        </dd>
+      </dl>
+
+    </div>
+
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_4_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_4_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_4_x/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_4_x/management.html">Management plugin</a></li>
+       <li><a href="/v3_4_x/federation.html">Federation plugin</a></li>
+       <li><a href="/v3_4_x/shovel.html" class="selected">Shovel plugin</a><ul>
+         <li><a href="/v3_4_x/shovel-static.html">Static Shovels</a></li>
+         <li><a href="/v3_4_x/shovel-dynamic.html" class="selected">Dynamic Shovels</a></li>
+         
+         
+       </ul></li>
+       <li><a href="/v3_4_x/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_4_x/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_4_x/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_4_x/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_4_x/installing-plugins.html">Installing plugins</a></li>
+       <li><a href="/v3_4_x/plugin-development.html">Plugin development</a></li>
+       
+     </ul></li>
+     <li><a href="/v3_4_x/news.html">News</a></li>
+     <li><a href="/v3_4_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_4_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_4_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_4_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

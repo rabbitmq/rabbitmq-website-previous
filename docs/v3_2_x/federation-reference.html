@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_2_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_2_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_2_x/favicon.ico" /><link rel="stylesheet" href="/v3_2_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_2_x/js/site.js"></script><script type="text/javascript" src="/v3_2_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Federation Reference</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_2_x/"><img src="/v3_2_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://www.gopivotal.com/"><img src="/v3_2_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_2_x/features.html">Features</a></li><li><a href="/v3_2_x/download.html">Installation</a></li><li><a href="/v3_2_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_2_x/getstarted.html">Tutorials</a></li><li><a href="/v3_2_x/services.html">Services</a></li><li><a href="/v3_2_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Federation Reference</h1>
+    <p class="intro">
+      This page provides a reference on all the fields you can set
+      when defining federation parameters, and describes how you can
+      monitor federation links.
+    </p>
+    <div class="docSection"><a name="configuration" id="configuration"></a>
+      <h2 class="docHeading">Configuration reference</h2>
+
+      <div class="docSubsection"><a name="policies" id="policies"></a>
+        <h3 class="docHeading">Policies</h3>
+        <p>
+          A policy can apply an upstream set (including the
+          implicitly-defined upstream set "all") or a single upstream
+          to a set of exchanges and / or queues.
+        </p>
+        <p>
+          To apply all upstreams:
+        </p>
+<pre class="example">
+rabbitmqctl set_policy federate-me '^amq\.' '{"federation-upstream-set":"all"}'
+</pre>
+        <p>
+          To apply a named set of upstreams:
+        </p>
+<pre class="example">
+rabbitmqctl set_policy federate-me '^amq\.' '{"federation-upstream-set":"my-set"}'
+</pre>
+        <p>
+          To apply a single upstream:
+        </p>
+<pre class="example">
+rabbitmqctl set_policy federate-me '^amq\.' '{"federation-upstream":"my-upstream"}'
+</pre>
+        <p>
+          Note that you cannot use
+          the <span class="code ">federation-upstream</span>
+          and <span class="code ">federation-upstream-set</span> keys together in a
+          policy. For more detail on policies, see
+          the <a href="parameters.html#policies">policy</a>
+          documentation.
+        </p>
+
+      </div>
+
+      <div class="docSubsection"><a name="upstreams" id="upstreams"></a>
+        <h3 class="docHeading">Upstreams</h3>
+        <p>
+          A <span class="code ">federation-upstream</span> parameter specifies how
+          to connect to a broker. It takes the form:
+        </p>
+<pre class="example">
+rabbitmqctl set_parameter federation-upstream <i>name</i> '<i>json-object</i>'
+</pre>
+        <p>
+          The <span class="code "><i>json-object</i></span> can contain the following keys:
+        </p>
+
+        <h4>Applying to federated exchanges and federated queues</h4>
+
+        <dl>
+          <dt><span class="code ">uri</span></dt>
+          <dd>
+            <p>
+              The AMQP URI(s) for the upstream. Mandatory. See
+              the <a href="uri-spec.html">AMQP URI reference</a> for
+              information on how RabbitMQ treats AMQP URIs in general,
+              and the <a href="uri-query-parameters.html">query parameter
+              reference</a> for the Erlang client's extensions
+              (including those for SSL and SASL) which are available to
+              federation.
+            </p>
+            <p>
+              Note that this field can either be a string, or a list of
+              strings. If more than one string is provided, the federation
+              plugin will randomly pick <b>one</b> URI from the list. This can
+              be used to connect to an upstream cluster and ensure the link
+              will eventually find another node in the event that one
+              fails. It's probably not a great idea to use multiple URIs that
+              do <b>not</b> point to the same cluster.
+            </p>
+            <p>
+              To connect to multiple URIs simultaneously use multiple
+              upstreams.
+            </p>
+          </dd>
+
+          <dt><span class="code ">prefetch-count</span></dt>
+          <dd>
+            The maximum number of unacknowledged messages copied over a link at
+            any one time. Default is <span class="code ">1000</span>.
+          </dd>
+
+          <dt><span class="code ">reconnect-delay</span></dt>
+          <dd>
+            The duration (in seconds) to wait before reconnecting to the broker
+            after being disconnected. Default is 1.
+          </dd>
+
+          <dt><span class="code ">ack-mode</span></dt>
+          <dd>
+            <p>
+              Determines how the link should acknowledge messages. If set
+              to <span class="code ">on-confirm</span> (the default), messages are
+              acknowledged to the upstream broker after they have been
+              confirmed downstream. This handles network errors and broker
+              failures without losing messages, and is the slowest option.
+            </p>
+            <p>
+              If set to <span class="code ">on-publish</span>, messages are acknowledged to
+              the upstream broker after they have been published
+              downstream. This handles network errors without losing messages,
+              but may lose messages in the event of broker failures.
+            </p>
+            <p>
+              If set to <span class="code ">no-ack</span>, message acknowledgements are not
+              used. This is the fastest option, but may lose messages in the
+              event of network or broker failures.
+            </p>
+          </dd>
+
+          <dt><span class="code ">trust-user-id</span></dt>
+          <dd>
+            <p>
+              Determines how federation should interact with
+              the <a href="validated-user-id.html">validated
+              user-id</a> feature. If set to <span class="code ">true</span>,
+              federation will pass through any validated user-id from
+              the upstream, even though it cannot validate it
+              itself. If set to <span class="code ">false</span> or not set, it will
+              clear any validated user-id it encounters. You should
+              only set this to <span class="code ">true</span> if you trust the
+              upstream server (and by extension, all its upstreams)
+              not to forge user-ids.
+            </p>
+          </dd>
+        </dl>
+
+        <h4>Applying to federated exchanges only</h4>
+
+        <dl>
+          <dt><span class="code ">exchange</span></dt>
+          <dd>
+            The name of the upstream exchange. Default is to use the
+            same name as the federated exchange.
+          </dd>
+
+          <dt><span class="code ">max-hops</span></dt>
+          <dd>
+            The maximum number of federation links that a message
+            published to a federated exchange can traverse before it
+            is discarded. Default is 1.
+          </dd>
+
+          <dt><span class="code ">expires</span></dt>
+          <dd>
+            <p>
+              The expiry time (in milliseconds) after which an <a href="federated-exchanges.html#details"><i>upstream
+              queue</i></a> for a federated exchange may be deleted,
+              if a connection to the upstream broker is lost. The
+              default is <span class="code ">'none'</span>, meaning the queue should
+              never expire.
+            </p>
+            <p>
+              This setting controls how long the upstream queue will
+              last before it is eligible for deletion if the connection
+              is lost.
+            </p>
+            <p>
+              This value is used to set the <span class="code ">"x-expires"</span> argument
+              for the upstream queue.
+            </p>
+          </dd>
+
+          <dt><span class="code ">message-ttl</span></dt>
+          <dd>
+            <p>
+              The expiry time for messages in the <i>upstream
+              queue</i> for a federated exchange (see
+              <span class="code ">expires</span>), in milliseconds. Default is
+              <span class="code ">'none'</span>, meaning messages should never expire. This
+              does not apply to federated queues.
+            </p>
+            <p>
+              This value is used to set the <span class="code ">"x-message-ttl"</span>
+              argument for the upstream queue.
+            </p>
+          </dd>
+
+          <dt><span class="code ">ha-policy</span></dt>
+          <dd>
+            Determines the <span class="code ">"x-ha-policy"</span> argument for the
+            <i>upstream queue</i> for a federated exchange
+            (see <span class="code ">expires</span>). This is only of interest when
+            connecting to old brokers which determine queue HA mode
+            using this argument. Default is <span class="code ">'none'</span>,
+            meaning the queue is not HA.
+          </dd>
+        </dl>
+
+        <h4>Applying to federated queues only</h4>
+        <dl>
+          <dt><span class="code ">queue</span></dt>
+          <dd>
+            The name of the upstream queue. Default is to use the same
+            name as the federated queue.
+          </dd>
+        </dl>
+      </div>
+
+      <div class="docSubsection"><a name="upstream-sets" id="upstream-sets"></a>
+        <h3 class="docHeading">Upstream sets</h3>
+        <p>
+          Each <span class="code ">upstream-set</span> list is a set of upstreams.
+        </p>
+<pre class="example">rabbitmqctl set_parameter federation-upstream-set <i>name</i> '[<i>json-object</i>, <i>json-object</i>, ...]'
+</pre>
+        <p>
+          The keys of the JSON objects can be:
+        </p>
+
+        <dl>
+          <dt><span class="code ">upstream</span></dt>
+          <dd>
+            The name of an upstream. Mandatory.
+          </dd>
+        </dl>
+
+        <p>
+          In addition, any of the properties from an upstream can be
+          overridden in an upstream set.
+        </p>
+
+        
+
+        <p>
+          There is an implicitly-defined upstream
+          set, <span class="code ">all</span>, which contains all upstreams.
+        </p>
+      </div>
+
+      <div class="docSubsection"><a name="other-config" id="other-config"></a>
+        <h3 class="docHeading">local-username</h3>
+        <p>
+          The <span class="code ">local-username</span> parameter specifies the user
+          under which to publish messages to the (local) federated
+          exchanges. The default is
+          <span class="code ">"guest"</span>. This user will need the appropriate permissions
+          to publish messages to these exchanges. Example:
+        </p>
+
+        <pre class="example">rabbitmqctl set_parameter federation local-username '"guest"'</pre>
+
+        <h3 class="docHeading">local-nodename</h3>
+        <p>
+          The <span class="code ">local-nodename</span> parameter specifies the name
+          this node should use to identify itself to other nodes in
+          the federation graph. (The default is constructed from the
+          Erlang node and the machine's fully-qualified domain name.)
+        </p>
+        <p>
+          It is important to specify it explicitly if your DNS will
+          not give machines distinct names.
+        </p>
+        <p>
+          Example:
+        </p>
+
+        <pre class="example">rabbitmqctl set_parameter federation local-nodename '"my-node"'</pre>
+
+      </div>
+    </div>
+
+    <div class="docSection"><a name="status" id="status"></a>
+      <h2 class="docHeading">Link status reporting</h2>
+      <p>
+        Each combination of federated exchange or queue and upstream needs a
+        link to run. This is the process that retrieves messages from upstream
+        and republishes them downstream. You can monitor the status of
+        federation links using <span class="code ">rabbitmqctl</span> and the management
+        plugin.
+      </p>
+      <h3>Using rabbitmqctl</h3>
+      <p>Invoke:</p>
+
+      <pre class="example">rabbitmqctl eval 'rabbit_federation_status:status().'</pre>
+
+      <p>
+        This will return a list of federation links running on the node you
+        are connecting to (i.e. not cluster-wide). It contains the following
+        keys:
+      </p>
+
+      <dl>
+        <dt><span class="code ">type</span></dt>
+        <dd>
+          <span class="code ">exchange</span> or <span class="code ">queue</span> depending on what type
+          of federated object this link relates to
+        </dd>
+        <dt><span class="code ">name</span></dt>
+        <dd>
+          the name of the federated exchange or queue
+        </dd>
+        <dt><span class="code ">upstream_name</span></dt>
+        <dd>
+          the name of the upstream exchange or queue
+        </dd>
+        <dt><span class="code ">vhost</span></dt>
+        <dd>
+          the virtual host containing the federated exchange or queue
+        </dd>
+        <dt><span class="code ">connection</span></dt>
+        <dd>
+          the name of the connection for this link (from config)
+        </dd>
+        <dt><span class="code ">status</span></dt>
+        <dd>
+          status of the link:
+          <ul>
+            <li><span class="code ">starting</span></li>
+            <li><span class="code ">{running, LocalConnectionName}</span></li>
+            <li><span class="code ">{shutdown, Error}</span></li>
+          </ul>
+        </dd>
+        <dt><span class="code ">timestamp</span></dt>
+        <dd>
+          time the status was last updated
+        </dd>
+      </dl>
+      <p>Example:</p>
+
+      <pre class="example"># rabbitmqctl eval 'rabbit_federation_status:status().'
+[[{type,&lt;&lt;"exchange"&gt;&gt;},
+  {name,&lt;&lt;"my-exchange"&gt;&gt;},
+  {vhost,&lt;&lt;"/"&gt;&gt;},
+  {connection,&lt;&lt;"upstream-server"&gt;&gt;},
+  {upstream_name,&lt;&lt;"my-upstream-x"&gt;&gt;},
+  {status,{running,&lt;&lt;"&lt;rabbit@my-server.1.281.0&gt;"&gt;&gt;}},
+  {timestamp,{{2012,3,1},{12,3,28}}}]]
+...done.</pre>
+
+      <h3>Using the management plugin</h3>
+
+      <p>
+        Install the <span class="code ">rabbitmq_federation_management</span> plugin. You
+        will now be able to see all federation links in the cluster by
+        clicking on Admin &gt; Federation Status, or making an HTTP request to
+        <span class="code ">GET /api/federation-links</span>.
+      </p>
+    </div>
+
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_2_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_2_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_2_x/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v3_2_x/management.html">Management plugin</a></li>
+       <li><a href="/v3_2_x/federation.html" class="selected">Federation plugin</a><ul>
+         <li><a href="/v3_2_x/federated-exchanges.html">Exchanges</a></li>
+         <li><a href="/v3_2_x/federated-queues.html">Queues</a></li>
+         <li><a href="/v3_2_x/federation-reference.html" class="selected">Reference</a></li>
+       </ul></li>
+       <li><a href="/v3_2_x/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v3_2_x/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v3_2_x/mqtt.html">MQTT plugin</a></li>
+       <li><a href="/v3_2_x/ldap.html">LDAP plugin</a></li>
+       <li><a href="/v3_2_x/mochiweb.html">Configuring web plugins</a></li>
+       <li><a href="/v3_2_x/plugin-development.html">Plugin development</a></li>
+     </ul></li>
+     <li><a href="/v3_2_x/news.html">News</a></li>
+     <li><a href="/v3_2_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_2_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_2_x/build.html">Building</a></li>
+     
+     <li><a href="/v3_2_x/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#configuration">Configuration reference</a></li><li><a href="#status">Link status reporting</a></li></ul></div><div id="related-links"><h4>Related Links</h4><ul><li><a href="/v3_2_x/uri-spec.html">AMQP URI Spec</a></li><li><a href="/v3_2_x/uri-query-parameters.html">AMQP URI Params</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_2_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_2_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2014 Pivotal Software, Inc. All rights reserved
+        | <a href="http://www.gopivotal.com/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_0_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_0_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_0_x/favicon.ico" /><link rel="stylesheet" href="/v3_0_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_0_x/js/site.js"></script><script type="text/javascript" src="/v3_0_x/js/ga-bootstrap.js"></script><title>RabbitMQ - SASL Authentication</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_0_x/"><img src="/v3_0_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v3_0_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_0_x/download.html">Installation</a></li><li><a href="/v3_0_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_0_x/getstarted.html">Tutorials</a></li><li><a href="/v3_0_x/services.html">Services</a></li><li><a href="/v3_0_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>SASL Authentication</h1>
+      <div class="docSection"><a name="intro" id="intro"></a>
+        <p>
+          RabbitMQ has pluggable support for various SASL authentication
+          mechanisms. There are three such mechanisms built into the
+          server: <span class="code ">PLAIN</span>, <span class="code ">AMQPLAIN</span>,
+          and <span class="code ">RABBIT-CR-DEMO</span>, and one - <span class="code ">EXTERNAL</span> -
+          available as a <a href="plugins.html">plugin</a>.
+
+          You can also implement your own authentication mechanism by
+          implementing the <span class="code ">rabbit_auth_mechanism</span>
+          behaviour in a plugin. See
+          the <a href="plugin-development.html">plugin development
+          guide</a> for more information on general plugin
+          development.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="built-in" id="built-in"></a>
+        <h2 class="docHeading">Built-in mechanisms</h2>
+        <p>
+          The three built-in mechanisms are:
+        </p>
+        <dl>
+          <dt>
+            <span class="code ">PLAIN</span>
+          </dt>
+          <dd>
+            SASL PLAIN authentication. This is enabled by default in
+            the RabbitMQ server and clients, and is the default for most
+            other clients.
+          </dd>
+          <dt>
+            <span class="code ">AMQPLAIN</span>
+          </dt>
+          <dd>
+            Non-standard version of PLAIN as defined by the AMQP 0-8
+            specification. This is enabled by default in the RabbitMQ
+            server, and is the default for QPid's Python client.
+          </dd>
+          <dt>
+            <span class="code ">RABBIT-CR-DEMO</span>
+          </dt>
+          <dd>
+            Non-standard mechanism which demonstrates
+            challenge-response authentication. This mechanism has
+            security equivalent to <span class="code ">PLAIN</span>, and
+            is <b>not</b> enabled by default in the RabbitMQ server.
+          </dd>
+        </dl>
+      </div>
+
+      <div class="docSection"><a name="server-config" id="server-config"></a>
+        <h2 class="docHeading">Server configuration</h2>
+        <p>
+          The configuration variable <span class="code ">auth_mechanisms</span> in
+          the <span class="code ">rabbit</span> application determines which of the
+          installed mechanisms are offered to connecting clients. This
+          variable should be a list of atoms corresponding to
+          mechanism names, for example <span class="code ">['PLAIN',
+          'AMQPLAIN']</span> by default. The server-side list is not
+          considered to be in any particular order. See the
+          <a href="configure.html#configuration-file">configuration file</a>
+          documentation.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="client-config" id="client-config"></a>
+          <h2 class="docHeading">Client configuration</h2>
+        <div class="docSubsection"><a name="java-config" id="java-config"></a>
+          <h3 class="docHeading">Java</h3>
+          <p>
+            The Java client does not use
+            the <span class="code ">javax.security.sasl</span> package by default
+            since this can be unpredictable on non-Oracle JDKs and is
+            missing entirely on Android. There is a RabbitMQ-specific
+            SASL implementation, configured by
+            the <span class="code ">SaslConfig</span> interface. A
+            class <span class="code ">DefaultSaslConfig</span> is provided to make
+            SASL configuration more convenient in the common case. A
+            class <span class="code ">JDKSaslConfig</span> is provided to act as a
+            bridge to <span class="code ">javax.security.sasl</span>.
+          </p>
+          <p>
+            See <span class="code ">ConnectionFactory.getSaslConfig()</span>
+          and <span class="code ">ConnectionFactory.setSaslConfig(SaslConfig)</span>
+          </p>
+        </div>
+
+        <div class="docSubsection"><a name="erlang-config" id="erlang-config"></a>
+          <h3 class="docHeading">Erlang</h3>
+          <p>
+            The Erlang client provides its own SASL mechanism
+            implementations in the <span class="code ">amqp_auth_mechanisms</span>
+            module. The <span class="code ">#amqp_params{}</span> record can be
+            provided with a list of authentication functions in
+            preference order for network connections.
+          </p>
+        </div>
+
+        <div class="docSubsection"><a name="dotnet-config" id="dotnet-config"></a>
+          <h3 class="docHeading">.Net</h3>
+          <p>
+            The .Net client provides its own SASL mechanism
+            implementations based on the <span class="code ">AuthMechanism</span>
+            and <span class="code ">AuthMechanismFactory</span>
+            interfaces. The <span class="code ">ConnectionFactory.AuthMechanisms</span>
+            property is a list of authentication mechanism factories in
+            preference order.
+          </p>
+        </div>
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_0_x/features.html">Features</a></li>
+     <li><a href="/v3_0_x/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/v3_0_x/configure.html">Configuration</a></li>
+       <li><a href="/v3_0_x/ssl.html">SSL Support</a></li>
+       <li><a href="/v3_0_x/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/v3_0_x/reliability.html">Reliable Delivery</a></li>
+       <li><a href="/v3_0_x/clustering.html">Clustering</a></li>
+       <li><a href="/v3_0_x/ha.html">High Availability</a></li>
+       <li><a href="/v3_0_x/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/v3_0_x/access-control.html">Access Control</a></li>
+       <li><a href="/v3_0_x/authentication.html" class="selected">SASL Authentication</a></li>
+       <li><a href="/v3_0_x/memory.html">Flow Control</a></li>
+       <li><a href="/v3_0_x/memory-use.html">Memory Use</a></li>
+       <li><a href="/v3_0_x/firehose.html">Firehose / Tracing</a></li>
+       <li><a href="/v3_0_x/manpages.html">Manual Pages</a></li>
+       <li><a href="/v3_0_x/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/v3_0_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_0_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_0_x/news.html">News</a></li>
+     <li><a href="/v3_0_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_0_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_0_x/build.html">Building</a></li>
+     <li><a href="/v3_0_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_0_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_0_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

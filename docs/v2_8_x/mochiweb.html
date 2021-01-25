@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v2_8_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v2_8_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v2_8_x/favicon.ico" /><link rel="stylesheet" href="/v2_8_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v2_8_x/js/site.js"></script><script type="text/javascript" src="/v2_8_x/js/ga-bootstrap.js"></script><title>RabbitMQ - HTTP server plugin </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v2_8_x/"><img src="/v2_8_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v2_8_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v2_8_x/download.html">Installation</a></li><li><a href="/v2_8_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v2_8_x/getstarted.html">Tutorials</a></li><li><a href="/v2_8_x/services.html">Services</a></li><li><a href="/v2_8_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>HTTP server plugin </h1>
+<p>The <span class="code ">rabbitmq-mochiweb</span> plugin provides hosting for other plugins that
+have HTTP interfaces. It allows these interfaces to co-exist on one or
+more HTTP listeners.</p>
+<h2>Installation</h2>
+<p>Typically <span class="code ">rabbitmq-mochiweb</span> comes bundled with other plugins that depend
+on it.</p>
+<p>If you wish to build <span class="code ">rabbitmq-mochiweb</span> from source, it can be built
+like any other plugin. See <a href="plugin-development.html">plugin
+development</a> for details.</p>
+<h2>Configuration</h2>
+<p>The configuration of <span class="code ">rabbitmq-mochiweb</span> determines what HTTP
+listeners are run, and how HTTP interfaces (hereafter "contexts") are
+assigned to them. Each context is given a URL path prefix to
+distinguish it from other contexts assigned to the same listener. The
+configuration is usually supplied in the main <a href="configure.html#configuration-file">RabbitMQ configuration
+file</a>.</p>
+<p>The default configuration specifies two listeners, one on port 55670
+and one on port 55672; then assigns the context used in the management
+plugin to the latter, and lets everything else default to the
+former. It looks like this:</p>
+<pre><span class="code ">  [{listeners,        [{mgmt, [{port, 55672}]}]},
+   {default_listener, [{port, 55670}]},
+   {contexts,         [{rabbit_mgmt, mgmt}]}]
+</span></pre>
+<p>The listeners are given as pairs of a name and options; the options
+are given to mochiweb, and only <span class="code ">port</span> is mandatory (see below for
+other options).</p>
+<p>The context entries assign contexts (<span class="code ">rabbit_mgmt</span> etc.) to the
+listeners. The context names are used by applications when registering
+their context (or contexts); any context not mentioned here will be
+assigned to the default listener, named <span class="code ">'*'</span>.</p>
+<p>A context may also be given as nested pair:</p>
+<pre><span class="code ">{my_context, {'*', "alternate"}}
+</span></pre>
+<p>In this case, the context registered as my_context will be available
+on the default listener under the URL path <span class="code ">/alternate/</span>. Otherwise
+the path prefix is decided by the application registering the context.</p>
+<h3>Listening on a single interface</h3>
+<p>Use <span class="code ">ip</span> to specify an interface for mochiweb to bind to (giving an IP
+address as a string or tuple). Example: <span class="code ">[{port, 55672}, {ip,
+"127.0.0.1"}]</span>.</p>
+<h3>SSL</h3>
+<p>Set <span class="code ">ssl</span> to <span class="code ">true</span> to switch on SSL for a listener. Use <span class="code ">ssl_opts</span> to
+specify SSL options. These are the standard Erlang SSL options - <a href="ssl.html">see
+the main page on SSL for more information</a>.</p>
+<p>For convenience, if you do not specify <span class="code ">ssl_opts</span> then
+rabbitmq-mochiweb will use the same options as the main RabbitMQ
+server does for AMQP over SSL, <b>but with client certificate
+verification switched off</b>. If you wish to use client certificate
+verification, specify it explicitly.</p>
+<h2>Example: enable SSL for management</h2>
+<p>In the following <span class="code ">rabbitmq.config</span>, SSL is enabled for the management
+plugin on port 55672.</p>
+<pre><span class="code ">[{rabbitmq_mochiweb,
+  [{listeners, [{'*',  [{port,     55670}]},
+                {mgmt, [{port,     55672},
+                        {ssl,      true},
+                        {ssl_opts, [{cacertfile, "/path/to/cacert.pem"},
+                                    {certfile,   "/path/to/cert.pem"},
+                                    {keyfile,    "/path/to/key.pem"}]}
+                       ]}
+               ]}
+  ]}
+].
+</span></pre></div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v2_8_x/features.html">Features</a></li>
+     <li><a href="/v2_8_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v2_8_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v2_8_x/plugins.html" class="selected">Plugins</a><ul>
+       <li><a href="/v2_8_x/management.html">Management plugin</a></li>
+       <li><a href="/v2_8_x/federation.html">Federation plugin</a></li>
+       <li><a href="/v2_8_x/shovel.html">Shovel plugin</a></li>
+       <li><a href="/v2_8_x/stomp.html">STOMP plugin</a></li>
+       <li><a href="/v2_8_x/mochiweb.html" class="selected">Configuring web plugins</a></li>
+       <li><a href="/v2_8_x/plugin-development.html">Plugin development</a></li>
+     </ul></li>
+     <li><a href="/v2_8_x/news.html">News</a></li>
+     <li><a href="/v2_8_x/protocol.html">Protocol</a></li>
+     <li><a href="/v2_8_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v2_8_x/build.html">Building</a></li>
+     <li><a href="/v2_8_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v2_8_x/sitemap.html">Sitemap</a> |
+        <a href="/v2_8_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

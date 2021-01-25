@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="viewport" name="viewport" /><link href="https://fonts.googleapis.com/css?family=Raleway:400,500,600,700" rel="stylesheet" /><link rel="stylesheet" href="/css/rabbit.css" type="text/css" /><link rel="stylesheet" href="/css/highlightjs_style.css" type="text/css" /><!--[if IE 6]>
+      <link rel="stylesheet" href="/css/rabbit-ie6.css" type="text/css" />
+      <![endif]--><link rel="icon" type="/image/vnd.microsoft.icon" href="/favicon.ico" /><link rel="stylesheet" href="/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/js/site.js"></script><script type="text/javascript" src="/js/ga-bootstrap.js"></script><title>RabbitMQ - Reliability Guide</title>
+    
+  </head>
+  <body id="reliability"><div id="outerContainer"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo.svg" alt="RabbitMQ" /></a></div><a class="btn menubtn" onclick="showHide()">Menu <img src="/img/carrot-down-white.svg" /></a><div class="mobilemenuicon" onclick="showHide()"><img src="/img/mobile-menu-icon.svg" /></div><div id="nav"><ul id="mainNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul></div></div><div class="nav-separator"></div><div id="innerContainer" class="container"><div id="left-content"><h1>Reliability Guide</h1>
+    <div class="docSection"><a name="background-info" id="background-info"></a>
+      <p class="intro">
+        This page explains how to use the various features of AMQP
+        and RabbitMQ to achieve <i>reliable delivery</i> - to ensure
+        that messages are always delivered, even encountering
+        failure in any part of your system.
+      </p>
+    </div>
+    <div class="docSection"><a name="what-can-fail" id="what-can-fail"></a>
+      <h2 class="docHeading">What Can Fail?</h2>
+      <p>
+        Network problems are probably the most common class of failure.  Not
+        only can networks fail, firewalls can interrupt idle connections,
+        and network failures are not always detected immediately.
+      </p>
+      <p>
+        In addition to connectivity failures, the broker and client
+        applications can experience hardware failure (or software can crash)
+        at any time. Additionally, even if client applications keep running,
+        logic errors can cause channel or connection errors which force the
+        client to establish a new channel or connection and recover from the
+        problem.
+      </p>
+    </div>
+    <div class="docSection"><a name="connection-failures" id="connection-failures"></a>
+      <h2 class="docHeading">Connection Failures</h2>
+      <p>
+        In the event of a connection failure, the client will need to
+        establish a new connection to the broker.  Any channels opened on the
+        previous connection will have been automatically closed and these will
+        need re-opening too.
+      </p>
+      <p>
+        In general when connections fail, the client will be informed by the
+        connection throwing an exception (or similar language construct). The
+        official Java and .NET clients additionally provide callback methods
+        to let you hear about connection failures in other contexts - Java
+        provides the <span class="code ">ShutdownListener</span> callback on
+        both <span class="code ">Connection</span> and <span class="code ">Channel</span> classes, and
+        .NET client provides <span class="code ">IConnection.ConnectionShutdown</span> and
+        <span class="code ">IModel.ModelShutdown</span> events for the same purpose.
+      </p>
+      <h3>Acknowledgements and Confirms</h3>
+      <p>
+        When a connection fails, messages may be in transit between client and
+        server - they may be in the middle of being parsed or generated, in OS
+        buffers, or on the wire. Messages in transit will be lost - they will
+        need to be retransmitted. <i>Acknowledgements</i> let the server and
+        clients know when to do this.
+      </p>
+      <p>
+        Acknowledgements can be used in both directions - to allow a consumer
+        to indicate to the server that it has received / processed a message
+        and to allow the server to indicate the same thing to the
+        producer. RabbitMQ refers to the latter case as a "confirm".
+      </p>
+      <p>
+        Of course, TCP ensures that packets have been received, and will
+        retransmit until they are - but that's just the network
+        layer. Acknowledgements and confirms indicate that messages have been
+        received <i>and acted upon</i>. An acknowledgement signals both the
+        receipt of a message, and a transfer of ownership where the receiver
+        assumes full responsibility for it.
+      </p>
+
+      <p>
+        Acknowledgements therefore have semantics - a consuming application
+        should not acknowledge messages until it has done whatever it needs to
+        do with them - recorded them in a database, forwarded them on, printed
+        them onto paper or anything else. Once it does so, the broker is free
+        to forget about the message.
+      </p>
+
+      <p>
+        Similarly, the broker will confirm messages once it has taken
+        responsibility for them (see <a href="confirms.html#when">here</a> for
+        what that means).
+      </p>
+
+      <p>
+        Use of acknowledgements guarantees <i>at-least-once</i>
+        delivery. Without acknowledgements, message loss is possible
+        during publish and consume operations and
+        only <i>at-most-once</i> delivery is guaranteed.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="heartbeat-overview" id="heartbeat-overview"></a>
+      <h2 class="docHeading">Detecting Dead TCP Connections with Heartbeats</h2>
+      <p>
+        In some types of network failure, packet loss can mean that
+        disrupted TCP connections take a moderately long time (about 11
+        minutes with default configuration on Linux, for example) to be
+        detected by the operating system. AMQP 0-9-1 offers a
+        <i>heartbeat</i> feature to ensure that the application layer
+        promptly finds out about disrupted connections (and also
+        completely unresponsive peers). Heartbeats also defend against
+        certain network equipment which may terminate "idle" TCP
+        connections. See <a href="heartbeats.html">Heartbeats</a> for details.
+      </p>
+</div>
+
+
+    <div class="docSection"><a name="at-the-broker" id="at-the-broker"></a>
+      <h2 class="docHeading">At the Broker</h2>
+      <p>
+        In order to avoid losing messages in the broker we need to cope with
+        broker restarts, broker hardware failure and <i>in extremis</i> even
+        broker crashes.
+      </p>
+      <p>
+        To ensure that messages and broker definitions survive restarts, we
+        need to ensure that they are on disk. The AMQP standard has a concept
+        of durability for exchanges, queues and of persistent messages,
+        requiring that a durable object or persistent message will survive a
+        restart. More details about specific flags pertaining to durability
+        and persistence can be found in the
+        <a href="/tutorials/amqp-concepts.html">AMQP Concepts Guide</a>.
+      </p>
+      <h3>Clustering and High Availability</h3>
+      <p>
+        If we need to ensure that our broker survives hardware failure, we can
+        use RabbitMQ's clustering. In a RabbitMQ cluster, all definitions (of
+        exchanges, bindings, users, etc) are mirrored across the entire
+        cluster. Queues behave differently, by default residing only on a
+        single node, but optionally being mirrored across several or all
+        nodes. Queues remain visible and reachable from all nodes regardless
+        of where they are located.
+      </p>
+      <p>
+        Mirrored queues replicate their contents across all configured cluster
+        nodes, tolerating node failures seamlessly and without message loss
+        (although see <a href="ha.html#unsynchronised-slaves">this note on
+        unsynchronised slaves</a>). However, consuming applications need to be
+        aware that when queues fail their consumers will be cancelled and they
+        will need to reconsume - see <a href="ha.html#behaviour">the
+        documentation</a> for more details.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="producer" id="producer"></a>
+      <h2 class="docHeading">At the Producer</h2>
+      <p>
+        When using confirms, producers recovering from a channel or connection
+        failure should retransmit any messages for which an acknowledgement
+        has not been received from the broker. There is a possibility of
+        message duplication here, because the broker might have sent a
+        confirmation that never reached the producer (due to network failures,
+        etc). Therefore consumer applications will need to perform
+        deduplication or handle incoming messages in an idempotent manner.
+      </p>
+      <h3>Ensuring Messages are Routed</h3>
+      <p>
+        In some circumstances it can be important for producers to ensure that
+        their messages are being routed to queues (although not always - in
+        the case of a pub-sub system producers will just publish and if no
+        consumers are interested it is correct for messages to be dropped).
+      </p>
+      <p>
+        To ensure messages are routed to a single known queue, the producer
+        can just declare a destination queue and publish directly to it. If
+        messages may be routed in more complex ways but the producer still
+        needs to know if they reached at least one queue, it can set the
+        <span class="code ">mandatory</span> flag on a <span class="code ">basic.publish</span>, ensuring
+        that a <span class="code ">basic.return</span> (containing a reply code and some
+        textual explanation) will be sent back to the client if no queues were
+        appropriately bound.
+      </p>
+      <p>
+        Producers should also be aware that when publishing to a clustered node,
+        if one or more destination queues that are bound to the exchange have
+        mirrors in the cluster, it's possible to incur delays in the face of
+        network failures between nodes, due to flow control between replicas
+        and the master queue process. See <a href="nettick.html">here</a> for
+        more details.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="consumer" id="consumer"></a>
+      <h2 class="docHeading">At the Consumer</h2>
+      <p>
+        In the event of network failure (or a node crashing), messages can be
+        duplicated, and consumers must be prepared to handle them. If
+        possible, the simplest way to handle this is to ensure that your
+        consumers handle messages in an idempotent way rather than explicitly
+        deal with deduplication.
+      </p>
+      <p>
+        If a message is delivered to a consumer and then requeued (because it
+        was not acknowledged before the consumer connection dropped, for
+        example) then RabbitMQ will set the <span class="code ">redelivered</span> flag on
+        it when it is delivered again (whether to the same consumer or a
+        different one). This is a hint that a consumer <i>may</i> have seen
+        this message before (although that's not guaranteed, the message may
+        have made it out of the broker but not into a consumer before the
+        connection dropped). Conversely if the <span class="code ">redelivered</span> flag
+        is not set then it is guaranteed that the message has not been seen
+        before. Therefore if a consumer finds it more expensive to deduplicate
+        messages or process them in an idempotent manner, it can do this only
+        for messages with the <span class="code ">redelivered</span> flag set.
+      </p>
+      <h3>Consumer Cancel Notification</h3>
+      <p>
+        Under some circumstances the server needs to be able to cancel a
+        consumer - since the queue it was consuming from has been deleted, or
+        has <a href="ha.html#behaviour">failed over</a>. In this case the
+        consumer should consume again but be aware that it may see messages
+        again which it has already seen.
+      </p>
+      <p>
+        Note that consumer cancel notification is a RabbitMQ extension to
+        AMQP, and as such may not be supported by all clients.
+      </p>
+      <h3>Messages That Cannot Be Processed</h3>
+      <p>
+        If a consumer determines that it cannot handle a message then it
+        can <i>reject</i> it using <span class="code ">basic.reject</span>
+        (or <span class="code ">basic.nack</span>), either asking the server to requeue it,
+        or not (in which case the server might be configured
+        to <a href="dlx.html">dead-letter</a> it instead.
+      </p>
+    </div>
+
+    <div class="docSection"><a name="distribution" id="distribution"></a>
+      <h2 class="docHeading">Distributed RabbitMQ</h2>
+      <p>
+        Rabbit provides two plugins to assist with distributing nodes over
+        unreliable networks: <a href="federation.html">federation</a> and
+        the <a href="shovel.html">shovel</a>. Both are implemented as AMQP
+        clients, so if you configure them to use confirms and
+        acknowledgements, they will retransmit when necessary. Both will use
+        confirms and acknowledgements by default.
+      </p>
+      <p>
+        When connecting clusters with federation or the shovel, it is
+        desirable to ensure that the federation links and shovels tolerate
+        node failures. Federation will automatically distribute links across
+        the downstream cluster and fail them over on failure of a downstream
+        node. In order to connect to a new upstream when an upstream
+        node fails you can specify multiple redundant URIs for an upstream,
+        or connect via a TCP load balancer.
+      </p>
+      <p>
+        When using the shovel, it is possible to specify redundant brokers in
+        a source or destination clause; however it is not currently possible
+        to make the shovel itself redundant. We hope to improve this situation
+        in the future; in the mean time a new node can be brought up manually
+        to run a shovel if the node it was originally running on fails.
+      </p>
+    </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/admin-guide.html" class="selected">Server Documentation</a><ul>
+       <li><a href="/configure.html">Configuration</a></li>
+       <li><a href="/ssl.html">TLS/SSL Support</a></li>
+       <li><a href="/distributed.html">Distributed RabbitMQ</a></li>
+       <li><a href="/reliability.html" class="selected">Reliable Delivery</a></li>
+       <li><a href="/clustering.html">Clustering</a></li>
+       <li><a href="/vhosts.html">Virtual Hosts</a></li>
+       <li><a href="/ha.html">High Availability</a></li>
+       <li><a href="/pacemaker.html">High Availability (pacemaker)</a></li>
+       <li><a href="/access-control.html">Access Control (Authorisation)</a></li>
+       <li><a href="/authentication.html">Authentication Mechanisms</a></li>
+       <li><a href="/ldap.html">LDAP</a></li>
+       <li><a href="/production-checklist.html">Production Checklist</a></li>
+       <li><a href="/alarms.html">Alarms</a></li>
+       <li><a href="/networking.html">Networking</a></li>
+       <li><a href="/memory-use.html">Memory Use</a></li>
+       <li><a href="/lazy-queues.html">Lazy Queues</a></li>
+       <li><a href="/event-exchange.html">Internal Event Exchange</a></li>
+       <li><a href="/firehose.html">Firehose (Message Tracing)</a></li>
+       <li><a href="/manpages.html">Manual Pages</a></li>
+       <li><a href="/windows-quirks.html">Windows Quirks</a></li>
+       
+       
+       
+       
+     </ul></li>
+     <li><a href="/clients.html">Client Documentation</a></li>
+     <li><a href="/plugins.html">Plugins</a></li>
+     <li><a href="/news.html">News</a></li>
+     <li><a href="/protocol.html">Protocol</a></li>
+     <li><a href="/extensions.html">Our Extensions</a></li>
+     <li><a href="/build.html">Building</a></li>
+     
+       <li><a href="/previous.html">Previous Releases</a></li>
+     
+     <li><a href="/mpl.html">License</a></li>
+   </ul></div><div class="in-this-page"><h4>In This Page</h4><ul><li><a href="#background-info"></a></li><li><a href="#what-can-fail">What Can Fail?</a></li><li><a href="#connection-failures">Connection Failures</a></li><li><a href="#heartbeat-overview">Detecting Dead TCP Connections with Heartbeats</a></li><li><a href="#at-the-broker">At the Broker</a></li><li><a href="#producer">At the Producer</a></li><li><a href="#consumer">At the Consumer</a></li><li><a href="#distribution">Distributed RabbitMQ</a></li></ul></div><div id="related-links"><h4>Related Links</h4><ul><li><a href="/heartbeats.html">Heartbeats</a></li></ul></div></div></div><div class="clear"></div><div class="pageFooter"><div class="container"><div class="rabbit-logo"><a href="/"><img src="/img/RabbitMQ-logo-white.svg" alt="RabbitMQ" /></a></div><ul class="footerNav"><li><a href="/#features">Features</a></li><li><a href="/#getstarted">Get Started</a></li><li><a href="/#support">Support</a></li><li><a href="/#community">Community</a></li><li><a href="/documentation.html">Docs</a></li><li><a href="/blog/">Blog</a></li></ul><a id="s1p-promo" href="https://springoneplatform.io/?utm_source=rabbitmq&amp;utm_medium=tile-web-banner&amp;utm_campaign=s1p-registration-promo" target="_blank"><img src="/img/banner-s1p.png" /></a><p id="copyright">
+          Copyright © 2007-Present <a href="https://pivotal.io/">Pivotal Software</a>, Inc. All rights reserved.
+          <a href="https://pivotal.io/terms-of-use">Terms of Use</a>,
+          <a href="https://pivotal.io/privacy-policy">Privacy</a> and
+          <a href="/trademark-guidelines.html">Trademark Guidelines</a></p></div></div></div><script type="text/javascript" src="/js/highlight.pack.js"></script><script type="text/javascript">
+        // code highlighting
+        onDOMReady(function() {
+          document.querySelectorAll(".sourcecode").forEach(function(el) {
+            hljs.highlightBlock(el);
+          });
+        });
+      </script></body>
+</html>

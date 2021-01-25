@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Erlang Versions</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html" class="selected">Installation</a></li><li><a href="/v3_4_x/documentation.html">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Erlang Versions</h1>
+    <h3>Which Version of Erlang?</h3>
+    <p>
+      In general, use the <a href="http://www.erlang.org/download.html">latest available</a>
+      stable (non-alpha) version of Erlang.
+    </p>
+    <p>
+      The minimum version of <a href="http://www.erlang.org">Erlang</a>
+      required to run the RabbitMQ server is R13B03. If you absolutely must
+      use an older version of Erlang, RabbitMQ 3.1.x is the newest version
+      compatible with R12B-3. Certain RabbitMQ configurations require more
+      <a href="http://www.erlang.org/download.html">recent versions</a>:
+    </p>
+    <p>
+    <table>
+      <th>If you want to:</th><th>Minimum version</th><th>Notes</th>
+      <tr>
+        <td>build / run <a href="download.html">RabbitMQ</a> server and most plugins</td>
+        <td>R13B03</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>use <a href="ssl.html">SSL</a> reliably</td>
+        <td>R16B01</td>
+        <td>Covers most common signature algorithms.</td>
+      </tr>
+      <tr>
+        <td>use <a href="web-stomp.html">web STOMP</a></td>
+        <td>R14B</td>
+        <td>The cowboy web server requires at least R14B.</td>
+      </tr>
+      <tr>
+        <td>run on a <a href="platforms.html#windows">64bit Windows</a> VM</td>
+        <td>R15B</td>
+        <td>Earlier versions are 32bit only.</td>
+      </tr>
+    </table>
+    </p>
+    <p>
+      If using <a href="clustering.html#upgrading">clustered</a> nodes,
+      all nodes should use the same version of Erlang.
+    </p>
+
+    <h3>OS support</h3>
+    <p>
+      Most current distributions now package Erlang that supports all
+      the above. One (partial) exception is Red Hat Enterprise Linux -
+      RPMs are available but not as part of the core distribution.
+      See the <a href="install-rpm.html">RPM-based Linux
+      Installation</a> page for how to install Erlang on RPM-based
+      distributions.
+    </p>
+
+    <h3>Building Erlang from source</h3>
+    <p>
+      If a sufficiently recent Erlang package is not available for your system then you will need to
+      <a href="http://www.erlang.org/doc/installation_guide/INSTALL.html">build Erlang from source</a>.
+      This requires a build environment that satisfies the Erlang build dependencies, such as OpenSSL.
+    </p>
+  </div><div id="right-nav"></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

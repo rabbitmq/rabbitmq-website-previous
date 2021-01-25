@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_0_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_0_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_0_x/favicon.ico" /><link rel="stylesheet" href="/v3_0_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_0_x/js/site.js"></script><script type="text/javascript" src="/v3_0_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Installing on Mac OS X </title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_0_x/"><img src="/v3_0_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v3_0_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_0_x/download.html" class="selected">Installation</a></li><li><a href="/v3_0_x/documentation.html">Documentation</a></li><li><a href="/v3_0_x/getstarted.html">Tutorials</a></li><li><a href="/v3_0_x/services.html">Services</a></li><li><a href="/v3_0_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Installing on Mac OS X </h1>
+<p>This guide will show you how to install and run RabbitMQ on your Mac
+without the need to compile Erlang (whether manually or by using some
+package manager like <a href="install-macports.html">Macports</a> or
+<a href="install-homebrew.html">Homebrew</a>).</p>
+<p>The steps will be:</p>
+<ul>
+<li>Download and install Erlang from a precompiled .dmg</li>
+<li>Download and install RabbitMQ from the tarball distribution</li>
+<li>Start the server</li>
+</ul>
+<h2>Installing Erlang</h2>
+<p>One of the easiest ways to install Erlang these days is to use one of
+the precompiled packages offered by Erlang Solutions. You can find
+them on this
+<a href="https://www.erlang-solutions.com/downloads/download-erlang-otp">page</a>.</p>
+<p>From there, download the latest Mac OS X package and then follow the
+installation instructions to get Erlang on your machine. Once you
+installed it you can type <span class="code ">erl</span> on the Terminal to launch the Erlang
+console. If all went well you should see something like this:</p>
+<pre><span class="code ">$ erl
+Erlang R15B01 (erts-5.9.1) [source] [64-bit] [smp:8:8] [async-threads:0] [hipe] [kernel-poll:false]
+
+Eshell V5.9.1  (abort with ^G)
+1&gt;
+</span></pre>
+<p>Quit the console by typing <span class="code ">q().</span> including that final dot.</p>
+<h2>Downloading and Running RabbitMQ</h2>
+<p>Download the latest RabbitMQ release from here:
+<a href="/releases/rabbitmq-server/v3.0.4/rabbitmq-server-generic-unix-3.0.4.tar.gz">rabbitmq-server-generic-unix-3.0.4.tar.gz</a>.</p>
+<p>Then unpackage it with the following command:</p>
+<pre><span class="code ">tar -xzvf rabbitmq-server-generic-unix-3.0.4.tar.gz
+</span></pre>
+<h2>Starting the Server</h2>
+<p>You can <span class="code ">cd</span> into the <span class="code ">rabbitmq_server-3.0.4</span> folder and
+then run the following command to start the server:</p>
+<pre><span class="code ">sbin/rabbitmq-server -detached
+</span></pre>
+<p>To stop the server type:</p>
+<pre><span class="code ">sbin/rabbitmqctl stop
+</span></pre>
+<p>For more information on the Generic Unix release please read <a href="install-generic-unix.html">its
+installation instructions</a>.</p></div><div id="right-nav"></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_0_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_0_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>

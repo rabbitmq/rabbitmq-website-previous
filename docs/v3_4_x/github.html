@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_4_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_4_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_4_x/favicon.ico" /><link rel="stylesheet" href="/v3_4_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_4_x/js/site.js"></script><script type="text/javascript" src="/v3_4_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Using Git and GitHub</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_4_x/"><img src="/v3_4_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_4_x/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_4_x/features.html">Features</a></li><li><a href="/v3_4_x/download.html">Installation</a></li><li><a href="/v3_4_x/documentation.html" class="selected">Documentation</a></li><li><a href="/v3_4_x/getstarted.html">Tutorials</a></li><li><a href="/v3_4_x/services.html">Services</a></li><li><a href="/v3_4_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Using Git and GitHub</h1>
+      <p class="intro">
+        This page describes the way we work with Git on the
+        RabbitMQ project.
+      </p>
+
+      <div class="docSection"><a name="overview" id="overview"></a>
+        <p>
+          <a href="http://git-scm.com/">Git</a> is a fast, powerful
+          distributed source control management system.
+        </p>
+        <p>
+          We use Git on the RabbitMQ project to manage almost
+          all of our source-code.
+        </p>
+        <ul>
+          <li>Git has numerous <a href="http://git-scm.com/doc">tutorials</a>.</li>
+
+          <li>
+            <a href="https://github.com/rabbitmq">RabbitMQ's Git repositories</a> are hosted on GitHub.
+            Individual project pages on this website will generally point
+            you in the direction of the specific combinations of modules
+            you'll need to check out.
+          </li>
+        </ul>
+      </div>
+
+      <div class="docSection"><a name="branch-per-bug" id="branch-per-bug"></a>
+        <h2 class="docHeading">Branching policy: Branch per issue</h2>
+        <p>
+          We use the technique of <i>branch per issue</i> when
+          developing RabbitMQ code, where each feature or bug fix is
+          developed on a branch of its own (using <span class="code ">git checkout
+          -b</span>) and merged into the <span class="code ">master</span> branch
+          only when the hurdle of QA is passed. Branches follow the
+          pattern <span class="code ">issue<i>NNNNN</i></span>, where <i>NNNN</i> is
+          the GitHub issue number. There are also branches named
+          <span class="code ">bug<i>NNNNN</i></span> for issues in the original
+          Bugzilla tracker (which is not public).
+        </p>
+      </div>
+
+      <div class="docSection"><a name="pull-requests" id="pull-requests"></a>
+        <h2 class="docHeading">Pull Requests and the Review/QA Process</h2>
+        <p>
+          Branches that are ready to be reviewed and/or QA'ed should be submitted as
+          pull requests. Feedback is then given in the comments. After receiving feedback,
+          update the original branch and push it: GitHub will take care of updating
+          the pull request. Then the process goes on until the pull request is merged
+          or closed (e.g. because a feature is rejected after an attempt to implement it).
+        </p>
+      </div>
+
+      <div class="docSection"><a name="default-branch" id="default-branch"></a>
+        <h2 class="docHeading">The master branch</h2>
+        <p>
+          The <span class="code ">master</span> branch contains all the work that
+          has been QA'd so far that is scheduled to appear in the next
+          release. The <span class="code ">master</span> branch of each RabbitMQ
+          repository is usually roughly in sync with the
+          <span class="code ">master</span> branches of the others. Generally, you
+          can track QA'd development work by tracking the
+          <span class="code ">master</span> branches of the RabbitMQ repositories
+          of interest.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="maintenance-branches" id="maintenance-branches"></a>
+        <h2 class="docHeading">Maintenance branch</h2>
+        <p>
+          There's a separate branch for maintenance work,
+          <span class="code ">stable</span>. It plays the same role as the
+          <span class="code ">master</span> branch except that it carries merged,
+          QA'd code intended for the next bug-fix release rather than
+          the next general release.
+        </p>
+      </div>
+
+      <div class="docSection"><a name="tags" id="tags"></a>
+        <h2 class="docHeading">Tags</h2>
+        <p>
+          We also use tags to give names to snapshots of the state of
+          the code. Generally, both the core repositories and the
+          repositories of plugins intended to work with the named
+          snapshot are tagged.
+        </p>
+        <p>
+          For example, if you are using RabbitMQ server version 3.4.4,
+          then examining the output of <span class="code ">git tag</span> in a copy
+          of <span class="code ">rabbitmq-stomp</span> gives:
+        </p>
+        <pre>$ git tag
+# omitted for brevity
+rabbitmq_v3_3_5
+rabbitmq_v3_4_0
+rabbitmq_v3_4_1
+rabbitmq_v3_4_2
+rabbitmq_v3_4_3
+rabbitmq_v3_4_4
+        </pre>
+        <p>
+          It's important to make sure that all the repositories you
+          are using are on the same tag as each other. Continuing with
+          our example of server version 3.4.4, you could make sure
+          your checkout of <span class="code ">rabbitmq-stomp</span> was at the
+          <span class="code ">rabbitmq_v3_4_4</span> tag by using <span class="code ">git
+          checkout</span>:
+        </p>
+        <pre>git checkout rabbitmq_v3_4_4</pre>
+        <p>
+          At this point, you could proceed with compiling the plugin
+          as explained in the plugin's documentation.
+        </p>
+      </div>
+  </div><div id="right-nav"><div id="in-this-section"><h4>In This Section</h4><ul>
+     <li><a href="/v3_4_x/admin-guide.html">Server Documentation</a></li>
+     <li><a href="/v3_4_x/clients.html">Client Documentation</a></li>
+     <li><a href="/v3_4_x/plugins.html">Plugins</a></li>
+     <li><a href="/v3_4_x/news.html">News</a></li>
+     <li><a href="/v3_4_x/protocol.html">Protocol</a></li>
+     <li><a href="/v3_4_x/extensions.html">Our Extensions</a></li>
+     <li><a href="/v3_4_x/build.html" class="selected">Building</a><ul>
+       <li><a href="/v3_4_x/build-server.html">Building the Server</a></li>
+       <li><a href="/v3_4_x/build-java-client.html">Building the Java Client</a></li>
+       <li><a href="/v3_4_x/build-dotnet-client.html">Building the .NET Client</a></li>
+       <li><a href="/v3_4_x/build-erlang-client.html">Building the Erlang Client</a></li>
+       <li><a href="/v3_4_x/github.html" class="selected">Our use of Git and GitHub</a></li>
+       
+     </ul></li>
+     
+     <li><a href="/v3_4_x/mpl.html">License</a></li>
+   </ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_4_x/sitemap.html">Sitemap</a> |
+        <a href="/v3_4_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a></p></div></div></body>
+</html>

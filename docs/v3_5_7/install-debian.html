@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v3_5_7/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v3_5_7/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v3_5_7/favicon.ico" /><link rel="stylesheet" href="/v3_5_7/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v3_5_7/js/site.js"></script><script type="text/javascript" src="/v3_5_7/js/ga-bootstrap.js"></script><title>RabbitMQ - Installing on Debian / Ubuntu</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v3_5_7/"><img src="/v3_5_7/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="pivotal-logo"><a href="http://pivotal.io/"><img src="/v3_5_7/img/logo-pivotal-118x25.png" alt="Pivotal" width="118" height="25" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v3_5_7/features.html">Features</a></li><li><a href="/v3_5_7/download.html" class="selected">Installation</a></li><li><a href="/v3_5_7/documentation.html">Docs</a></li><li><a href="/v3_5_7/getstarted.html">Tutorials</a></li><li><a href="/v3_5_7/services.html">Support</a></li><li><a href="/v3_5_7/community.html">Community</a></li><li><a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Installing on Debian / Ubuntu</h1>
+    <div class="docSection"><a name="debian" id="debian"></a>
+      <h3>Download the Server</h3>
+      <table class="downloads" border="0" cellpadding="0" cellspacing="0"><tr><th class="desc">Description</th><th>Download </th><th> </th></tr>
+        <tr><td class="desc" id="">
+	  .deb for Debian-based Linux (from rabbitmq.com)
+        </td><td><a class="adownload" href="/releases/rabbitmq-server/v3.5.7/rabbitmq-server_3.5.7-1_all.deb">rabbitmq-server_3.5.7-1_all.deb</a></td><td class="signature"><a href="/releases/rabbitmq-server/v3.5.7/rabbitmq-server_3.5.7-1_all.deb.asc">(Signature)</a></td></tr>
+        <tr><td class="desc" id="">
+	  .deb for Debian-based Linux (from github.com)
+        </td><td><a class="adownload" href="https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_5_7/rabbitmq-server_3.5.7-1_all.deb">rabbitmq-server_3.5.7-1_all.deb</a></td><td class="signature"><a href="/releases//rabbitmq-server_3.5.7-1_all.deb.asc">(Signature)</a></td></tr>
+      </table>
+      <p>
+        <span class="code ">rabbitmq-server</span> is included in Debian since 6.0
+        (squeeze) and in Ubuntu since 9.04. However, the versions
+        included are often quite old. You will probably get better
+        results installing the .deb from our website. Check
+        the <a href="http://packages.qa.debian.org/r/rabbitmq-server.html">Debian
+        package</a>
+        and <a href="https://launchpad.net/ubuntu/+source/rabbitmq-server">Ubuntu
+        package</a> details for which version of the server is
+        available for which versions of the distribution.
+      </p>
+      <p>
+        You can either download it with the link above and install
+        with <span class="code ">dpkg</span>, or use our APT repository (see below).
+      </p>
+      <p>
+        All dependencies should be met automatically.
+      </p>
+
+      <div class="docSubsection"><a name="running-debian" id="running-debian"></a>
+        <h3 class="docHeading">Run RabbitMQ Server</h3>
+        <dl class="instructions">
+          <dt>Customise RabbitMQ Environment Variables</dt>
+          <dd>
+            <p>
+              The server should start using defaults.
+              You can
+              <a href="configure.html#customise-general-unix-environment">customise the RabbitMQ environment</a>.
+              Also see how to <a href="configure.html#configuration-file">configure components</a>.
+            </p>
+          </dd>
+          <dt>Start the Server</dt>
+          <dd>
+            <p>
+              The server is started as a daemon by default when the
+              RabbitMQ server package is installed.
+            </p>
+            <p>
+              As an administrator, start and stop the
+              server as usual for Debian using
+              <span class="code ">invoke-rc.d rabbitmq-server <i>stop/start/etc</i></span>.
+            </p>
+            <p>
+              <em>Note: </em>The server is set up to run as system user
+              <span class="code ">rabbitmq</span>.
+              If you change the location of the Mnesia database or the logs,
+              you must ensure the files are owned by this user
+              (and also update the environment variables).
+            </p>
+          </dd>
+        </dl>
+      </div>
+
+      <div class="docSubsection"><a name="apt" id="apt"></a>
+	<h3 class="docHeading">APT repositories</h3>
+
+        <p>
+          RabbitMQ hosts our own apt repository. We also have an alternative <a href="https://packagecloud.io/rabbitmq/rabbitmq-server">repository on Package Cloud</a>.
+        </p>
+
+        <h3>Using rabbitmq.com APT Repository</h3>
+	<ol>
+	  <li>
+	    Add the following line to your <span class="code ">/etc/apt/sources.list</span>:
+	    <pre class="sourcecode">deb http://www.rabbitmq.com/debian/ testing main</pre>
+	    (Please note that the word <span class="code ">testing</span> in this
+	    line refers to the state of our release of RabbitMQ, not
+	    any particular Debian distribution. You can use it with
+	    Debian stable, testing or unstable, as well as with
+	    Ubuntu. We describe the release as "testing" to emphasise
+	    that we release somewhat frequently.)
+	  </li>
+	  <li>
+	    (optional) To avoid warnings about unsigned packages, add
+	    our <a href="rabbitmq-signing-key-public.asc">public
+	      key</a> to your trusted key list using
+	    <span class="code ">apt-key(8)</span>:
+
+	    <pre class="sourcecode">wget https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+sudo apt-key add rabbitmq-signing-key-public.asc</pre>
+
+            <p>Our public signing key is also <a href="https://bintray.com/user/downloadSubjectPublicKey?username=rabbitmq">available from Bintray</a>.</p>
+	  </li>
+	  <li>
+	    Run <span class="code ">apt-get update</span>.
+	  </li>
+	  <li>
+	    Install packages as usual; for instance,
+
+	    <pre class="sourcecode">sudo apt-get install rabbitmq-server</pre>
+	  </li>
+	</ol>
+
+
+        <h3>Using PackageCloud APT Repository</h3>
+        <p>
+          PackageCloud installs packages via HTTPS and signs them using their GPG key.
+          There are multiple ways to install:
+
+          <ul>
+            <li>Provided installation scripts</li>
+            <li>Using PackageCloud Chef cookbook</li>
+            <li>Using PackageCloud Puppet module</li>
+            <li>Manually</li>
+          </ul>
+
+          See <a href="https://packagecloud.io/rabbitmq/rabbitmq-server/install">PackageCloud RabbitMQ repository instructions</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="docSection"><a name="selinux-ports" id="selinux-ports"></a>
+  <h2 class="docHeading">Port Access</h2>
+  <p xmlns="">
+    SELinux and similar mechanisms may prevent RabbitMQ from binding to a port. When that happens,
+    RabbitMQ will fail to start. Make sure the following ports can be opened:
+
+    <ul>
+  <li>4369 (epmd), 25672 (Erlang distribution) </li>
+  <li>5672, 5671 (AMQP 0-9-1 without and with TLS)</li>
+  <li>15672 (if management plugin is enabled)</li>
+  <li>61613, 61614 (if STOMP is enabled)</li>
+  <li>1883, 8883 (if MQTT is enabled)</li>
+</ul>
+
+    It is possible to <a href="/v3_5_7/configure.html">configure RabbitMQ</a> to use different ports.
+  </p>
+</div>
+    <div class="docSection"><a name="default-user-access" id="default-user-access"></a>
+  <h2 class="docHeading">Default user access</h2>
+  <p xmlns="">
+    The broker creates a user <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> with password
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span>. Unconfigured clients will in general use these
+    credentials. <strong>By default, these credentials can only be
+    used when connecting to the broker as localhost</strong> so you
+    will need to take action before connecting fromn any other
+    machine.
+  </p>
+  <p xmlns="">
+    See the documentation on <a href="access-control.html">access
+    control</a> for information on how to create more users, delete
+    the <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> user, or allow remote access to the
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">guest</span> user.
+  </p>
+</div>
+    <div class="docSection"><a name="managing-unix" id="managing-unix"></a>
+  <h2 class="docHeading">Managing the Broker</h2>
+  <p xmlns="">
+    To stop the server or check its status, etc., you can invoke
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl</span> (as an administrator). It should be
+    available on the path. All <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl</span> commands will
+    report the node absence if no broker is running.
+  </p>
+  <ul xmlns="">
+    <li>Invoke <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl stop</span> to stop the server.</li>
+    <li>Invoke <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl status</span> to check whether it is
+      running.</li>
+  </ul>
+  <p xmlns="">
+    More <a href="man/rabbitmqctl.1.man.html">info on rabbitmqctl</a>.
+  </p>
+
+  <h3 xmlns="">Logging</h3>
+  <p xmlns="">
+    Output from the server is sent to a
+    <b>RABBITMQ_NODENAME</b>.log file in the
+    <b>RABBITMQ_LOG_BASE</b> directory. Additional log data is
+    written to <b>RABBITMQ_NODENAME</b>-sasl.log.
+  </p>
+  <p xmlns="">
+    The broker always appends to the log files, so a complete
+    log history is retained.
+  </p>
+  <p xmlns="">
+    You can use the <span xmlns="http://www.w3.org/1999/xhtml" class="code ">logrotate</span> program
+    to do all necessary rotation and compression,
+    and you can change it. By default,
+    this script runs weekly on files located in default
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/var/log/rabbitmq</span> directory. See
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/etc/logrotate.d/rabbitmq-server</span>
+    to configure
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">logrotate</span>.
+  </p>
+</div>
+
+    <div class="docSection"><a name="kernel-resource-limits" id="kernel-resource-limits"></a>
+      <h2 class="docHeading">Controlling System Limits on Linux</h2>
+      <div class="docSubsection"><a name="max-open-files-intro" id="max-open-files-intro"></a>
+  <p xmlns="">
+    RabbitMQ installations running production workloads may need system
+    limits and kernel parameters tuning in order to handle a decent number of
+    concurrent connections and queues. The main setting that needs adjustment
+    is the max number of open files, also known as <span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit -n</span>.
+    The default value on many operating systems is too low for a messaging
+    broker (eg. 1024 on several Linux distributions). We recommend allowing
+    for at least 65536 file descriptors for user <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmq</span> in
+    production environments. 4096 should be sufficient for most development
+    workloads.
+  </p>
+</div>
+      <div class="docSubsection"><a name="linux-max-open-files-limit-different-limits" id="linux-max-open-files-limit-different-limits"></a>
+    <p xmlns="">
+      There are two limits in play: the maximum number of open files the OS kernel
+      allows (<span xmlns="http://www.w3.org/1999/xhtml" class="code ">fs.file-max</span>) and the per-user limit (<span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit -n</span>).
+      The former must be higher than the latter.
+    </p>
+</div>
+      <div class="docSubsection"><a name="linux-max-open-files-limit-options-debian" id="linux-max-open-files-limit-options-debian"></a>
+  <p xmlns="">
+    The most straightforward way to adjust the per-user limit for
+    RabbitMQ is to edit the <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/etc/default/rabbitmq-server</span>
+    (provided by the RabbitMQ Debian package) or <a href="http://www.rabbitmq.com/configure.html">rabbitmq-env.conf</a>
+    to invoke <span xmlns="http://www.w3.org/1999/xhtml" class="code ">ulimit</span> before the service is started.
+
+<pre class="sourcecode">
+ulimit -S -n 4096
+</pre>
+  </p>
+
+  <p xmlns="">
+    This <em>soft</em> limit cannot go higher than the <em>hard</em> limit
+    (which defaults to 4096 in many distributions).
+    <a href="http://docs.basho.com/riak/latest/ops/tuning/open-files-limit/#Linux">The hard limit can be increased</a> via
+    <span xmlns="http://www.w3.org/1999/xhtml" class="code ">/etc/security/limits.conf</span>. This also requires enabling the <a href="http://askubuntu.com/a/34559">pam_limits.so</a> module
+    and re-login or reboot.
+  </p>
+
+  <p xmlns="">
+    Note that limits cannot be changed for running OS processes.
+  </p>
+</div>
+      <div class="docSubsection"><a name="linux-max-open-files-limit-different-limits" id="linux-max-open-files-limit-different-limits"></a>
+    <p xmlns="">
+      For more information about controlling <span xmlns="http://www.w3.org/1999/xhtml" class="code ">fs.file-max</span>
+      with <span xmlns="http://www.w3.org/1999/xhtml" class="code ">sysctl</span>, please refer to the excellent
+      <a href="http://docs.basho.com/riak/latest/ops/tuning/open-files-limit/#Linux">Riak guide on open file limit tuning</a>.
+    </p>
+</div>
+      <div class="docSubsection"><a name="verifying-limits" id="verifying-limits"></a>
+  <h3 class="docHeading">Verifying the Limit</h3>
+  <p xmlns="">
+    <a href="management.html">RabbitMQ management UI</a> displays the number of file descriptors available
+    for it to use on the Overview tab.
+<pre class="sourcecode">rabbitmqctl status</pre>
+    includes the same value.
+  </p>
+  <p xmlns="">
+    The following command
+
+<pre class="sourcecode">
+cat /proc/$RABBITMQ_BEAM_PROCESS_PID/limits
+</pre>
+
+    can be used to display effective limits of a running process. <span xmlns="http://www.w3.org/1999/xhtml" class="code ">$RABBITMQ_BEAM_PROCESS_PID</span>
+    is the OS PID of the Erlang VM running RabbitMQ, as returned by <span xmlns="http://www.w3.org/1999/xhtml" class="code ">rabbitmqctl status</span>.
+  </p>
+</div>
+      <div class="docSubsection"><a name="chef-puppet-bosh" id="chef-puppet-bosh"></a>
+  <h3 class="docHeading">Configuration Management Tools</h3>
+  <p xmlns="">
+    Configuration management tools (e.g. Chef, Puppet, BOSH) provide assistance
+    with system limit tuning. Our <a href="devtools.html#devops-tools">developer tools</a> guide
+    lists relevant modules and projects.
+  </p>
+</div>
+    </div>
+  </div><div id="right-nav"></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v3_5_7/sitemap.html">Sitemap</a> |
+        <a href="/v3_5_7/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2015 Pivotal Software, Inc. All rights reserved
+        | <a href="http://pivotal.io/privacy-policy">Privacy Policy</a>
+        | <a href="https://github.com/rabbitmq/rabbitmq-website/">This Site is Open Source</a>        
+        | <a href="https://groups.google.com/forum/#!msg/rabbitmq-users/UuvnsOV7yS4/14b8pHcs8I0J">We're Hiring</a></p></div></div></body>
+</html>

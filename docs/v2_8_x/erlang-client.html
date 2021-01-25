@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="description" content="RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard" /><meta name="googlebot" content="NOODP" /><meta name="google-site-verification" content="nSYeDgyKM9mw5CWcZuD0xu7iSWXlJijAlg9rcxVOYf4" /><meta name="google-site-verification" content="6UEaC3SWhpGQvqRnSJIEm2swxXpM5Adn4dxZhFsNdw0" /><link rel="stylesheet" href="/v2_8_x/css/rabbit.css" type="text/css" /><style xmlns:html="http://www.w3.org/1999/xhtml" xmlns:doc="http://www.rabbitmq.com/namespaces/ad-hoc/doc">
+    body { 
+    background: 
+    url(/v2_8_x/img/previous-bg.png);
+   }
+  </style><link rel="icon" type="/image/vnd.microsoft.icon" href="/v2_8_x/favicon.ico" /><link rel="stylesheet" href="/v2_8_x/css/tutorial.css" type="text/css" /><script type="text/javascript" src="/v2_8_x/js/site.js"></script><script type="text/javascript" src="/v2_8_x/js/ga-bootstrap.js"></script><title>RabbitMQ - Erlang AMQP client library</title>
+    
+  </head>
+  <body><div id="outerContainer"><div id="rabbit-logo"><a href="/v2_8_x/"><img src="/v2_8_x/img/rabbitmq_logo_strap.png" alt="RabbitMQ" width="253" height="53" /></a></div><div id="vmw-logo"><a href="http://www.vmware.com/"><img src="/v2_8_x/img/vmw_logo_09q3.png" alt="VMware" width="118" height="18" /></a></div><div id="nav-search"><ul class="mainNav"><li><a href="/v2_8_x/download.html" class="selected">Installation</a></li><li><a href="/v2_8_x/documentation.html">Documentation</a></li><li><a href="/v2_8_x/getstarted.html">Tutorials</a></li><li><a href="/v2_8_x/services.html">Services</a></li><li><a href="/v2_8_x/community.html">Community</a></li></ul></div><div class="nav-separator"></div><div id="left-content"><h1>Erlang AMQP client library</h1>
+    <p>
+      The RabbitMQ Erlang client library allows Erlang code to
+      interface to AMQP servers. The current release implements AMQP
+      protocol version 0-9-1. Please see the <a href="specification.html">specification</a> page for more
+      information on interoperation and standards-conformance.
+    </p>
+
+    <p>
+      The library is open-source, and is dual-licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">the Apache
+      License v2</a> and <a href="mpl.html">the Mozilla Public License
+      v1.1</a>.
+    </p>
+
+    <p>
+      You will need an AMQP server, such as our very own <a href="download.html">RabbitMQ server</a>, to use with the client
+      library.
+    </p>
+
+    <h3>Version</h3>
+
+    <p>
+      The current release of the RabbitMQ Erlang AMQP library is <b>
+      2.8.7</b>.
+    </p>
+
+    <h2>
+      Download the library and documentation
+    </h2>
+
+    <h3>The library</h3>
+
+    <p>
+      The library is available as source, or compiled as a loadable .ez binary
+archive. The AMQP client binary archive has a runtime dependency on the some
+modules common to the RabbitMQ server. These are provided as a separate
+loadable .ez archive.
+    </p>
+
+    <table class="downloads" border="0" cellpadding="0" cellspacing="0"><tr><th class="desc">Description</th><th>Download </th><th> </th></tr>
+      <tr><td class="desc" id="">
+	AMQP client library .ez archive
+      </td><td><a class="adownload" href="/releases/rabbitmq-erlang-client/v2.8.7/amqp_client-2.8.7.ez">amqp_client-2.8.7.ez</a></td><td class="signature"><a href="/releases/rabbitmq-erlang-client/v2.8.7/amqp_client-2.8.7.ez.asc">(Signature)</a></td></tr>
+      <tr><td class="desc" id="">
+	RabbitMQ common library .ez bundle
+      </td><td><a class="adownload" href="/releases/rabbitmq-erlang-client/v2.8.7/rabbit_common-2.8.7.ez">rabbit_common-2.8.7.ez</a></td><td class="signature"><a href="/releases/rabbitmq-erlang-client/v2.8.7/rabbit_common-2.8.7.ez.asc">(Signature)</a></td></tr>
+      <tr><td class="desc" id="">
+	Source code and tests (tar.gz)
+      </td><td><a class="adownload" href="/releases/rabbitmq-erlang-client/v2.8.7/amqp_client-2.8.7-src.tar.gz">amqp_client-2.8.7-src.tar.gz</a></td><td class="signature"><a href="/releases/rabbitmq-erlang-client/v2.8.7/amqp_client-2.8.7-src.tar.gz.asc">(Signature)</a></td></tr>
+    </table>
+
+    <p>
+      Please see <a href="signatures.html">checking signatures</a> for
+      details on how to verify the signatures on our packages, and the
+      <a href="build-erlang-client.html">build page</a> for
+      instructions on compiling from source-code.
+    </p>
+
+    <h3>The documentation</h3>
+
+    <p>Please refer to the <a href="erlang-client-user-guide.html">Erlang AMQP
+user quide</a>.</p>
+
+    <p>
+      The edoc documentation is <a href="/releases/rabbitmq-erlang-client/v2.8.7/doc/">browseable on-line</a>.
+    </p>
+
+    <h3>Other versions</h3>
+
+    <p>
+      Consult <a href="/releases/rabbitmq-erlang-client/">the
+      archive</a> if you want to download a version of the RabbitMQ
+      Erlang Client library other than the above.
+    </p>
+
+    <h2>Mercurial repositories</h2>
+    <p>
+      The Erlang AMQP client library and tests depends on the server
+      and the code-generation library modules. Please see the <a href="build-erlang-client.html">build instructions</a>.
+    </p>
+
+    <p>
+      For information on how to work with the RabbitMQ mercurial
+      repositories, please see <a href="mercurial.html">this page</a>.
+    </p><table class="downloads" border="0" cellpadding="0" cellspacing="0"><tr><th>Snapshot</th><th>Repository checkout command</th><th>Repository overview</th></tr>
+      <tr><td><a class="adownload" href="http://hg.rabbitmq.com/rabbitmq-erlang-client/archive/default.zip">rabbitmq-erlang-client</a></td><td><code>hg clone http://hg.rabbitmq.com/rabbitmq-erlang-client/</code></td><td><a class="arepo" href="http://hg.rabbitmq.com/rabbitmq-erlang-client/">Browse source</a></td></tr>
+      <tr><td><a class="adownload" href="http://hg.rabbitmq.com/rabbitmq-server/archive/default.zip">rabbitmq-server</a></td><td><code>hg clone http://hg.rabbitmq.com/rabbitmq-server/</code></td><td><a class="arepo" href="http://hg.rabbitmq.com/rabbitmq-server/">Browse source</a></td></tr>
+      <tr><td><a class="adownload" href="http://hg.rabbitmq.com/rabbitmq-codegen/archive/default.zip">rabbitmq-codegen</a></td><td><code>hg clone http://hg.rabbitmq.com/rabbitmq-codegen/</code></td><td><a class="arepo" href="http://hg.rabbitmq.com/rabbitmq-codegen/">Browse source</a></td></tr>
+    </table>
+
+    <h2>Support</h2>
+
+    <p>
+      For help compiling or installing RabbitMQ, or for general
+      queries, please <a href="contact.html"> contact us</a>.
+    </p>
+  </div><div id="right-nav"><div id="related-links"><h4>Related Links</h4><ul><li><a href="/v2_8_x/erlang-client-user-guide.html">Erlang Client Guide</a></li></ul></div></div><div class="clear"></div><div class="pageFooter"><p class="righter"><a href="/v2_8_x/sitemap.html">Sitemap</a> |
+        <a href="/v2_8_x/contact.html">Contact</a></p><p id="copyright">
+        Copyright © 2013 VMware, Inc. All rights reserved.
+        <a href="http://www.vmware.com/help/legal.html">Terms of Use</a> |
+        <a href="http://www.vmware.com/help/privacy.html">Privacy</a></p></div></div></body>
+</html>
